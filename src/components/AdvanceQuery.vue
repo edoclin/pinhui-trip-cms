@@ -1,12 +1,18 @@
 <template>
-    <el-dialog v-model="show" title="高级条件查询">
-        <el-form :model="conditions">
-            <el-form-item v-for="(item, index) in conditions" :key="index" :label="item.name" label-width="120">
+    <el-dialog v-model="show" title="高级条件查询" destroy-on-close :close-on-click-modal="false" >
+        <el-form :model="conditions" label-width="120px">
+            <el-form-item v-for="(item, index) in conditions" :key="index" :label="item.name">
                 <el-input v-model="form[item.key]">
                     <template #prefix v-if="index !== 0">
                         <el-switch v-model="isAnd[item.key]" inline-prompt active-text="与" inactive-text="或" />
                     </template>
                 </el-input>
+            </el-form-item>
+            <el-form-item label="当前状态">
+                <el-select v-model="form['status']" placeholder="请选择状态" style="width: 100%">
+                    <el-option v-for="status in statusEnum" :key="status.key" :label="status.name"
+                        :value="status.key" />
+                </el-select>
             </el-form-item>
             <el-form-item label="创建时间">
                 <el-date-picker format="YYYY-MM-DDTHH:mm:ss" v-model="form.createdBetween" type="datetimerange"
@@ -28,6 +34,11 @@
 
 <script setup>
 import { reactive } from 'vue';
+
+import { useMapState } from 'src/stores';
+import { useCommonStore } from 'src/stores/common_store';
+
+const { statusEnum } = useMapState(useCommonStore, ['statusEnum'])
 
 
 const props = defineProps({

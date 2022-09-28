@@ -9,5 +9,6 @@ export const  listBase = (current: Number, limit: Number, queryParam: {}) => POS
 export const  postBase = (params: {}) => POST(`/base`, params)
 export const  putBase = (params: {}) => PUT(`/base`, params)
 export const  deleteBaseByIds = (batch: {}) => DELETE(`/base/batch`, batch)
-export const  getBaseConditons = () => GET(`/base/conditions`)
-export const  getTableCoumns = () => GET(`/base/table-columns`)
+export const  getBaseConditions = () => GET(`/base/conditions`)
+export const  getTableColumns = () => GET(`/base/table-columns`)
+export const  getSelector = () => GET(`/base/selector`)

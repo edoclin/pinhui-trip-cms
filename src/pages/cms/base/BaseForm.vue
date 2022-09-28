@@ -3,6 +3,12 @@
         <el-form-item label="基地名称"  prop="baseName">
             <el-input v-model="form.baseName" />
         </el-form-item>
+        <el-form-item label="当前状态">
+                <el-select v-model="form['status']" placeholder="请选择状态" style="width: 100%">
+                    <el-option v-for="status in statusEnum" :key="status.key" :label="status.name"
+                        :value="status.key" />
+                </el-select>
+            </el-form-item>
         <el-form-item label="基地位置" prop="polygonGeometry">
             <div style="height: 60vh;width: 100%;">
                 <el-amap :center="amapParam.center" :zoom="amapParam.zoom">
@@ -58,6 +64,13 @@ import { postBase, putBase } from '../../../api/base'
 import { ElMessage } from 'element-plus'
 import '@wangeditor/editor/dist/css/style.css' // 引入 css
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+
+import { useMapState } from 'src/stores';
+import { useCommonStore } from 'src/stores/common_store';
+
+const { statusEnum } = useMapState(useCommonStore, ['statusEnum'])
+
+
 
 const valueHtml = reactive({
     html: ''
@@ -196,7 +209,6 @@ const props = defineProps({
     data: {}
 })
 if (props.data) {
-    console.log(props.data);
     form.baseId = props.data.baseId
     form.baseName = props.data.baseName
     form.baseLocationText = props.data.baseLocationText
@@ -204,8 +216,8 @@ if (props.data) {
     form.descSimple = props.data.descSimple
     form.descRichText = props.data.descRichText
     valueHtml.html = props.data.descRichText
+    form.status = statusEnum.value.find(item => item.name === props.data.status).key
     props.data.polygon.forEach(item => {
-        console.log(item);
         form.polygonGeometry.push([item.lng, item.lat])
     })
     amapParam.center = [props.data.centroid.lng, props.data.centroid.lat]

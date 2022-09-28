@@ -1,6 +1,8 @@
 import { route } from 'quasar/wrappers'
 import { createMemoryHistory, createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
-
+// @ts-ignore
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 import routes from './routes'
 /*
  * If not building with SSR mode, you can
@@ -16,7 +18,7 @@ export default route(function (/* { store, ssrContext } */) {
     ? createMemoryHistory
     : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory)
 
-  return createRouter({
+  const router = createRouter({
     scrollBehavior: () => ({
       left: 0,
       top: 0
@@ -27,4 +29,10 @@ export default route(function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.VUE_ROUTER_BASE)
   })
+  router.beforeEach(async (to, from, next) => {
+    NProgress.start() // 开启顶部加载动画
+    next()
+    NProgress.done()
+  })
+  return router
 })

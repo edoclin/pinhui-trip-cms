@@ -31,11 +31,15 @@
 </template>
 <script setup>
 import { ElMessage } from 'element-plus'
-import { markRaw, reactive, watch } from 'vue'
-import { listBase, deleteBaseByIds, getBaseConditions, getTableColumns } from '../../../api/base'
+import { reactive, watch } from 'vue'
+import {
+  list$module_name$,
+  delete$module_name$ByIds,
+  get$module_name$Conditions,
+  getTableColumns
+} from '../../../api/$module_name_file$'
 import AdvanceQuery from '../../../components/AdvanceQuery.vue'
-import BaseFormVue from './BaseForm.vue'
-
+import $component_name$FormVue from './$component_name$Form.vue'
 
 const page = reactive({
   current: 1,
@@ -47,7 +51,7 @@ const conditions = reactive({
   map: []
 })
 
-getBaseConditions().then(res => {
+get$module_name$Conditions().then(res => {
   conditions.map = res.data
 })
 
@@ -58,13 +62,13 @@ const queryParam = reactive({
 })
 
 watch(page, () => {
-  listBase(page.current, page.size, queryParam).then(res => {
+  list$module_name$(page.current, page.size, queryParam).then(res => {
     tableData.data = res.data
     page.total = res.count
   })
 })
 
-listBase(page.current, page.size, queryParam).then(res => {
+list$module_name$(page.current, page.size, queryParam).then(res => {
   tableData.data = res.data
   page.total = res.count
 })
@@ -88,14 +92,14 @@ const handleSelectionChange = (value) => {
 const deleteSelected = () => {
   let ids = []
 
-  selectedData.data.forEach(item => ids.push(item.baseId))
+  selectedData.data.forEach(item => ids.push(item.$id_name$Id))
 
-  deleteBaseByIds({ ids }).then(res => {
+  delete$module_name$ByIds({ ids }).then(res => {
     ElMessage({
       type: 'success',
       message: res.data
     })
-    listBase(page.current, page.size, { ...queryParam }).then(res => {
+    list$module_name$(page.current, page.size, { ...queryParam }).then(res => {
       tableData.data = res.data
       page.total = res.count
     })
@@ -105,7 +109,7 @@ const deleteSelected = () => {
 const sortTable = (column) => {
   queryParam.isAsc = column.order === 'ascending'
   queryParam.orderColumns = [column.prop]
-  listBase(page.current, page.size, queryParam).then(res => {
+  list$module_name$(page.current, page.size, queryParam).then(res => {
     tableData.data = res.data
     page.total = res.count
   })
@@ -123,7 +127,7 @@ const queryConditions = ({
   queryParam.createdBetween = createdBetween
   queryParam.updatedBetween = updatedBetween
   queryParam.conditions = conditions
-  listBase(page.current, page.size, { ...queryParam }).then(res => {
+  list$module_name$(page.current, page.size, { ...queryParam }).then(res => {
     tableData.data = res.data
     page.total = res.count
     advancedQuery.show = false
@@ -134,12 +138,12 @@ const queryConditions = ({
 const emit = defineEmits(['onEdit'])
 
 const onEdit = (record) => {
-  console.log(record);
+  console.log(record)
   emit('onEdit', {
     record,
-    component: BaseFormVue,
-    title: '基地编辑',
-    name: record.baseName
+    component: $component_name$FormVue,
+    title: '$zh_module_name$编辑',
+    name: record.$_name$
   })
 }
 </script>
