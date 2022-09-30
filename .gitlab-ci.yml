@@ -14,7 +14,7 @@ install-staging:dep:
   only:
     - master
   script:
-    - source ~/.bashrc
+    - node -v
     - echo $PATH
     - ls
     - pwd
