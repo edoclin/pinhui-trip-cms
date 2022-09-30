@@ -58,9 +58,9 @@
 </template>
 <script setup>
 import { onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
-import { regeo } from '../../../api/amap'
-import { sliceUploadFile, getAccessUrl } from '../../../api/cos'
-import { postBase, putBase } from '../../../api/base'
+import { regeo } from 'src/api/amap'
+import { sliceUploadFile, getAccessUrl } from 'src/api/cos'
+import { postBase, putBase } from 'src/api/base'
 import { ElMessage } from 'element-plus'
 import '@wangeditor/editor/dist/css/style.css' // 引入 css
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'

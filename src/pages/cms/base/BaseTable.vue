@@ -32,8 +32,8 @@
 <script setup>
 import { ElMessage } from 'element-plus'
 import { markRaw, reactive, watch } from 'vue'
-import { listBase, deleteBaseByIds, getBaseConditions, getTableColumns } from '../../../api/base'
-import AdvanceQuery from '../../../components/AdvanceQuery.vue'
+import { listBase, deleteBaseByIds, getBaseConditions, getTableColumns } from 'src/api/base'
+import AdvanceQuery from 'src/components/AdvanceQuery.vue'
 import BaseFormVue from './BaseForm.vue'
 
 
@@ -139,7 +139,7 @@ const onEdit = (record) => {
     record,
     component: BaseFormVue,
     title: '基地编辑',
-    name: record.baseName
+    name: record.baseId
   })
 }
 </script>

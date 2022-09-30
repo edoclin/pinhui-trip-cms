@@ -17,7 +17,7 @@
 </template>
 <script setup>
 import { reactive, ref } from 'vue';
-import { post$module_name$, put$module_name$ } from '../../../api/$module_name_1$'
+import { post$module_name$, put$module_name$ } from 'src/api/$module_name_1$'
 import { ElMessage } from 'element-plus'
 
 import { useMapState } from 'src/stores';

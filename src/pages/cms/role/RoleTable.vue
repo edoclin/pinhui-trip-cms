@@ -37,8 +37,8 @@ import {
   deleteRoleByIds,
   getRoleConditions,
   getTableColumns
-} from '../../../api/role'
-import AdvanceQuery from '../../../components/AdvanceQuery.vue'
+} from 'src/api/role'
+import AdvanceQuery from 'src/components/AdvanceQuery.vue'
 import RoleFormVue from './RoleForm.vue'
 
 const page = reactive({
@@ -143,7 +143,7 @@ const onEdit = (record) => {
     record,
     component: RoleFormVue,
     title: '角色编辑',
-    name: record.customRoleName
+    name: record.customRoleId
   })
 }
 </script>

@@ -11,10 +11,17 @@ interface PreparedRole {
     roleId: string
 }
 
+interface CourseVersion {
+    key: string
+    name: string
+}
+
+
 export const useCommonStore = defineStore('common_store', {
     state: () => ({
         statusEnum: {} as StatusEnum,
-        preparedRole: {} as PreparedRole
+        preparedRole: {} as PreparedRole,
+        courseVersion: {} as CourseVersion,
     }),
     getters: {
     },
@@ -25,6 +32,9 @@ export const useCommonStore = defineStore('common_store', {
         },
         updatePreparedRole(preparedRole: PreparedRole) {
             this.preparedRole = preparedRole
+        },
+        updateCourseVersion(courseVersion: CourseVersion) {
+            this.courseVersion = courseVersion
         }
     }
 })

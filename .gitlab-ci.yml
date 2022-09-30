@@ -1,0 +1,37 @@
+stages:
+  - install
+  - deploy
+
+cache:
+  key: ${CI_BUILD_REF_NAME}
+  paths:
+    - node_modules/
+
+install-staging:dep:
+  stage: install
+  tags:
+    - nginx
+  only:
+    - master
+  script:
+    - echo "=====start install======"
+    - yarn install --registry https://registry.npm.taobao.org  #安装依赖
+    - echo "=====end install======"
+  artifacts:
+    expire_in: 60 mins
+    paths:
+      - node_modules/
+
+deploy-staging:dep:
+  stage: deploy
+  tags:
+    - nginx
+  only:
+    - master
+  script:
+    - echo "=====start build======"
+    - yarn run 'spa build'  # 将项目打包
+    - echo "=====end build======"
+    - echo "=====start deploy======"
+    - sudo cp -rf ./dist/spa  /home/fsx/dev/nginx/dist
+    - echo "=====end deploy!!!!!!======"

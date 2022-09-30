@@ -24,10 +24,13 @@ function createWindow () {
     width: 1920,
     height: 1080,
     useContentSize: true,
+    frame: false,
+
     webPreferences: {
       contextIsolation: true,
       // More info: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/electron-preload-script
       preload: path.resolve(__dirname, process.env.QUASAR_ELECTRON_PRELOAD),
+      nodeIntegration: true
     },
   })
 

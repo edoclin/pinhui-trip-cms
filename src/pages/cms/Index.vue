@@ -10,6 +10,7 @@
               </el-icon>
               <span>基地管理</span>
             </template>
+            <el-menu-item-group title="基地">
             <el-menu-item index="base/table"
                           @click="clickMenuItem('基地列表', 'baseTable', 'baseTable', './base/BaseTable')">
               <el-icon>
@@ -24,6 +25,23 @@
               </el-icon>
               新增基地
             </el-menu-item>
+            </el-menu-item-group>
+            <el-menu-item-group title="课程">
+              <el-menu-item index="base/course/table"
+                            @click="clickMenuItem('课程列表', 'baseCourseTable', 'baseCourseTable', './base/course/BaseCourseTable')">
+                <el-icon>
+                  <Document/>
+                </el-icon>
+                课程列表
+              </el-menu-item>
+              <el-menu-item index="base/course/form"
+                            @click="clickMenuItem('新增课程', 'baseCourseForm', 'baseCourseForm', './base/course/BaseCourseForm')">
+                <el-icon>
+                  <FolderAdd/>
+                </el-icon>
+                新增课程
+              </el-menu-item>
+            </el-menu-item-group>
           </el-sub-menu>
           <el-sub-menu index="user">
             <template #title>
@@ -32,27 +50,31 @@
               </el-icon>
               <span>用户管理</span>
             </template>
-            <el-menu-item index="user/table"
-                          @click="clickMenuItem('用户列表', 'userTable', 'userTable', './user/UserTable')">
-              <el-icon>
-                <Document/>
-              </el-icon>
-              用户列表
-            </el-menu-item>
-            <el-menu-item index="user/role-table"
-                          @click="clickMenuItem('角色列表', 'roleTable', 'roleTable', './role/RoleTable')">
-              <el-icon>
-                <Document/>
-              </el-icon>
-              角色列表
-            </el-menu-item>
-            <el-menu-item index="user/role-form"
-                          @click="clickMenuItem('添加角色', 'roleForm', 'roleForm', './role/RoleForm')">
-              <el-icon>
-                <Document/>
-              </el-icon>
-              添加角色
-            </el-menu-item>
+            <el-menu-item-group title="用户">
+              <el-menu-item index="user/table"
+                            @click="clickMenuItem('用户列表', 'userTable', 'userTable', './user/UserTable')">
+                <el-icon>
+                  <Document/>
+                </el-icon>
+                用户列表
+              </el-menu-item>
+            </el-menu-item-group>
+            <el-menu-item-group title="角色">
+              <el-menu-item index="user/role-table"
+                            @click="clickMenuItem('角色列表', 'roleTable', 'roleTable', './role/RoleTable')">
+                <el-icon>
+                  <Document/>
+                </el-icon>
+                角色列表
+              </el-menu-item>
+              <el-menu-item index="user/role-form"
+                            @click="clickMenuItem('添加角色', 'roleForm', 'roleForm', './role/RoleForm')">
+                <el-icon>
+                  <Document/>
+                </el-icon>
+                添加角色
+              </el-menu-item>
+            </el-menu-item-group>
           </el-sub-menu>
           <el-sub-menu index="manage">
             <template #title>
@@ -61,13 +83,13 @@
               </el-icon>
               <span>系统管理</span>
             </template>
-<!--            <el-menu-item index="manage/server"-->
-<!--                          @click="clickMenuItem('服务器状态', 'Server', 'Server', './manage/Server')">-->
-<!--              <el-icon>-->
-<!--                <Document/>-->
-<!--              </el-icon>-->
-<!--              服务器状态-->
-<!--            </el-menu-item>-->
+            <!--            <el-menu-item index="manage/server"-->
+            <!--                          @click="clickMenuItem('服务器状态', 'Server', 'Server', './manage/Server')">-->
+            <!--              <el-icon>-->
+            <!--                <Document/>-->
+            <!--              </el-icon>-->
+            <!--              服务器状态-->
+            <!--            </el-menu-item>-->
           </el-sub-menu>
         </el-menu>
       </el-aside>
@@ -98,7 +120,7 @@
                 :inactive-icon="SvgLight"
                 active-color="#2c2c2c"
             />
-            <el-button size="large" text style="margin-top: 8px;" type="plain"
+            <el-button size="large" text style="margin-top: 8px;"
                        :icon="isFullscreen ? SvgExitFullScreen :SvgFullScreen" @click="onToggle"></el-button>
             <el-menu-item index="message">通知</el-menu-item>
             <el-sub-menu index="setting">
@@ -269,7 +291,7 @@ const handleEdit = ({
   position: absolute;
   left: 200px;
   right: 0;
-  top: 60px;
+  top: 70px;
   bottom: 0;
   overflow-y: scroll;
 }

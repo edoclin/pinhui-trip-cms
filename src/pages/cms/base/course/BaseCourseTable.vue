@@ -1,13 +1,23 @@
 <template>
   <div>
     <advance-query v-if="advancedQuery.show" :conditions="conditions.map" @onSubmit="queryConditions"
-                   @onCancel="advancedQuery.show = false"></advance-query>
+                   @onCancel="advancedQuery.show = false">
+      <template v-slot:selector="scope">
+        <el-form-item label="所属基地">
+          <el-select :multiple="true" v-model="scope.formData['selector'].baseIds" placeholder="请选择关联基地"
+                     style="width: 100%">
+            <el-option v-for="base in baseSelector.data" :key="base.baseId" :label="base.baseName"
+                       :value="base.baseId"/>
+          </el-select>
+        </el-form-item>
+      </template>
+    </advance-query>
     <el-table @sort-change='sortTable' border table-layout="auto" stripe :data="tableData.data" style="width: 100%"
               @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="30"/>
       <el-table-column v-for="(item, index) in tableData.columns" :key="index" :sortable="item.sortable"
                        :fixed="item.fixed" :prop="item.column" :label="item.label"></el-table-column>
-      <el-table-column fixed="right" label="操作">
+      <el-table-column :fixed="'right'" label="操作">
         <template #header v-if="selectedData.data.length !== 0">
           <el-popconfirm @confirm="deleteSelected" :title="`确定删除所选中的${selectedData.data.length}条记录?`">
             <template #reference>
@@ -33,13 +43,22 @@
 import { ElMessage } from 'element-plus'
 import { reactive, watch } from 'vue'
 import {
-  list$module_name$,
-  delete$module_name$ByIds,
-  get$module_name$Conditions,
+  listBaseCourse,
+  deleteBaseCourseByIds,
+  getBaseCourseConditions,
   getTableColumns
-} from 'src/api/$module_name_file$'
+} from 'src/api/base-course'
 import AdvanceQuery from 'src/components/AdvanceQuery.vue'
-import $component_name$FormVue from './$component_name$Form.vue'
+import BaseCourseFormVue from './BaseCourseForm.vue'
+import { getSelector } from '../../../../api/base'
+
+const baseSelector = reactive({
+  data: []
+})
+
+getSelector().then(res => {
+  baseSelector.data = res.data
+})
 
 const page = reactive({
   current: 1,
@@ -51,7 +70,7 @@ const conditions = reactive({
   map: []
 })
 
-get$module_name$Conditions().then(res => {
+getBaseCourseConditions().then(res => {
   conditions.map = res.data
 })
 
@@ -62,13 +81,13 @@ const queryParam = reactive({
 })
 
 watch(page, () => {
-  list$module_name$(page.current, page.size, queryParam).then(res => {
+  listBaseCourse(page.current, page.size, queryParam).then(res => {
     tableData.data = res.data
     page.total = res.count
   })
 })
 
-list$module_name$(page.current, page.size, queryParam).then(res => {
+listBaseCourse(page.current, page.size, queryParam).then(res => {
   tableData.data = res.data
   page.total = res.count
 })
@@ -92,14 +111,14 @@ const handleSelectionChange = (value) => {
 const deleteSelected = () => {
   let ids = []
 
-  selectedData.data.forEach(item => ids.push(item.$id_name$Id))
+  selectedData.data.forEach(item => ids.push(item.courseId))
 
-  delete$module_name$ByIds({ ids }).then(res => {
+  deleteBaseCourseByIds({ ids }).then(res => {
     ElMessage({
       type: 'success',
       message: res.data
     })
-    list$module_name$(page.current, page.size, { ...queryParam }).then(res => {
+    listBaseCourse(page.current, page.size, { ...queryParam }).then(res => {
       tableData.data = res.data
       page.total = res.count
     })
@@ -109,7 +128,7 @@ const deleteSelected = () => {
 const sortTable = (column) => {
   queryParam.isAsc = column.order === 'ascending'
   queryParam.orderColumns = [column.prop]
-  list$module_name$(page.current, page.size, queryParam).then(res => {
+  listBaseCourse(page.current, page.size, queryParam).then(res => {
     tableData.data = res.data
     page.total = res.count
   })
@@ -122,12 +141,14 @@ const advancedQuery = reactive({
 const queryConditions = ({
   conditions,
   createdBetween,
-  updatedBetween
+  updatedBetween,
+  selector
 }) => {
   queryParam.createdBetween = createdBetween
   queryParam.updatedBetween = updatedBetween
   queryParam.conditions = conditions
-  list$module_name$(page.current, page.size, { ...queryParam }).then(res => {
+  queryParam.selector = selector
+  listBaseCourse(page.current, page.size, { ...queryParam }).then(res => {
     tableData.data = res.data
     page.total = res.count
     advancedQuery.show = false
@@ -141,9 +162,9 @@ const onEdit = (record) => {
   console.log(record)
   emit('onEdit', {
     record,
-    component: $component_name$FormVue,
-    title: '$zh_module_name$编辑',
-    name: record.$_name$
+    component: BaseCourseFormVue,
+    title: '课程编辑',
+    name: record.courseId
   })
 }
 </script>

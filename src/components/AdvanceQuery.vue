@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="show" title="高级条件查询" destroy-on-close :close-on-click-modal="false" >
+    <el-dialog :show-close="false" v-model="show" title="高级条件查询" destroy-on-close :close-on-click-modal="false" >
         <el-form :model="conditions" label-width="120px">
             <el-form-item v-for="(item, index) in conditions" :key="index" :label="item.name">
                 <el-input v-model="form[item.key]">
@@ -14,6 +14,8 @@
                         :value="status.key" />
                 </el-select>
             </el-form-item>
+          <slot :formData="form" name="selector">
+          </slot>
             <el-form-item label="创建时间">
                 <el-date-picker format="YYYY-MM-DDTHH:mm:ss" v-model="form.createdBetween" type="datetimerange"
                     range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" />
@@ -46,6 +48,7 @@ const props = defineProps({
 })
 
 const form = reactive({
+  selector: {}
 })
 const show = reactive(true)
 
@@ -58,7 +61,9 @@ const onSubmit = () => {
     let result = []
     let createdBetween = {}
     let updatedBetween = {}
-    if (form.createdBetween) {
+    let selector = {}
+
+  if (form.createdBetween) {
         createdBetween = {
             start: form.createdBetween[0],
             end: form.createdBetween[1],
@@ -74,14 +79,23 @@ const onSubmit = () => {
         delete form.updatedBetween
     }
 
+  if (form.selector) {
+    selector = {...form.selector}
+    Object.keys(form.selector).forEach(key => {
+      delete form.selector[key]
+    })
+  }
+
     Object.keys(form).forEach(key => {
+      if (key === 'selector') return
         result.push({
             column: key,
             value: form[key],
             isAnd: isAnd[key] === undefined ? false : isAnd[key]
         })
     })
-    emit('onSubmit', { conditions: result, createdBetween, updatedBetween })
+  console.log(selector)
+    emit('onSubmit', { conditions: result, createdBetween, updatedBetween, selector })
 }
 
 const onCancel = () => {

@@ -52,10 +52,6 @@ export const GET = (url: string, params: {} = {}) => {
 }
 
 export const POST = (url: string, params: {}) => {
-    console.log("POST");
-    
-    console.log(params);
-    
     return new Promise((resolve, reject) => {
         api.post(url, {...params})
             .then(res => {

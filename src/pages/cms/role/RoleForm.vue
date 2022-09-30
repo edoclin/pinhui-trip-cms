@@ -12,7 +12,7 @@
                    :value="role.roleId"/>
       </el-select>
     </el-form-item>
-    <el-form-item label="关联基地" prop="baseIds">
+    <el-form-item label="关联基地" prop="baseIds" v-show="!form['preparedRoleIds'].find(item => item === 'ROLE1')">
       <el-select :multiple="true" v-model="form['baseIds']" placeholder="请选择关联基地" style="width: 100%">
         <el-option v-for="base in baseSelector.data" :key="base.baseId" :label="base.baseName"
                    :value="base.baseId"/>
@@ -32,12 +32,12 @@
 </template>
 <script setup>
 import { reactive, ref } from 'vue'
-import { postRole, putRole } from '../../../api/role'
+import { postRole, putRole } from 'src/api/role'
 import { ElMessage } from 'element-plus'
 
 import { useMapState } from 'src/stores'
 import { useCommonStore } from 'src/stores/common_store'
-import { getSelector } from '../../../api/base'
+import { getSelector } from 'src/api/base'
 
 const { statusEnum, preparedRole } = useMapState(useCommonStore, ['statusEnum', 'preparedRole'])
 
@@ -46,15 +46,17 @@ const baseSelector = reactive({
 })
 
 getSelector().then(res => {
-  console.log(res.data)
   baseSelector.data = res.data
 })
 
 const formRef = ref()
 
-const form = reactive({})
+const form = reactive({
+  preparedRoleIds: []
+})
 
 const onResetForm = (formEl) => {
+  console.log(formEl)
   if (formEl) {
     formEl.resetFields()
   }
@@ -68,7 +70,6 @@ const onSubmit = (formEl) => {
         type: 'success',
         message: res.data,
       })
-      onResetForm(formEl)
     })
   } else {
     postRole(form).then(res => {
@@ -84,7 +85,15 @@ const onSubmit = (formEl) => {
 const props = defineProps({
   data: {}
 })
+console.log(props.data)
 if (props.data) {
+  form.customRoleId = props.data.customRoleId
+  form.customRoleName = props.data.customRoleName
+  form.customRoleDesc = props.data.customRoleDesc
+  form.preparedRoleIds = props.data.preparedRoleIds
+  form.baseIds = props.data.baseIds
+  form.status = statusEnum.value.find(item => item.name === props.data.status).key
+
 }
 
 </script>
