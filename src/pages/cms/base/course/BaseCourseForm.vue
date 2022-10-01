@@ -20,17 +20,25 @@
     <el-form-item prop="defaultCoverResourcePath" label="课程封面图">
       <el-upload :auto-upload="false" :show-file-list="false" accept="image/*"
                  :on-change="handleChangeFileUpload">
-        <el-button type="primary">点击上传</el-button>
+        <el-button type="primary" :loading="uploading">{{ uploading ? '上传中...' : '点击上传' }}</el-button>
         <template #tip>
           <div class="el-upload__tip">
-            请选择图片上传
+            <el-progress
+                style="width: 160px"
+                v-if="uploading"
+                :percentage="100"
+                :indeterminate="true"
+                :duration="1"
+                :format="() => ''"
+            />
+            <span v-else>请选择图片文件上传</span>
           </div>
         </template>
       </el-upload>
     </el-form-item>
     <el-form-item label="课程版本">
       <el-transfer
-          v-model="form['versions']"
+          v-model="form['versionNames']"
           :titles="['未添加', '已添加']"
           :button-texts="['移除', '添加']"
           @change="showTransferTip"
@@ -40,7 +48,7 @@
       />
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="onSubmit(formRef)">{{ data ? '更新' : '创建' }}</el-button>
+      <el-button type="primary" @click="onSubmit(formRef)" :disabled="uploading">{{ data ? '更新' : '创建' }}</el-button>
       <el-button v-if="!data" @click="onResetForm(formRef)">重置</el-button>
     </el-form-item>
   </el-form>
@@ -64,6 +72,10 @@ const showTransferTip = (current, direction, value) => {
     ElMessageBox.alert('请点击已添加列表项上传课程', '提示', {
       confirmButtonText: '确认',
     })
+  } else if (direction === 'left') {
+    value.forEach(item => {
+      form.versions.splice(form.versions.findIndex(version => version.version === item), 1)
+    })
   }
 }
 
@@ -71,11 +83,11 @@ const onSubmitCourseVersion = version => {
   console.log("onSubmitCourseVersion")
   console.log(version)
   courseVersionForm.show = false
-  if (courseVersionForm.form.versions.find(item => item.version === version.version) !== undefined) {
-    console.log("AAAAAAAAAA")
+  if (form.versions.find(item => item.version === version.result.version) !== undefined) {
+    form.versions.splice(form.versions.findIndex(item => item.version === version.result.version),1, { ...version.result })
     return
   }
-  courseVersionForm.form.versions.push({ ...version })
+  form.versions.push({ ...version.result })
 }
 
 const courseVersionForm = reactive({
@@ -104,7 +116,9 @@ getSelector().then(res => {
 
 const formRef = ref()
 
-const form = reactive({})
+const form = reactive({
+  versions: []
+})
 
 const onResetForm = (formEl) => {
   if (formEl) {
@@ -112,13 +126,17 @@ const onResetForm = (formEl) => {
   }
 }
 
+const uploading = ref(false)
+
 const handleChangeFileUpload = (uploadFile) => {
+  uploading.value = true
   sliceUploadFile(uploadFile.raw, 'course-cover').then(data => {
     form.defaultCoverResourcePath = data.Key
     ElMessage({
       type: 'success',
       message: '上传成功'
     })
+    uploading.value = false
   })
 }
 

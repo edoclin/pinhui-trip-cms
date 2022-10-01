@@ -13,9 +13,19 @@ declare module '@vue/runtime-core' {
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
+// console.log(process.env.DEV)
+// console.log(process.env.PROD)
+// console.log(process.env.DEBUGGING)
+// console.log(process.env.CLIENT)
+// console.log(process.env.SERVER)
+// console.log(process.env.MODE)
+// console.log(process.env.NODE_ENV)
+
 const api = axios.create({
-    baseURL: 'http://172.27.63.55:8000/server'
+    baseURL: process.env.NODE_ENV === 'production' ? 'http://172.27.63.55:5000/server' : 'http://172.27.63.55:8000/server'
 })
+
+
 
 const amapRequest = axios.create({
     baseURL: 'https://restapi.amap.com/v3/'
@@ -91,9 +101,11 @@ export default boot(({ app }) => {
     const userStore = useUserStore()
     // 添加请求拦截器
     api.interceptors.request.use(config => {
+        // @ts-ignore
         config.headers['token'] = userStore.token
 
         // todo 在发送请求之前做些什么
+        // @ts-ignore
         console.log(`headers['token']=${config.headers['token']}`);
 
         return config
