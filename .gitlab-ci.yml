@@ -18,9 +18,9 @@ install-staging:dep:
     - yarn install --registry https://registry.npm.taobao.org  #安装依赖
     - echo "=====end install======"
   artifacts:
-    expire_in: 60 mins
+    expire_in: 30 days
     paths:
-      - node_modules/*
+      - node_modules
 
 deploy-staging:dep:
   stage: deploy
@@ -30,8 +30,8 @@ deploy-staging:dep:
     - master
   script:
     - echo "=====start build======"
-    - yarn run 'spa build'  # 将项目打包
+    - yarn run 'spa build'
     - echo "=====end build======"
     - echo "=====start deploy======"
-    - sudo cp -rf ./dist/spa  /home/fsx/dev/nginx/dist
-    - echo "=====end deploy!!!!!!======"
+    - cp -rf ./dist/spa  /home/fsx/dev/nginx/dist
+    - echo "=====end deploy======"
