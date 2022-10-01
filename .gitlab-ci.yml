@@ -33,5 +33,5 @@ deploy-staging:dep:
     - yarn run 'spa build'
     - echo "=====end build======"
     - echo "=====start deploy======"
-    - cp -rf ./dist/spa  /home/fsx/dev/nginx/dist
+    - sudo cp -rf ./dist/spa  /home/fsx/dev/nginx/dist
     - echo "=====end deploy======"
