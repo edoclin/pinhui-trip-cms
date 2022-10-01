@@ -67,12 +67,21 @@ const showTransferTip = (current, direction, value) => {
   }
 }
 
-const onSubmitCourseVersion = e => {
-  console.log(e)
+const onSubmitCourseVersion = version => {
+  console.log("onSubmitCourseVersion")
+  console.log(version)
+  courseVersionForm.show = false
+  if (courseVersionForm.form.versions.find(item => item.version === version.version) !== undefined) {
+    console.log("AAAAAAAAAA")
+    return
+  }
+  courseVersionForm.form.versions.push({ ...version })
 }
 
 const courseVersionForm = reactive({
-  form: {},
+  form: {
+    versions: []
+  },
   show: false,
 })
 

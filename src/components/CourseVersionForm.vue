@@ -151,7 +151,7 @@
         </div>
       </el-form-item>
       <el-form-item label="简单描述" prop="descSimple" style="margin-top: 100px">
-        <el-input v-model="courseVersionForm.part2['descSimple']" :rows="2" type="textarea"
+        <el-input v-model="courseVersionForm.part3['descSimple']" :rows="2" type="textarea"
                   placeholder="请输入描述内容"/>
       </el-form-item>
       <el-form-item label="富文本描述" prop="descRichText">
@@ -408,7 +408,8 @@ const nextStep = () => {
       message: '请锁定编辑地图！'
     })
   } else {
-    courseVersionForm[`part${active.value += 1}`]['descRichText'] = valueHtml.html
+    courseVersionForm[`part${active.value}`]['descRichText'] = valueHtml.html
+    active.value += 1
     valueHtml.html = ''
   }
 }
@@ -513,10 +514,42 @@ const editorConfig = reactive({
 // 使用defineEmits创建名称，接受一个数组
 const emit = defineEmits(['onSubmit', 'onCancel'])
 const onSubmit = () => {
-  if (active.value === 0) {
+  let result = {
+    descSimple: courseVersionForm.info.descSimple,
+    descRichText: courseVersionForm.info.descRichText,
+    version: props.form['courseVersion'],
+    parts: [
+      {
+        partNumber: 1,
+        descSimple: courseVersionForm.part1.descSimple,
+        descRichText: courseVersionForm.part1.descRichText,
+        videoResourcePath: courseVersionForm.part1.videoResourcePath,
+      },
+      {
+        partNumber: 2,
+        descSimple: courseVersionForm.part2.descSimple,
+        descRichText: courseVersionForm.part2.descRichText,
+        videoResourcePath: courseVersionForm.part2.videoResourcePath,
+      },
+      {
+        partNumber: 3,
+        route: {
+          routeName: courseVersionForm.part3.routeName,
+          descSimple: courseVersionForm.part3.descSimple,
+          descRichText: courseVersionForm.part3.descRichText,
+          polylineGeometry: route.polyline.path,
+          points: route.markers
+        }
+      },
+      {
+        partNumber: 4,
+        descSimple: courseVersionForm.part4.descSimple,
+        descRichText: valueHtml.html,
+        videoResourcePath: courseVersionForm.part4.videoResourcePath,
+      },
+    ]
   }
-
-  // emit('onSubmit', {})
+  emit('onSubmit', {result})
 }
 
 const onCancel = () => {

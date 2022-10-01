@@ -20,7 +20,7 @@ install-staging:dep:
   artifacts:
     expire_in: 60 mins
     paths:
-      - node_modules/
+      - node_modules/*
 
 deploy-staging:dep:
   stage: deploy
