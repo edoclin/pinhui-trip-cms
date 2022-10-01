@@ -22,7 +22,7 @@ declare module '@vue/runtime-core' {
 // console.log(process.env.NODE_ENV)
 
 const api = axios.create({
-    baseURL: process.env.NODE_ENV === 'production' ? 'http://172.27.63.55:5000/server' : 'http://172.27.63.55:8000/server'
+    baseURL: process.env.NODE_ENV === 'production' ? 'https://172.27.63.55/server' : 'http://172.27.63.55:8000/server'
 })
 
 
