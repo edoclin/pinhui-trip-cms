@@ -4,7 +4,7 @@ import { RouteRecordRaw } from 'vue-router'
 // 递归读取pages下的vue文件注册到路由，无需手动添加router
 // '../pages/**/**/**/**.vue' : 支持读取到pages下第四级目录
 // If 有更高的嵌套需求: eg五级：'../pages/**/**/**/**/**.vue'
-const pageModules = import.meta.glob('../pages/**/**/**/**.vue')
+const pageModules = import.meta.glob('../pages/**/**.vue')
 const routes: RouteRecordRaw[] = [
     {
         path: '/',

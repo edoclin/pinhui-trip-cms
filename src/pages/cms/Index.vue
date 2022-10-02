@@ -3,7 +3,7 @@
     <el-container>
       <el-aside width="200px">
         <el-menu style="height: calc(100vh - 70px)">
-          <el-sub-menu index="base">
+          <el-sub-menu index="base" id="guide-base-manage">
             <template #title>
               <el-icon>
                 <location/>
@@ -11,36 +11,53 @@
               <span>基地管理</span>
             </template>
             <el-menu-item-group title="基地">
-            <el-menu-item index="base/table"
-                          @click="clickMenuItem('基地列表', 'baseTable', 'baseTable', './base/BaseTable')">
-              <el-icon>
-                <Document/>
-              </el-icon>
-              基地列表
-            </el-menu-item>
-            <el-menu-item index="base/form"
-                          @click="clickMenuItem('新增基地', 'baseForm', 'baseForm', './base/BaseForm')">
-              <el-icon>
-                <FolderAdd/>
-              </el-icon>
-              新增基地
-            </el-menu-item>
+              <el-menu-item index="base/table"
+                            id="guide-base-manage-table"
+                            @click="clickMenuItem('基地列表', 'BaseTable', 'BaseTable', './base/BaseTable')">
+                <el-icon>
+                  <Document/>
+                </el-icon>
+                基地列表
+              </el-menu-item>
+              <el-menu-item index="base/form"
+                            @click="clickMenuItem('新增基地', 'BaseForm', 'BaseForm', './base/BaseForm')">
+                <el-icon>
+                  <FolderAdd/>
+                </el-icon>
+                新增基地
+              </el-menu-item>
             </el-menu-item-group>
             <el-menu-item-group title="课程">
               <el-menu-item index="base/course/table"
-                            @click="clickMenuItem('课程列表', 'baseCourseTable', 'baseCourseTable', './base/course/BaseCourseTable')">
+                            @click="clickMenuItem('课程列表', 'BaseCourseTable', 'BaseCourseTable', './base/course/BaseCourseTable')">
                 <el-icon>
                   <Document/>
                 </el-icon>
                 课程列表
               </el-menu-item>
               <el-menu-item index="base/course/form"
-                            @click="clickMenuItem('新增课程', 'baseCourseForm', 'baseCourseForm', './base/course/BaseCourseForm')">
+                            @click="clickMenuItem('新增课程', 'BaseCourseForm', 'BaseCourseForm', './base/course/BaseCourseForm')">
                 <el-icon>
                   <FolderAdd/>
                 </el-icon>
                 新增课程
               </el-menu-item>
+              <el-menu-item-group title="分类">
+                <el-menu-item index="base/course/category/table"
+                              @click="clickMenuItem('课程分类', 'BaseCourseCategoryTable', 'BaseCourseCategoryTable', './base/course/category/BaseCourseCategoryTable')">
+                  <el-icon>
+                    <Document/>
+                  </el-icon>
+                  分类列表
+                </el-menu-item>
+                <el-menu-item index="base/course/category/form"
+                              @click="clickMenuItem('新增分类', 'BaseCourseCategoryForm', 'BaseCourseCategoryForm', './base/course/category/BaseCourseCategoryForm')">
+                  <el-icon>
+                    <FolderAdd/>
+                  </el-icon>
+                  新增分类
+                </el-menu-item>
+              </el-menu-item-group>
             </el-menu-item-group>
           </el-sub-menu>
           <el-sub-menu index="user">
@@ -52,7 +69,7 @@
             </template>
             <el-menu-item-group title="用户">
               <el-menu-item index="user/table"
-                            @click="clickMenuItem('用户列表', 'userTable', 'userTable', './user/UserTable')">
+                            @click="clickMenuItem('用户列表', 'UserTable', 'UserTable', './user/UserTable')">
                 <el-icon>
                   <Document/>
                 </el-icon>
@@ -61,14 +78,14 @@
             </el-menu-item-group>
             <el-menu-item-group title="角色">
               <el-menu-item index="user/role-table"
-                            @click="clickMenuItem('角色列表', 'roleTable', 'roleTable', './role/RoleTable')">
+                            @click="clickMenuItem('角色列表', 'RoleTable', 'RoleTable', './role/RoleTable')">
                 <el-icon>
                   <Document/>
                 </el-icon>
                 角色列表
               </el-menu-item>
               <el-menu-item index="user/role-form"
-                            @click="clickMenuItem('添加角色', 'roleForm', 'roleForm', './role/RoleForm')">
+                            @click="clickMenuItem('添加角色', 'RoleForm', 'RoleForm', './role/RoleForm')">
                 <el-icon>
                   <Document/>
                 </el-icon>
@@ -112,38 +129,41 @@
               后台管理系统
             </el-menu-item>
             <div class="flex-grow"/>
-            <el-switch
-                style="margin-top: 12px"
-                v-model="isDark"
-                inline-prompt
-                :active-icon="SvgDark"
-                :inactive-icon="SvgLight"
-                active-color="#2c2c2c"
-            />
-            <el-button size="large" text style="margin-top: 8px;"
+            <div id="guide-dark">
+              <el-switch
+                  style="margin-top: 12px"
+                  v-model="isDark"
+                  inline-prompt
+                  :active-icon="SvgDark"
+                  :inactive-icon="SvgLight"
+                  active-color="#2c2c2c"
+              />
+            </div>
+
+            <el-button size="large" text style="margin-top: 8px;" id="guide-fullscreen"
                        :icon="isFullscreen ? SvgExitFullScreen :SvgFullScreen" @click="onToggle"></el-button>
             <el-menu-item index="message">通知</el-menu-item>
             <el-sub-menu index="setting">
               <template #title>设置</template>
               <el-menu-item index="change-password">修改密码</el-menu-item>
-              <el-menu-item index="dark" @click="toggleDark()">
-                {{ isDark }}
-              </el-menu-item>
             </el-sub-menu>
           </el-menu>
         </el-header>
         <el-main>
-          <el-tabs style="height: calc(100vh - 100px - 12px)"
-                   v-model="currentTab.name"
-                   type="card"
-                   closable
-                   @tab-remove="removeTab">
+          <el-tabs
+              style="height: calc(100vh - 100px - 12px)"
+              v-model="currentTab.name"
+              type="card"
+              closable
+              @tab-remove="removeTab">
             <el-tab-pane
                 v-for="item in editableTabs"
                 :key="item.key"
                 :label="item.title"
                 :name="item.name">
-              <component :is="item.component" @onEdit="handleEdit" :data="children[item.name]"></component>
+              <component
+                  :is="item.component" ref="itemRefs" @onEdit="handleEdit" :data="children[item.name]"
+                  @onUpdate="handleUpdate"></component>
             </el-tab-pane>
           </el-tabs>
           <el-footer>
@@ -155,16 +175,21 @@
   </div>
 </template>
 <script setup>
-import { reactive, markRaw, ref, onMounted, onUnmounted } from 'vue'
+import { reactive, markRaw, ref, onMounted, onUnmounted, getCurrentInstance } from 'vue'
 
 const pageModules = import.meta.glob('./**/**/**/**/**.vue')
 
 import { useDark, useToggle } from '@vueuse/core'
-import SvgLight from '../../components/SvgLight.vue'
-import SvgDark from '../../components/SvgDark.vue'
-import SvgFullScreen from '../../components/SvgFullScreen.vue'
-import SvgExitFullScreen from '../../components/SvgExitFullScreen.vue'
+import SvgLight from 'src/components/SvgLight.vue'
+import SvgDark from 'src/components/SvgDark.vue'
+import SvgFullScreen from 'src/components/SvgFullScreen.vue'
+import SvgExitFullScreen from 'src/components/SvgExitFullScreen.vue'
 import screenfull from 'screenfull'
+
+import Driver from 'driver.js'
+import 'driver.js/dist/driver.min.css'
+import steps from 'src/api/steps'
+import { useQuasar } from 'quasar'
 
 const isFullscreen = ref(false)
 
@@ -176,8 +201,28 @@ const onToggle = () => {
   screenfull.toggle()
 }
 
+const itemRefs = ref([])
+
+const { proxy } = getCurrentInstance()
+
 onMounted(() => {
   screenfull.on('change', change)
+  let $q = useQuasar()
+  if ($q.localStorage.getItem('first') === null) {
+    let driver = new Driver({
+      // 禁止点击蒙版关闭
+      allowClose: false,
+      animate: true,
+      closeBtnText: '关闭',
+      doneBtnText: '完成',
+      keyboardControl: true,
+      nextBtnText: '下一个',
+      prevBtnText: '上一个'
+    })
+    driver.defineSteps(steps())
+    driver.start()
+    $q.localStorage.set('first', false)
+  }
 })
 
 // 删除侦听器
@@ -251,6 +296,15 @@ const handleEdit = ({
     currentTab.name = name
   }
 }
+
+const handleUpdate = (refName) => {
+  console.log("AAAAAAAAAA")
+  let find = itemRefs.value.find(item => item.name === refName)
+  if (find !== undefined) {
+    find.updateData()
+  }
+}
+
 
 </script>
 
