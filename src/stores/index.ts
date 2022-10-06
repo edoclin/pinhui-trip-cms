@@ -2,6 +2,7 @@ import { store } from 'quasar/wrappers'
 import { createPinia, mapState } from 'pinia'
 import { Router } from 'vue-router'
 import { computed, ComputedRef } from 'vue';
+import piniaPluginPersist from 'pinia-plugin-persist'
 
 /*
  * When adding new properties to stores, you should also
@@ -25,10 +26,8 @@ declare module 'pinia' {
 
 export default store((/* { ssrContext } */) => {
     const pinia = createPinia()
-
     // You can add Pinia plugins here
-    // pinia.use(SomePiniaPlugin)
-
+    pinia.use(piniaPluginPersist)
     return pinia
 })
 

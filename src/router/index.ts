@@ -4,6 +4,9 @@ import { createMemoryHistory, createRouter, createWebHashHistory, createWebHisto
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import routes from './routes'
+
+import generatedRoutes from 'virtual:generated-pages'
+
 /*
  * If not building with SSR mode, you can
  * directly export the Router instantiation;
@@ -23,7 +26,7 @@ export default route(function (/* { store, ssrContext } */) {
       left: 0,
       top: 0
     }),
-    routes,
+    routes: generatedRoutes,
     // Leave this as is and make changes in quasar.conf.js instead!
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath

@@ -1,5 +1,5 @@
 <template>
-    <el-dialog :show-close="false" v-model="show" title="高级条件查询" destroy-on-close :close-on-click-modal="false" >
+    <el-dialog :close-on-press-escape="false" :show-close="false" v-model="show" title="高级条件查询" destroy-on-close :close-on-click-modal="false" >
         <el-form :model="conditions" label-width="120px">
             <el-form-item v-for="(item, index) in conditions" :key="index" :label="item.name">
                 <el-input v-model="form[item.key]">

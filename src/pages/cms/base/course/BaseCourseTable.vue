@@ -50,13 +50,13 @@ import {
 } from 'src/api/base-course'
 import AdvanceQuery from 'src/components/AdvanceQuery.vue'
 import BaseCourseFormVue from './BaseCourseForm.vue'
-import { getSelector } from '../../../../api/base'
+import { getBaseSelector } from '../../../../api/base'
 
 const baseSelector = reactive({
   data: []
 })
 
-getSelector().then(res => {
+getBaseSelector().then(res => {
   baseSelector.data = res.data
 })
 
@@ -167,6 +167,15 @@ const onEdit = (record) => {
     name: record.courseId
   })
 }
+
+const updateData = () => {
+  listBaseCourse(page.current, page.size, { ...queryParam }).then(res => {
+    tableData.data = res.data
+    page.total = res.count
+  })
+}
+
+defineExpose({updateData, name: 'BaseCourseCategoryTable'})
 </script>
 <style>
 </style>

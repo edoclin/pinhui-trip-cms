@@ -3,16 +3,15 @@
     <el-container>
       <el-aside width="200px">
         <el-menu style="height: calc(100vh - 70px)">
-          <el-sub-menu index="base" id="guide-base-manage">
+          <el-sub-menu index="base">
             <template #title>
               <el-icon>
-                <location/>
+                <Location/>
               </el-icon>
               <span>基地管理</span>
             </template>
             <el-menu-item-group title="基地">
               <el-menu-item index="base/table"
-                            id="guide-base-manage-table"
                             @click="clickMenuItem('基地列表', 'BaseTable', 'BaseTable', './base/BaseTable')">
                 <el-icon>
                   <Document/>
@@ -63,7 +62,7 @@
           <el-sub-menu index="user">
             <template #title>
               <el-icon>
-                <location/>
+                <User/>
               </el-icon>
               <span>用户管理</span>
             </template>
@@ -96,7 +95,7 @@
           <el-sub-menu index="manage">
             <template #title>
               <el-icon>
-                <location/>
+                <Tools/>
               </el-icon>
               <span>系统管理</span>
             </template>
@@ -107,6 +106,37 @@
             <!--              </el-icon>-->
             <!--              服务器状态-->
             <!--            </el-menu-item>-->
+          </el-sub-menu>
+          <el-sub-menu index="pages">
+            <template #title>
+              <el-icon>
+                <User/>
+              </el-icon>
+              <span>页面管理</span>
+            </template>
+            <el-menu-item-group title="小程序端">
+              <el-menu-item index="mini/carousel/table"
+                            @click="clickMenuItem('轮播图列表', 'ViewCarouselTable', 'ViewCarouselTable', './page/course/ViewCarouselTable')">
+                <el-icon>
+                  <Document/>
+                </el-icon>
+                轮播图列表
+              </el-menu-item>
+              <el-menu-item index="mini/carousel/form"
+                            @click="clickMenuItem('新增轮播图', 'ViewCarouselForm', 'ViewCarouselForm', './page/course/ViewCarouselForm')">
+                <el-icon>
+                  <Document/>
+                </el-icon>
+                新增轮播图
+              </el-menu-item>
+              <el-menu-item index="mini/carousel/list"
+                            @click="clickMenuItem('展示状态编辑', 'ViewCarouselList', 'ViewCarouselList', './page/course/ViewCarouselList')">
+                <el-icon>
+                  <Document/>
+                </el-icon>
+                展示状态编辑
+              </el-menu-item>
+            </el-menu-item-group>
           </el-sub-menu>
         </el-menu>
       </el-aside>
@@ -129,6 +159,7 @@
               后台管理系统
             </el-menu-item>
             <div class="flex-grow"/>
+
             <div id="guide-dark">
               <el-switch
                   style="margin-top: 12px"
@@ -141,10 +172,17 @@
             </div>
 
             <el-button size="large" text style="margin-top: 8px;" id="guide-fullscreen"
-                       :icon="isFullscreen ? SvgExitFullScreen :SvgFullScreen" @click="onToggle"></el-button>
-            <el-menu-item index="message">通知</el-menu-item>
+                       :icon="isFullscreen ? SvgExitFullScreen :SvgFullScreen" @click="onToggle($event)"></el-button>
+
+            <el-button v-if="isElectron" size="large" text style="margin-top: 8px;" id="guide-quit"
+                       :icon="SvgQuit" @click="onBlur($event); electronExitDialog = true"></el-button>
+            <el-badge :value="99" style="margin-top: 20px;margin-right: 15px;margin-left: 18px">
+              <el-icon :size="17">
+                <ChatDotSquare/>
+              </el-icon>
+            </el-badge>
             <el-sub-menu index="setting">
-              <template #title>设置</template>
+              <template #title>个人中心</template>
               <el-menu-item index="change-password">修改密码</el-menu-item>
             </el-sub-menu>
           </el-menu>
@@ -172,10 +210,33 @@
         </el-main>
       </el-container>
     </el-container>
+
+    <el-dialog
+        v-if="isElectron"
+        v-model="electronExitDialog"
+        title="提示"
+        width="30%"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :show-close="false"
+        center
+        align-center>
+      <el-result
+          icon="warning"
+          title="是否退出当前程序？"
+      />
+      <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="electronExitDialog = false">取消</el-button>
+                <el-button type="primary" @click="onElectronQuit">确认</el-button>
+            </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 <script setup>
-import { reactive, markRaw, ref, onMounted, onUnmounted, getCurrentInstance } from 'vue'
+
+import { mapActions } from 'pinia'
 
 const pageModules = import.meta.glob('./**/**/**/**/**.vue')
 
@@ -183,6 +244,7 @@ import { useDark, useToggle } from '@vueuse/core'
 import SvgLight from 'src/components/SvgLight.vue'
 import SvgDark from 'src/components/SvgDark.vue'
 import SvgFullScreen from 'src/components/SvgFullScreen.vue'
+import SvgQuit from 'src/components/SvgQuit.vue'
 import SvgExitFullScreen from 'src/components/SvgExitFullScreen.vue'
 import screenfull from 'screenfull'
 
@@ -190,14 +252,52 @@ import Driver from 'driver.js'
 import 'driver.js/dist/driver.min.css'
 import steps from 'src/api/steps'
 import { useQuasar } from 'quasar'
+import { useCommonStore } from 'src/stores/common_store'
+import { getCourseVersion, getPreparedRole, getStatusEnum } from 'src/api/common'
+
+const commonActions = mapActions(useCommonStore,
+    [
+      'updateStatusEnum',
+      'updatePreparedRole',
+      'updateCourseVersion'])
+
+getStatusEnum().then(res => {
+  commonActions.updateStatusEnum(res.data)
+})
+
+getPreparedRole().then(res => {
+  commonActions.updatePreparedRole(res.data)
+})
+
+getCourseVersion().then(res => {
+  commonActions.updateCourseVersion(res.data)
+})
+
+const isElectron = ref(process.env.MODE === 'electron')
 
 const isFullscreen = ref(false)
+
+const electronExitDialog = ref(false)
 
 const change = () => {
   isFullscreen.value = screenfull.isFullscreen
 }
 
-const onToggle = () => {
+const onElectronQuit = () => {
+  window.$electron.exitApp()
+}
+
+const onBlur = (evt) => {
+  let target = evt.target
+  if (target.nodeName === 'svg') {
+    target = evt.target.parentNode.parentNode
+  }
+  target.blur()
+  return true
+}
+
+const onToggle = (evt) => {
+  onBlur(evt)
   screenfull.toggle()
 }
 
@@ -270,9 +370,21 @@ const clickMenuItem = (title, name, key, componentPath) => {
 }
 
 const removeTab = (name) => {
-  editableTabs.splice(editableTabs.findIndex(item => item.name === name), 1)
+  let index = editableTabs.findIndex(item => item.name === name)
+  // chrome 标签逻辑
+  if (index === 0) {
+    // 打开引导页
+  } else if (index === editableTabs.length - 1) {
+    //最后一个标签 -> 打开前一个标签
+    currentTab.name = editableTabs[index - 1].name
+  } else {
+    // 打开后一个标签
+    currentTab.name = editableTabs[index + 1].name
+
+  }
+
+  editableTabs.splice(index, 1)
   delete children[name]
-  currentTab.name = editableTabs[0].name
 }
 
 const children = reactive({})
@@ -298,7 +410,6 @@ const handleEdit = ({
 }
 
 const handleUpdate = (refName) => {
-  console.log("AAAAAAAAAA")
   let find = itemRefs.value.find(item => item.name === refName)
   if (find !== undefined) {
     find.updateData()

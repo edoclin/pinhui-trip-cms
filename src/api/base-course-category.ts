@@ -6,4 +6,4 @@ export const  putBaseCourseCategory = (params: {}) => PUT(`/baseCourseCategory`,
 export const  deleteBaseCourseCategoryByIds = (batch: {}) => DELETE(`/baseCourseCategory/batch`, batch)
 export const  getBaseCourseCategoryConditions = () => GET(`/baseCourseCategory/conditions`)
 export const  getTableColumns = () => GET(`/baseCourseCategory/table-columns`)
-export const  getSelector = () => GET(`/baseCourseCategory/selector`)
+export const  getBaseCourseCategorySelector = () => GET(`/baseCourseCategory/selector`)

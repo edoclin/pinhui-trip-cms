@@ -14,7 +14,6 @@ export const useUserStore = defineStore('user_store', {
     }),
     getters: {
     },
-
     actions: {
         updateToken(token: string) {
             this.token = token
@@ -22,6 +21,9 @@ export const useUserStore = defineStore('user_store', {
         updateUserInfo(userinfo: UserInfo) {
             this.userinfo = userinfo
         }
+    },
+    persist: {
+        enabled: true
     }
 })
 

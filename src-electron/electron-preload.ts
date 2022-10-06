@@ -12,8 +12,8 @@
 
  */
 
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 
-contextBridge.exposeInMainWorld('NODE', {
-  NODE: () => "NODE"
+contextBridge.exposeInMainWorld('$electron', {
+  exitApp: () => ipcRenderer.send("app-quit")
 })

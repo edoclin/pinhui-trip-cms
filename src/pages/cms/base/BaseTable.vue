@@ -35,6 +35,7 @@ import { markRaw, reactive, watch } from 'vue'
 import { listBase, deleteBaseByIds, getBaseConditions, getTableColumns } from 'src/api/base'
 import AdvanceQuery from 'src/components/AdvanceQuery.vue'
 import BaseFormVue from './BaseForm.vue'
+import { listBaseCourse } from '../../../api/base-course'
 
 
 const page = reactive({
@@ -142,6 +143,14 @@ const onEdit = (record) => {
     name: record.baseId
   })
 }
+
+const updateData = () => {
+  listBase(page.current, page.size, { ...queryParam }).then(res => {
+    tableData.data = res.data
+    page.total = res.count
+  })
+}
+defineExpose({updateData, name: 'BaseCourseCategoryTable'})
 </script>
 <style>
 </style>

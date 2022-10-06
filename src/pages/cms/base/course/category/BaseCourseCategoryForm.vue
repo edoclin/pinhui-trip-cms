@@ -4,7 +4,7 @@
       <el-input v-model="form.categoryName"/>
     </el-form-item>
     <el-form-item label="展示图片" prop="coverResourcePath">
-      <el-upload :on-preview="handlePreviewUpload" :auto-upload="false" list-type="picture-card" v-model:file-list="fileList" accept="image/*"
+      <el-upload :on-preview="handlePreviewUpload" list-type="picture-card" v-model:file-list="fileList" :auto-upload="false" accept="image/*"
                  :on-change="handleChangeFileUpload">
         <el-button type="primary" :loading="uploading">{{ uploading ? '上传中...' : (fileList.length === 1 ? '重新上传' : '点击上传') }}</el-button>
         <template #tip>
@@ -62,7 +62,6 @@ import { generateAccessUrl } from 'src/api/common'
 const fileList = ref([])
 
 const handlePreviewUpload = (e) => {
-  console.log(e)
   window.open(e.url, "_black")
 }
 
@@ -127,7 +126,6 @@ const handleChangeFileUpload = (uploadFile) => {
   uploading.value = true
   fileList.value = []
   sliceUploadFile(uploadFile.raw, 'course-category-cover').then(data => {
-    console.log(data)
     form.coverResourcePath = data.Key
     ElMessage({
       type: 'success',
@@ -140,7 +138,6 @@ const handleChangeFileUpload = (uploadFile) => {
         url: res.data
       })
     })
-
   })
 }
 

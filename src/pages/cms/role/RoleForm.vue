@@ -37,7 +37,7 @@ import { ElMessage } from 'element-plus'
 
 import { useMapState } from 'src/stores'
 import { useCommonStore } from 'src/stores/common_store'
-import { getSelector } from 'src/api/base'
+import { getBaseSelector } from 'src/api/base'
 
 const { statusEnum, preparedRole } = useMapState(useCommonStore, ['statusEnum', 'preparedRole'])
 
@@ -45,7 +45,7 @@ const baseSelector = reactive({
   data: []
 })
 
-getSelector().then(res => {
+getBaseSelector().then(res => {
   baseSelector.data = res.data
 })
 
@@ -61,6 +61,7 @@ const onResetForm = (formEl) => {
     formEl.resetFields()
   }
 }
+const emit = defineEmits(['onUpdate'])
 
 const onSubmit = (formEl) => {
   // update
@@ -80,6 +81,7 @@ const onSubmit = (formEl) => {
       onResetForm(formEl)
     })
   }
+  emit('onUpdate', 'RoleTable')
 }
 
 const props = defineProps({

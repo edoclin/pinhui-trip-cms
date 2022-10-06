@@ -13,18 +13,24 @@
     </el-form-item>
     <el-form-item label="所属基地" prop="baseId">
       <el-select v-model="form['baseId']" placeholder="请选择所属基地" style="width: 100%">
-        <el-option v-for="base in baseSelector.data" :key="base.baseId" :label="base.baseName"
+        <el-option v-for="base in selectorData.baseSelector" :key="base.baseId" :label="base.baseName"
                    :value="base.baseId"/>
       </el-select>
     </el-form-item>
+    <el-form-item label="所属分类" prop="categoryIds">
+      <el-select multiple v-model="form['categoryIds']" placeholder="请选择所属分类" style="width: 100%">
+        <el-option v-for="category in selectorData.baseCourseCategorySelector" :key="category.categoryId" :label="category.categoryName"
+                   :value="category.categoryId"/>
+      </el-select>
+    </el-form-item>
     <el-form-item prop="defaultCoverResourcePath" label="课程封面图">
-      <el-upload :auto-upload="false" :show-file-list="false" accept="image/*"
+      <el-upload :on-preview="handlePreviewUpload" list-type="picture-card" v-model:file-list="fileList" :auto-upload="false" accept="image/*"
                  :on-change="handleChangeFileUpload">
-        <el-button type="primary" :loading="uploading">{{ uploading ? '上传中...' : '点击上传' }}</el-button>
+        <el-button type="primary" :loading="uploading">{{ uploading ? '上传中...' : (fileList.length === 1 ? '重新上传' : '点击上传') }}</el-button>
         <template #tip>
           <div class="el-upload__tip">
             <el-progress
-                style="width: 160px"
+                style="width: 202px"
                 v-if="uploading"
                 :percentage="100"
                 :indeterminate="true"
@@ -41,7 +47,7 @@
           v-model="form['versionNames']"
           :titles="['未添加', '已添加']"
           :button-texts="['移除', '添加']"
-          @change="showTransferTip"
+          @change="handleTransfer"
           :props="{disabled: false, key: 'key', label: 'name'}"
           :data="courseVersion"
           @right-check-change="addCourseVersion"
@@ -54,20 +60,21 @@
   </el-form>
 </template>
 <script setup>
-import { reactive, ref } from 'vue'
 import { postBaseCourse, putBaseCourse } from 'src/api/base-course'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 import { useMapState } from 'src/stores'
 import { useCommonStore } from 'src/stores/common_store'
 import { sliceUploadFile } from 'src/api/cos'
-import { getSelector } from 'src/api/base'
+import { getBaseSelector } from 'src/api/base'
 import CourseVersionForm from 'src/components/CourseVersionForm.vue'
+import { generateAccessUrl } from 'src/api/common'
+import { getBaseCourseCategorySelector } from 'src/api/base-course-category'
 
 const { statusEnum, courseVersion } = useMapState(useCommonStore, ['statusEnum', 'courseVersion'])
 
 
-const showTransferTip = (current, direction, value) => {
+const handleTransfer = (current, direction, value) => {
   if (direction === 'right') {
     ElMessageBox.alert('请点击已添加列表项上传课程', '提示', {
       confirmButtonText: '确认',
@@ -80,8 +87,6 @@ const showTransferTip = (current, direction, value) => {
 }
 
 const onSubmitCourseVersion = version => {
-  console.log("onSubmitCourseVersion")
-  console.log(version)
   courseVersionForm.show = false
   if (form.versions.find(item => item.version === version.result.version) !== undefined) {
     form.versions.splice(form.versions.findIndex(item => item.version === version.result.version),1, { ...version.result })
@@ -105,13 +110,18 @@ const addCourseVersion = (selected, current) => {
   courseVersionForm.show = true
 }
 
-const baseSelector = reactive({
-  data: []
+const selectorData = reactive({
+  baseSelector: [],
+  baseCourseCategorySelector: [],
 })
 
 
-getSelector().then(res => {
-  baseSelector.data = res.data
+getBaseSelector().then(res => {
+  selectorData.baseSelector = res.data
+})
+
+getBaseCourseCategorySelector().then(res => {
+  selectorData.baseCourseCategorySelector = res.data
 })
 
 const formRef = ref()
@@ -127,9 +137,14 @@ const onResetForm = (formEl) => {
 }
 
 const uploading = ref(false)
+const fileList = ref([])
+const handlePreviewUpload = (e) => {
+  window.open(e.url, "_black")
+}
 
 const handleChangeFileUpload = (uploadFile) => {
   uploading.value = true
+  fileList.value = []
   sliceUploadFile(uploadFile.raw, 'course-cover').then(data => {
     form.defaultCoverResourcePath = data.Key
     ElMessage({
@@ -137,8 +152,21 @@ const handleChangeFileUpload = (uploadFile) => {
       message: '上传成功'
     })
     uploading.value = false
+    generateAccessUrl(data.Key).then(res => {
+      fileList.value.push({
+        name: '',
+        url: res.data
+      })
+    })
+  }).catch(err => {
+    ElMessage({
+      type: 'error',
+      message: err
+    })
   })
 }
+
+const emit = defineEmits(['onUpdate'])
 
 const onSubmit = (formEl) => {
   // update
@@ -159,6 +187,8 @@ const onSubmit = (formEl) => {
       onResetForm(formEl)
     })
   }
+  emit('onUpdate', 'BaseCourseTable')
+
 }
 
 const props = defineProps({
@@ -166,5 +196,8 @@ const props = defineProps({
 })
 if (props.data) {
 }
+
+
+
 
 </script>

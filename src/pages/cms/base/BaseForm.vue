@@ -1,63 +1,74 @@
 <template>
-    <el-form :model="form" label-width="120px" ref="formRef">
-        <el-form-item label="基地名称"  prop="baseName">
-            <el-input v-model="form.baseName" />
+  <el-form :model="form" label-width="120px" ref="formRef">
+    <el-form-item label="基地名称" prop="baseName">
+      <el-input v-model="form.baseName"/>
+    </el-form-item>
+    <el-form-item label="当前状态">
+      <el-select v-model="form['status']" placeholder="请选择状态" style="width: 100%">
+        <el-option v-for="status in statusEnum" :key="status.key" :label="status.name"
+                   :value="status.key"/>
+      </el-select>
+    </el-form-item>
+    <el-form-item label="基地位置" prop="polygonGeometry">
+      <div style="height: 60vh;width: 100%;">
+        <el-amap :center="amapParam.center" :zoom="amapParam.zoom">
+          <el-amap-search-box :visible="true" @select="selectPoi" @choose="choosePoi"/>
+          <el-amap-control-geolocation :visible="true" @complete="getLocation"/>
+          <el-amap-mouse-tool v-if="form.polygonGeometry.length === 0" type="polygon" :auto-clear="true"
+                              @draw="drawMouseTool"/>
+          <el-amap-polygon :path="form.polygonGeometry" :visible="true" :editable="amapPolygon.editable"
+                           :draggable="amapPolygon.editable" @end="end"/>
+        </el-amap>
+        <el-form-item v-if="form.polygonGeometry.length !== 0" label="操作" style="margin-top: 10px">
+          <el-button
+                     :type="amapPolygon.editable ? 'danger' : 'primary'"
+                     @click="amapPolygon.editable = !amapPolygon.editable">{{ amapPolygon.editable ? '保存' : '编辑' }}
+          </el-button>
         </el-form-item>
-        <el-form-item label="当前状态">
-                <el-select v-model="form['status']" placeholder="请选择状态" style="width: 100%">
-                    <el-option v-for="status in statusEnum" :key="status.key" :label="status.name"
-                        :value="status.key" />
-                </el-select>
-            </el-form-item>
-        <el-form-item label="基地位置" prop="polygonGeometry">
-            <div style="height: 60vh;width: 100%;">
-                <el-amap :center="amapParam.center" :zoom="amapParam.zoom">
-                    <el-amap-search-box :visible="true" @select="selectPoi" @choose="choosePoi" />
-                    <el-amap-control-geolocation :visible="true" @complete="getLocation" />
-                    <el-amap-mouse-tool v-if="form.polygonGeometry.length === 0" type="polygon" :auto-clear="true"
-                        @draw="drawMouseTool" />
-                    <el-amap-polygon :path="form.polygonGeometry" :visible="true" :editable="amapPolygon.editable"
-                        :draggable="amapPolygon.editable" @end="end" />
-                </el-amap>
-                <el-button style="width: 100%" v-if="form.polygonGeometry.length !== 0"
-                    :type="amapPolygon.editable ? 'danger' : 'primary'"
-                    @click="amapPolygon.editable = !amapPolygon.editable">{{amapPolygon.editable ? '保存' : '编辑'}}
-                </el-button>
-            </div>
-        </el-form-item>
-        <el-form-item prop="baseLocationText" label="详细位置" style="margin-top: 50px">
-            <el-input v-model="form.baseLocationText" />
-        </el-form-item>
-        <el-form-item prop="coverResourcePath" label="展示图片">
-            <el-upload :auto-upload="false" :show-file-list="false" accept="image/*"
-                :on-change="handleChangeFileUpload">
-                <el-button type="primary">点击上传</el-button>
-                <template #tip>
-                    <div class="el-upload__tip">
-                        请选择图片上传
-                    </div>
-                </template>
-            </el-upload>
-        </el-form-item>
-        <el-form-item label="简单描述" prop="descSimple">
-            <el-input v-model="form.descSimple" :rows="2" type="textarea" placeholder="请输入描述内容" />
-        </el-form-item>
-        <el-form-item label="富文本描述" prop="descRichText">
-            <div style="border: 1px solid #ccc">
-                <Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :defaultConfig="toolbarConfig"
-                    mode="default" />
-                <Editor style="height: 1000px;width: 100%; overflow-y: hidden;" v-model="valueHtml.html"
-                    :defaultConfig="editorConfig" mode="default" @onCreated="handleCreated" />
-            </div>
-        </el-form-item>
-        <el-form-item>
-            <el-button type="primary" @click="onSubmit(formRef)">{{data ? '更新' : '创建'}}</el-button>
-            <el-button v-if="!data" @click="onResetForm(formRef)">重置</el-button>
-        </el-form-item>
-    </el-form>
+
+      </div>
+    </el-form-item>
+    <el-form-item prop="baseLocationText" label="详细位置" style="margin-top: 50px">
+      <el-input v-model="form.baseLocationText"/>
+    </el-form-item>
+    <el-form-item prop="coverResourcePath" label="展示图片">
+      <el-upload :on-preview="handlePreviewUpload" list-type="picture-card" v-model:file-list="fileList" :auto-upload="false" accept="image/*"
+                 :on-change="handleChangeFileUpload">
+        <el-button type="primary" :loading="uploading">{{ uploading ? '上传中...' : (fileList.length === 1 ? '重新上传' : '点击上传') }}</el-button>
+        <template #tip>
+          <div class="el-upload__tip">
+            <el-progress
+                style="width: 202px"
+                v-if="uploading"
+                :percentage="100"
+                :indeterminate="true"
+                :duration="1"
+                :format="() => ''"
+            />
+            <span v-else>请选择图片文件上传</span>
+          </div>
+        </template>
+      </el-upload>
+    </el-form-item>
+    <el-form-item label="简单描述" prop="descSimple">
+      <el-input v-model="form.descSimple" :rows="2" type="textarea" placeholder="请输入描述内容"/>
+    </el-form-item>
+    <el-form-item label="富文本描述" prop="descRichText">
+      <div style="border: 1px solid #ccc">
+        <Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :defaultConfig="toolbarConfig"
+                 mode="default"/>
+        <Editor style="height: 1000px;width: 100%; overflow-y: hidden;" v-model="valueHtml.html"
+                :defaultConfig="editorConfig" mode="default" @onCreated="handleCreated"/>
+      </div>
+    </el-form-item>
+    <el-form-item>
+      <el-button type="primary" @click="onSubmit(formRef)">{{ data ? '更新' : '创建' }}</el-button>
+      <el-button v-if="!data" @click="onResetForm(formRef)">重置</el-button>
+    </el-form-item>
+  </el-form>
 </template>
 <script setup>
-import { onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
+import { onBeforeUnmount, reactive, ref, shallowRef } from 'vue'
 import { regeo } from 'src/api/amap'
 import { sliceUploadFile, getAccessUrl } from 'src/api/cos'
 import { postBase, putBase } from 'src/api/base'
@@ -65,162 +76,185 @@ import { ElMessage } from 'element-plus'
 import '@wangeditor/editor/dist/css/style.css' // 引入 css
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 
-import { useMapState } from 'src/stores';
-import { useCommonStore } from 'src/stores/common_store';
+import { useMapState } from 'src/stores'
+import { useCommonStore } from 'src/stores/common_store'
+import { generateAccessUrl } from 'src/api/common'
 
 const { statusEnum } = useMapState(useCommonStore, ['statusEnum'])
 
-
-
 const valueHtml = reactive({
-    html: ''
+  html: ''
 })
 const editorRef = shallowRef()
 const formRef = ref()
 
 onBeforeUnmount(() => {
-    const editor = editorRef.value
-    if (editor == null) return
-    editor.destroy()
+  const editor = editorRef.value
+  if (editor == null) return
+  editor.destroy()
 })
 
 const handleCreated = (editor) => {
-    editorRef.value = editor
+  editorRef.value = editor
 }
 const toolbarConfig = reactive({
-    excludeKeys: [
-        'fullScreen'
-    ]
+  excludeKeys: [
+    'fullScreen'
+  ]
 })
 const editorConfig = reactive({
-    placeholder: '请输入内容',
-    MENU_CONF: {
-        'uploadImage': {
-            maxFileSize: 1024 * 1024 * 10,
-            maxNumberOfFiles: 100,
-            allowedFileTypes: ['image/*'],
-            metaWithUrl: false,
-            withCredentials: true,
-            timeout: 10 * 1000,
-            async customUpload(file, insertFn) {
-                sliceUploadFile(file, 'rich_text').then(res => {
-                    getAccessUrl(600, res.Key).then(res => {
-                        insertFn(res.data, '', res.data)
-                    })
-                })
-            }
-        },
-        'uploadVideo': {
-            maxFileSize: 1024 * 1024 * 100 * 10, // 100M
-            maxNumberOfFiles: 10,
-            allowedFileTypes: ['video/*', 'audio/*'],
-            metaWithUrl: false,
-            withCredentials: true,
-            timeout: 20 * 1000,
-            async customUpload(file, insertFn) {
-                sliceUploadFile(file, 'rich_text').then(res => {
-                    getAccessUrl(600, res.Key).then(res => {
-                        insertFn(res.data, '', res.data)
-                    })
-                })
-            }
-        }
+  placeholder: '请输入内容',
+  MENU_CONF: {
+    'uploadImage': {
+      maxFileSize: 1024 * 1024 * 10,
+      maxNumberOfFiles: 100,
+      allowedFileTypes: ['image/*'],
+      metaWithUrl: false,
+      withCredentials: true,
+      timeout: 10 * 1000,
+      async customUpload (file, insertFn) {
+        sliceUploadFile(file, 'rich_text').then(res => {
+          getAccessUrl(600, res.Key).then(res => {
+            insertFn(res.data, '', res.data)
+          })
+        })
+      }
+    },
+    'uploadVideo': {
+      maxFileSize: 1024 * 1024 * 100 * 10, // 100M
+      maxNumberOfFiles: 10,
+      allowedFileTypes: ['video/*', 'audio/*'],
+      metaWithUrl: false,
+      withCredentials: true,
+      timeout: 20 * 1000,
+      async customUpload (file, insertFn) {
+        sliceUploadFile(file, 'rich_text').then(res => {
+          getAccessUrl(600, res.Key).then(res => {
+            insertFn(res.data, '', res.data)
+          })
+        })
+      }
     }
+  }
 })
 const form = reactive({
-    baseName: '',
-    baseLocationText: '',
-    polygonGeometry: [],
-    coverResourcePath: '',
-    descSimple: '',
-    descRichText: ''
+  baseName: '',
+  baseLocationText: '',
+  polygonGeometry: [],
+  coverResourcePath: '',
+  descSimple: '',
+  descRichText: ''
 })
 
 const amapParam = reactive({
-    center: [110, 30],
-    zoom: 12
+  center: [110, 30],
+  zoom: 12
 })
 
 const onResetForm = (formEl) => {
-    if (formEl) {
-        formEl.resetFields()
-    }
+  if (formEl) {
+    formEl.resetFields()
+  }
 }
 
-
 const onSubmit = (formEl) => {
-    form.descRichText = valueHtml.html
-    // update
-    if (props.data) {
-        putBase(form).then(res => {
-            ElMessage({
-                type: 'success',
-                message: res.data,
-            })
-            onResetForm(formEl)
-        })
-    } else {
-        postBase(form).then(res => {
-            ElMessage({
-                type: 'success',
-                message: res.data,
-            })
-            onResetForm(formEl)
-        })
-    }
+  form.descRichText = valueHtml.html
+  // update
+  if (props.data) {
+    putBase(form).then(res => {
+      ElMessage({
+        type: 'success',
+        message: res.data,
+      })
+      onResetForm(formEl)
+    })
+  } else {
+    postBase(form).then(res => {
+      ElMessage({
+        type: 'success',
+        message: res.data,
+      })
+      onResetForm(formEl)
+    })
+    emit('onUpdate', 'BaseTable')
+  }
 }
 
 const selectPoi = (e) => {
-    amapParam.center = [e.poi.location.lng, e.poi.location.lat]
-    regeo(e.poi.location.lng, e.poi.location.lat).then(data => {
-        form.baseLocationText = data
-    })
+  amapParam.center = [e.poi.location.lng, e.poi.location.lat]
+  regeo(e.poi.location.lng, e.poi.location.lat).then(data => {
+    form.baseLocationText = data
+  })
 }
 const choosePoi = (e) => {
 }
 
 const getLocation = (e) => {
-    amapParam.center = [e.poi.location.lng, e.poi.location.lat]
+  amapParam.center = [e.poi.location.lng, e.poi.location.lat]
 }
 const drawMouseTool = (e) => {
-    form.polygonGeometry = e
+  form.polygonGeometry = e
 }
 
 const amapPolygon = reactive({
-    editable: true
+  editable: true
 })
-const end = ({ type, target }) => {
-    console.log(target._opts.path);
-    form.polygonGeometry = target._opts.path
+const end = ({
+  type,
+  target
+}) => {
+  console.log(target._opts.path)
+  form.polygonGeometry = target._opts.path
+}
+const emit = defineEmits(['onUpdate'])
+
+
+const uploading = ref(false)
+const fileList = ref([])
+
+const handlePreviewUpload = (e) => {
+  window.open(e.url, "_black")
 }
 
 const handleChangeFileUpload = (uploadFile) => {
-    sliceUploadFile(uploadFile.raw, "base-cover").then(data => {
-        form.coverResourcePath = data.Key
-        ElMessage({
-            type: 'success',
-            message: '上传成功'
-        })
+  uploading.value = true
+  fileList.value = []
+  sliceUploadFile(uploadFile.raw, 'base-cover').then(data => {
+    form.coverResourcePath = data.Key
+    ElMessage({
+      type: 'success',
+      message: '上传成功'
     })
+    uploading.value = false
+    generateAccessUrl(data.Key).then(res => {
+      fileList.value.push({
+        name: '',
+        url: res.data
+      })
+    })
+  })
 }
 
-
 const props = defineProps({
-    data: {}
+  data: {}
 })
 if (props.data) {
-    form.baseId = props.data.baseId
-    form.baseName = props.data.baseName
-    form.baseLocationText = props.data.baseLocationText
-    form.coverResourcePath = props.data.coverResourcePath
-    form.descSimple = props.data.descSimple
-    form.descRichText = props.data.descRichText
-    valueHtml.html = props.data.descRichText
-    form.status = statusEnum.value.find(item => item.name === props.data.status).key
-    props.data.polygon.forEach(item => {
-        form.polygonGeometry.push([item.lng, item.lat])
-    })
-    amapParam.center = [props.data.centroid.lng, props.data.centroid.lat]
+  form.baseId = props.data.baseId
+  form.baseName = props.data.baseName
+  form.baseLocationText = props.data.baseLocationText
+  form.coverResourcePath = props.data.coverResourcePath
+  form.descSimple = props.data.descSimple
+  form.descRichText = props.data.descRichText
+  valueHtml.html = props.data.descRichText
+  form.status = statusEnum.value.find(item => item.name === props.data.status).key
+  props.data.polygon.forEach(item => {
+    form.polygonGeometry.push([item.lng, item.lat])
+  })
+  amapParam.center = [props.data.centroid.lng, props.data.centroid.lat]
+  fileList.value = [{
+    name: '',
+    url: props.data.coverResourcePathUrl
+  }]
 }
 
 </script>

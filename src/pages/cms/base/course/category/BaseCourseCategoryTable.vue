@@ -149,6 +149,7 @@ const onEdit = (record) => {
 }
 
 const updateData = () => {
+  console.log("updateData")
   listBaseCourseCategory(page.current, page.size, { ...queryParam }).then(res => {
     tableData.data = res.data
     page.total = res.count

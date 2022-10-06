@@ -1,6 +1,6 @@
 import { boot } from 'quasar/wrappers'
 
-import VueAMap, {initAMapApiLoader} from '@vuemap/vue-amap';
+import {initAMapApiLoader} from '@vuemap/vue-amap';
 import '@vuemap/vue-amap/dist/style.css'
 
 export const amapJsKey = '8dcb17b2c1269311984efcb5e13c36b4'
@@ -12,5 +12,5 @@ initAMapApiLoader({
 // "async" is optional;
 // more info on params: https://v2.quasar.dev/quasar-cli/boot-files
 export default boot(async ({ app}) => {
-    app.use(VueAMap)
+    // app.use(VueAMap)
 })

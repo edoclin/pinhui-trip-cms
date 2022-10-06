@@ -1,14 +1,6 @@
 const steps = () => {
   return [
     {
-      element: '#guide-fullscreen',
-      popover: {
-        title: '引导',
-        description: '全屏化',
-        position: 'bottom-right'
-      }
-    },
-    {
       element: '#guide-dark',
       popover: {
         title: '引导',
@@ -17,27 +9,21 @@ const steps = () => {
       }
     },
     {
-      element: '#guide-tabs',
+      element: '#guide-fullscreen',
       popover: {
         title: '引导',
-        description: '切换到/关闭当前页面',
+        description: '全屏化',
         position: 'bottom-right'
       }
     },
     {
-      element: '#guide-base-manage',
+      element: '#guide-quit',
       popover: {
-        title: '基地管理',
-        description: '打开和关闭基地管理菜单'
+        title: '引导',
+        description: '退出当前程序',
+        position: 'bottom-right'
       }
-    },
-    {
-      element: '#guide-base-manage-table',
-      popover: {
-        title: '基地列表',
-        description: '查询基地信息'
-      }
-    },
+    }
   ]
 }
 export default steps

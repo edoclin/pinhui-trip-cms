@@ -25,7 +25,6 @@ export const useCommonStore = defineStore('common_store', {
     }),
     getters: {
     },
-
     actions: {
         updateStatusEnum(statusEnum: StatusEnum) {
             this.statusEnum = statusEnum
@@ -36,7 +35,8 @@ export const useCommonStore = defineStore('common_store', {
         updateCourseVersion(courseVersion: CourseVersion) {
             this.courseVersion = courseVersion
         }
-    }
+    },
+
 })
 
 
