@@ -25,11 +25,11 @@
     </el-table>
 <!--    modify_flag-->
     <el-row style="margin-top: 10px">
-      <el-col :span="6">
+      <el-col :span="12">
         <el-pagination small background layout="total, sizes, prev, pager, next" :total="page.total"
                        :page-sizes="[10, 20, 50, 100]" v-model:currentPage="page.current" v-model:page-size="page.size"/>
       </el-col>
-      <el-col :span="6" :offset="12" style="position: absolute;right: 0;color: #919398" >数据更新时间: {{fetchTime}}</el-col>
+      <el-col style="position: absolute;right: 0;color: #919398;font-size: 12px;margin-top: 5px" >数据更新时间: {{fetchTime}}</el-col>
     </el-row>
 
 
