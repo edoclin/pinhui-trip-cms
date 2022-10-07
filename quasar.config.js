@@ -50,6 +50,7 @@ module.exports = configure((ctx) => {
       'axios',
       'element-plus',
       'amap',
+      'bus',
     ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css

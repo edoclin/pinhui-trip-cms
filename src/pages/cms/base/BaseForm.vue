@@ -68,7 +68,6 @@
   </el-form>
 </template>
 <script setup>
-import { onBeforeUnmount, reactive, ref, shallowRef } from 'vue'
 import { regeo } from 'src/api/amap'
 import { sliceUploadFile, getAccessUrl } from 'src/api/cos'
 import { postBase, putBase } from 'src/api/base'
@@ -80,8 +79,9 @@ import { useMapState } from 'src/stores'
 import { useCommonStore } from 'src/stores/common_store'
 import { generateAccessUrl } from 'src/api/common'
 
+import { openURL } from 'quasar'
 const { statusEnum } = useMapState(useCommonStore, ['statusEnum'])
-
+const bus = inject('bus')
 const valueHtml = reactive({
   html: ''
 })
@@ -166,7 +166,6 @@ const onSubmit = (formEl) => {
         type: 'success',
         message: res.data,
       })
-      onResetForm(formEl)
     })
   } else {
     postBase(form).then(res => {
@@ -176,8 +175,8 @@ const onSubmit = (formEl) => {
       })
       onResetForm(formEl)
     })
-    emit('onUpdate', 'BaseTable')
   }
+  bus.emit('update-base-table')
 }
 
 const selectPoi = (e) => {
@@ -213,7 +212,7 @@ const uploading = ref(false)
 const fileList = ref([])
 
 const handlePreviewUpload = (e) => {
-  window.open(e.url, "_black")
+  openURL(e.url)
 }
 
 const handleChangeFileUpload = (uploadFile) => {
@@ -256,5 +255,4 @@ if (props.data) {
     url: props.data.coverResourcePathUrl
   }]
 }
-
 </script>

@@ -167,6 +167,13 @@ const updateData = () => {
     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 }
+
+
+const bus = inject('bus')
+
+bus.on('update-base-table',() => {
+  updateData()
+})
 defineExpose({updateData, name: 'BaseCourseCategoryTable'})
 </script>
 <style>
