@@ -1,5 +1,5 @@
 <template>
-  <el-tabs v-model="currentTab" stretch type="border-card" tab-position="left" style="height: 350px">
+  <el-tabs v-model="currentTab" stretch type="card" tab-position="left">
     <el-tab-pane label="基地课程" name="BASE_COURSE">
       <draggable-transform :data="courseCarousel" :right="currentModel" @onDraggableChange="handleChange"></draggable-transform>
     </el-tab-pane>

@@ -29,7 +29,6 @@ module.exports = configure((ctx) => {
     htmlVariables: {
       title: '游品慧',
       desc: 'DESC',
-      VueDevToolsUrl: 'http://localhost:8098'
     },
     server: {},
     eslint: {

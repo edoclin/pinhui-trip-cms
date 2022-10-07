@@ -92,25 +92,11 @@
               </el-menu-item>
             </el-menu-item-group>
           </el-sub-menu>
-          <el-sub-menu index="manage">
-            <template #title>
-              <el-icon>
-                <Tools/>
-              </el-icon>
-              <span>系统管理</span>
-            </template>
-            <!--            <el-menu-item index="manage/server"-->
-            <!--                          @click="clickMenuItem('服务器状态', 'Server', 'Server', './manage/Server')">-->
-            <!--              <el-icon>-->
-            <!--                <Document/>-->
-            <!--              </el-icon>-->
-            <!--              服务器状态-->
-            <!--            </el-menu-item>-->
-          </el-sub-menu>
+
           <el-sub-menu index="pages">
             <template #title>
               <el-icon>
-                <User/>
+                <House/>
               </el-icon>
               <span>页面管理</span>
             </template>
@@ -132,11 +118,26 @@
               <el-menu-item index="mini/carousel/list"
                             @click="clickMenuItem('展示状态编辑', 'ViewCarouselList', 'ViewCarouselList', './page/course/ViewCarouselList')">
                 <el-icon>
-                  <Document/>
+                  <DataBoard/>
                 </el-icon>
                 展示状态编辑
               </el-menu-item>
             </el-menu-item-group>
+          </el-sub-menu>
+          <el-sub-menu index="manage">
+            <template #title>
+              <el-icon>
+                <Setting/>
+              </el-icon>
+              <span>系统管理</span>
+            </template>
+            <!--            <el-menu-item index="manage/server"-->
+            <!--                          @click="clickMenuItem('服务器状态', 'Server', 'Server', './manage/Server')">-->
+            <!--              <el-icon>-->
+            <!--                <Document/>-->
+            <!--              </el-icon>-->
+            <!--              服务器状态-->
+            <!--            </el-menu-item>-->
           </el-sub-menu>
         </el-menu>
       </el-aside>
@@ -165,17 +166,17 @@
                   style="margin-top: 12px"
                   v-model="isDark"
                   inline-prompt
-                  :active-icon="SvgDark"
-                  :inactive-icon="SvgLight"
+                  :active-icon="Moon"
+                  :inactive-icon="Sunny"
                   active-color="#2c2c2c"
               />
             </div>
 
             <el-button size="large" text style="margin-top: 8px;" id="guide-fullscreen"
-                       :icon="isFullscreen ? SvgExitFullScreen :SvgFullScreen" @click="onToggle($event)"></el-button>
+                       :icon="isFullscreen ? SvgExitFullScreen : FullScreen" @click="onToggle($event)"></el-button>
 
             <el-button v-if="isElectron" size="large" text style="margin-top: 8px;" id="guide-quit"
-                       :icon="SvgQuit" @click="onBlur($event); electronExitDialog = true"></el-button>
+                       :icon="SwitchButton" @click="onBlur($event); electronExitDialog = true"></el-button>
             <el-badge :value="99" style="margin-top: 20px;margin-right: 15px;margin-left: 18px">
               <el-icon :size="17">
                 <ChatDotSquare/>
@@ -239,6 +240,7 @@
 import { mapActions } from 'pinia'
 
 const pageModules = import.meta.glob('./**/**/**/**/**.vue')
+import { Moon, Sunny, FullScreen, SwitchButton } from '@element-plus/icons-vue'
 
 import { useDark, useToggle } from '@vueuse/core'
 import SvgLight from 'src/components/SvgLight.vue'

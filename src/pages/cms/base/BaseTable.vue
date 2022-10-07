@@ -23,8 +23,15 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination small background layout="total, sizes, prev, pager, next" :total="page.total"
-                   :page-sizes="[10, 20, 50, 100]" v-model:currentPage="page.current" v-model:page-size="page.size"/>
+<!--    modify_flag-->
+    <el-row style="margin-top: 10px">
+      <el-col :span="6">
+        <el-pagination small background layout="total, sizes, prev, pager, next" :total="page.total"
+                       :page-sizes="[10, 20, 50, 100]" v-model:currentPage="page.current" v-model:page-size="page.size"/>
+      </el-col>
+      <el-col :span="6" :offset="12" style="position: absolute;right: 0;color: #919398" >数据更新时间: {{fetchTime}}</el-col>
+    </el-row>
+
 
 
   </div>
@@ -35,8 +42,11 @@ import { markRaw, reactive, watch } from 'vue'
 import { listBase, deleteBaseByIds, getBaseConditions, getTableColumns } from 'src/api/base'
 import AdvanceQuery from 'src/components/AdvanceQuery.vue'
 import BaseFormVue from './BaseForm.vue'
-import { listBaseCourse } from '../../../api/base-course'
+//modify_flag
+import { date } from 'quasar'
 
+//modify_flag
+const fetchTime = ref('')
 
 const page = reactive({
   current: 1,
@@ -62,12 +72,15 @@ watch(page, () => {
   listBase(page.current, page.size, queryParam).then(res => {
     tableData.data = res.data
     page.total = res.count
+    //modify_flag 所有list方法都加上更新时间戳......
+    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 })
 
 listBase(page.current, page.size, queryParam).then(res => {
   tableData.data = res.data
   page.total = res.count
+  fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
 })
 
 getTableColumns().then(res => {
@@ -99,6 +112,7 @@ const deleteSelected = () => {
     listBase(page.current, page.size, { ...queryParam }).then(res => {
       tableData.data = res.data
       page.total = res.count
+      fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
     })
   })
 }
@@ -109,6 +123,7 @@ const sortTable = (column) => {
   listBase(page.current, page.size, queryParam).then(res => {
     tableData.data = res.data
     page.total = res.count
+    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 }
 
@@ -128,6 +143,7 @@ const queryConditions = ({
     tableData.data = res.data
     page.total = res.count
     advancedQuery.show = false
+    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 }
 
@@ -148,6 +164,7 @@ const updateData = () => {
   listBase(page.current, page.size, { ...queryParam }).then(res => {
     tableData.data = res.data
     page.total = res.count
+    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 }
 defineExpose({updateData, name: 'BaseCourseCategoryTable'})
