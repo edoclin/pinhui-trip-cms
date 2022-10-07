@@ -202,11 +202,8 @@ const end = ({
   type,
   target
 }) => {
-  console.log(target._opts.path)
   form.polygonGeometry = target._opts.path
 }
-const emit = defineEmits(['onUpdate'])
-
 
 const uploading = ref(false)
 const fileList = ref([])
@@ -238,21 +235,21 @@ const props = defineProps({
   data: {}
 })
 if (props.data) {
-  form.baseId = props.data.baseId
-  form.baseName = props.data.baseName
-  form.baseLocationText = props.data.baseLocationText
-  form.coverResourcePath = props.data.coverResourcePath
-  form.descSimple = props.data.descSimple
-  form.descRichText = props.data.descRichText
-  valueHtml.html = props.data.descRichText
-  form.status = statusEnum.value.find(item => item.name === props.data.status).key
-  props.data.polygon.forEach(item => {
-    form.polygonGeometry.push([item.lng, item.lat])
+  form["baseId"] = props.data["baseId"]
+  form["baseName"] = props.data["baseName"]
+  form["baseLocationText"] = props.data["baseLocationText"]
+  form["coverResourcePath"] = props.data["coverResourcePath"]
+  form["descSimple"] = props.data["descSimple"]
+  form["descRichText"] = props.data["descRichText"]
+  valueHtml.html = props.data["descRichText"]
+  form["status"] = statusEnum.value.find(item => item.name === props.data["status"]).key
+  props.data["polygon"].forEach(item => {
+    form["polygonGeometry"].push([item.lng, item.lat])
   })
-  amapParam.center = [props.data.centroid.lng, props.data.centroid.lat]
+  amapParam.center = [props.data["centroid"].lng, props.data["centroid"].lat]
   fileList.value = [{
     name: '',
-    url: props.data.coverResourcePathUrl
+    url: props.data["coverResourcePathUrl"]
   }]
 }
 </script>

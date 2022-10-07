@@ -190,25 +190,30 @@
             </el-menu>
           </el-header>
           <el-main>
-            <el-tabs
-                style="height: calc(100vh - 100px - 12px)"
-                v-model="currentTab.name"
-                type="card"
-                closable
-                @tab-remove="removeTab">
-              <el-tab-pane
-                  v-for="item in editableTabs"
-                  :key="item.key"
-                  :label="item.title"
-                  :name="item.name">
-                <component
-                    :is="item.component" ref="itemRefs" @onEdit="handleEdit" :data="children[item.name]"
-                    @onUpdate="handleUpdate"></component>
-              </el-tab-pane>
-            </el-tabs>
+            <el-scrollbar>
+              <el-tabs
+                  ref="elTabRef"
+                  stretch
+                  style="height: calc(100vh - 100px - 12px)"
+                  v-model="currentTab.name"
+                  type="card"
+                  closable
+                  @tab-remove="removeTab">
+                  <el-tab-pane
+                      v-for="item in editableTabs"
+                      :key="item.key"
+                      :label="item.title"
+                      :name="item.name">
+                    <component
+                        :is="item.component" :data="children[item.name]"></component>
+                  </el-tab-pane>
+              </el-tabs>
+              <el-backtop/>
+            </el-scrollbar>
             <el-footer>
               © 2022 武汉图歌信息技术有限责任公司
             </el-footer>
+
           </el-main>
         </el-container>
       </el-container>
@@ -254,6 +259,8 @@ import steps from 'src/api/steps'
 import { useQuasar } from 'quasar'
 import { useCommonStore } from 'src/stores/common_store'
 import { getCourseVersion, getPreparedRole, getStatusEnum } from 'src/api/common'
+
+const bus = inject('bus')
 
 const commonActions = mapActions(useCommonStore,
     [
@@ -330,6 +337,10 @@ onUnmounted(() => {
   screenfull.off('change', change)
 })
 
+onMounted(() => {
+  // console.log(elTabRef.value.offsetHeigh)
+})
+
 const isDark = useDark()
 
 const toggleDark = useToggle(isDark)
@@ -382,14 +393,13 @@ const removeTab = (name) => {
     currentTab.name = editableTabs[index + 1].name
 
   }
-
   editableTabs.splice(index, 1)
   delete children[name]
 }
 
 const children = reactive({})
 
-const handleEdit = ({
+bus.on('edit-item', ({
   record,
   component,
   title,
@@ -407,16 +417,9 @@ const handleEdit = ({
     children[name] = record
     currentTab.name = name
   }
-}
+})
 
-const handleUpdate = (refName) => {
-  let find = itemRefs.value.find(item => item.name === refName)
-  if (find !== undefined) {
-    find.updateData()
-  }
-}
-
-
+const elTabRef = ref(null)
 </script>
 
 <style>
@@ -458,7 +461,6 @@ const handleUpdate = (refName) => {
   right: 0;
   top: 70px;
   bottom: 0;
-  overflow-y: scroll;
 }
 
 </style>

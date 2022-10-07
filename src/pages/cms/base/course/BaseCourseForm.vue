@@ -74,6 +74,8 @@ import { getBaseCourseCategorySelector } from 'src/api/base-course-category'
 const { statusEnum, courseVersion } = useMapState(useCommonStore, ['statusEnum', 'courseVersion'])
 
 
+const bus = inject('bus')
+
 const handleTransfer = (current, direction, value) => {
   if (direction === 'right') {
     ElMessageBox.alert('请点击已添加列表项上传课程', '提示', {
@@ -176,7 +178,6 @@ const onSubmit = (formEl) => {
         type: 'success',
         message: res.data,
       })
-      onResetForm(formEl)
     })
   } else {
     postBaseCourse(form).then(res => {
@@ -187,14 +188,23 @@ const onSubmit = (formEl) => {
       onResetForm(formEl)
     })
   }
-  emit('onUpdate', 'BaseCourseTable')
-
+  bus.emit('update-base-course-table')
 }
 
 const props = defineProps({
   data: {}
 })
 if (props.data) {
+    form["courseId"] = props.data["courseId"]
+    form["baseId"] = props.data["baseId"]
+    form["baseName"] = props.data["baseName"]
+    form["courseName"] = props.data["courseName"]
+    form["defaultCoverResourcePath"] = props.data["defaultCoverResourcePath"]
+    form["status"] = statusEnum.value.find(item => item.name === props.data["status"]).key
+    fileList.value = [{
+      name: '',
+      url: props.data["defaultCoverResourcePathUrl"]
+    }]
 }
 
 

@@ -23,15 +23,17 @@
         </template>
       </el-table-column>
     </el-table>
-<!--    modify_flag-->
+    <!--    modify_flag-->
     <el-row style="margin-top: 10px">
       <el-col :span="12">
         <el-pagination small background layout="total, sizes, prev, pager, next" :total="page.total"
-                       :page-sizes="[10, 20, 50, 100]" v-model:currentPage="page.current" v-model:page-size="page.size"/>
+                       :page-sizes="[10, 20, 50, 100]" v-model:currentPage="page.current"
+                       v-model:page-size="page.size"/>
       </el-col>
-      <el-col style="position: absolute;right: 0;color: #919398;font-size: 12px;margin-top: 5px" >数据更新时间: {{fetchTime}}</el-col>
+      <el-col style="position: absolute;right: 0;color: #919398;font-size: 12px;margin-top: 5px">数据更新时间:
+        {{ fetchTime }}
+      </el-col>
     </el-row>
-
 
 
   </div>
@@ -151,7 +153,12 @@ const queryConditions = ({
 const emit = defineEmits(['onEdit'])
 
 const onEdit = (record) => {
-  console.log(record);
+  bus.emit('edit-item', {
+    record,
+    component: BaseFormVue,
+    title: '基地编辑',
+    name: record.baseId
+  })
   emit('onEdit', {
     record,
     component: BaseFormVue,
@@ -168,13 +175,11 @@ const updateData = () => {
   })
 }
 
-
 const bus = inject('bus')
 
-bus.on('update-base-table',() => {
+bus.on('update-base-table', () => {
   updateData()
 })
-defineExpose({updateData, name: 'BaseCourseCategoryTable'})
 </script>
 <style>
 </style>

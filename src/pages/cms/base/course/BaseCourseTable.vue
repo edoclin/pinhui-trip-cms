@@ -41,7 +41,6 @@
 </template>
 <script setup>
 import { ElMessage } from 'element-plus'
-import { reactive, watch } from 'vue'
 import {
   listBaseCourse,
   deleteBaseCourseByIds,
@@ -50,7 +49,9 @@ import {
 } from 'src/api/base-course'
 import AdvanceQuery from 'src/components/AdvanceQuery.vue'
 import BaseCourseFormVue from './BaseCourseForm.vue'
-import { getBaseSelector } from '../../../../api/base'
+import { getBaseSelector } from 'src/api/base'
+
+const bus = inject('bus')
 
 const baseSelector = reactive({
   data: []
@@ -155,12 +156,8 @@ const queryConditions = ({
   })
 }
 
-// 使用defineEmits创建名称，接受一个数组
-const emit = defineEmits(['onEdit'])
-
 const onEdit = (record) => {
-  console.log(record)
-  emit('onEdit', {
+  bus.emit('edit-item', {
     record,
     component: BaseCourseFormVue,
     title: '课程编辑',
@@ -174,8 +171,9 @@ const updateData = () => {
     page.total = res.count
   })
 }
-
-defineExpose({updateData, name: 'BaseCourseCategoryTable'})
+bus.on('update-base-course-table', () => {
+  updateData()
+})
 </script>
 <style>
 </style>
