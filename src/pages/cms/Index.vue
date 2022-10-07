@@ -192,7 +192,7 @@
           <el-main>
             <el-scrollbar>
               <el-tabs
-                  ref="elTabRef"
+                  id="el-tabs"
                   stretch
                   style="height: calc(100vh - 100px - 12px)"
                   v-model="currentTab.name"
@@ -337,8 +337,11 @@ onUnmounted(() => {
   screenfull.off('change', change)
 })
 
+const elTabRef = ref(null)
+
+
 onMounted(() => {
-  // console.log(elTabRef.value.offsetHeigh)
+  console.log(window.document.getElementById('el-tabs').clientHeight)
 })
 
 const isDark = useDark()
@@ -419,7 +422,6 @@ bus.on('edit-item', ({
   }
 })
 
-const elTabRef = ref(null)
 </script>
 
 <style>
