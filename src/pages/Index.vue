@@ -13,7 +13,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 router.push({
-  path: '/cms'
+  path: '/cms/login'
 })
 
 

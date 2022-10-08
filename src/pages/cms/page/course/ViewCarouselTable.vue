@@ -154,22 +154,35 @@ const queryConditions = ({
     page.total = res.count
     advancedQuery.show = false
     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
-
   })
 }
 
+const bus = inject('bus')
+
+
 // 使用defineEmits创建名称，接受一个数组
-const emit = defineEmits(['onEdit'])
+// const emit = defineEmits(['onEdit'])
 
 const onEdit = (record) => {
   console.log(record)
-  emit('onEdit', {
+  bus.emit('edit-item', {
     record,
     component: ViewCarouselFormVue,
     title: '轮播图编辑',
     name: record.carouselId
   })
 }
+
+const updateData = () => {
+  listViewCarouselByPage(page.current, page.size, { ...queryParam }).then(res => {
+    tableData.data = res.data
+    page.total = res.count
+    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
+  })
+}
+
+bus.on('update-course-carousel-table', updateData)
+
 </script>
 <style>
 </style>

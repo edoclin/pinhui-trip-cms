@@ -152,29 +152,31 @@ const onResetForm = (formEl) => {
 }
 
 
-const emit = defineEmits(['onUpdate'])
+// const emit = defineEmits(['onUpdate'])
 
-const onSubmit = (formEl) => {
+const bus = inject('bus')
+
+const onSubmit = async (formEl) => {
   form.descRichText = valueHtml.html
   // update
   if (props.data) {
-    putBaseCourseCategory(form).then(res => {
+    await putBaseCourseCategory(form).then(res => {
       ElMessage({
         type: 'success',
         message: res.data,
       })
-      onResetForm(formEl)
     })
   } else {
-    postBaseCourseCategory(form).then(res => {
+    await postBaseCourseCategory(form).then(res => {
       ElMessage({
         type: 'success',
         message: res.data,
       })
+      valueHtml.html = ''
       onResetForm(formEl)
     })
   }
-  emit('onUpdate', 'BaseCourseCategoryTable')
+  bus.emit('update-base-course-category-table')
 }
 
 const props = defineProps({

@@ -48,6 +48,8 @@ import {
 import AdvanceQuery from 'src/components/AdvanceQuery.vue'
 import BaseCourseCategoryFormVue from './BaseCourseCategoryForm.vue'
 
+const bus = inject('bus')
+
 //modify_flag
 import { date } from 'quasar'
 
@@ -156,10 +158,10 @@ const queryConditions = ({
 }
 
 // 使用defineEmits创建名称，接受一个数组
-const emit = defineEmits(['onEdit'])
+// const emit = defineEmits(['onEdit'])
 
 const onEdit = (record) => {
-  emit('onEdit', {
+  bus.emit('edit-item', {
     record,
     component: BaseCourseCategoryFormVue,
     title: '分类编辑',
@@ -168,17 +170,18 @@ const onEdit = (record) => {
 }
 
 const updateData = () => {
-  console.log("updateData")
   listBaseCourseCategory(page.current, page.size, { ...queryParam }).then(res => {
+    console.log(res.data)
     tableData.data = res.data
     page.total = res.count
     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
-
   })
 }
+bus.on('update-base-course-category-table', updateData)
+
 // 组件是默认关闭的, 无法通过ref获取到
 // https://blog.csdn.net/qq_35443423/article/details/125574122?spm=1001.2101.3001.6650.9&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-9-125574122-blog-116994776.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-9-125574122-blog-116994776.pc_relevant_default&utm_relevant_index=10
-defineExpose({updateData, name: 'BaseCourseCategoryTable'})
+// defineExpose({updateData, name: 'BaseCourseCategoryTable'})
 </script>
 <style>
 </style>

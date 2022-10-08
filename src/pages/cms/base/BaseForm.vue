@@ -157,18 +157,18 @@ const onResetForm = (formEl) => {
   }
 }
 
-const onSubmit = (formEl) => {
+const onSubmit = async (formEl) => {
   form.descRichText = valueHtml.html
   // update
   if (props.data) {
-    putBase(form).then(res => {
+    await putBase(form).then(res => {
       ElMessage({
         type: 'success',
         message: res.data,
       })
     })
   } else {
-    postBase(form).then(res => {
+    await postBase(form).then(res => {
       ElMessage({
         type: 'success',
         message: res.data,

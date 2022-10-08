@@ -190,9 +190,7 @@ const updateData = () => {
     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 }
-bus.on('update-base-course-table', () => {
-  updateData()
-})
+bus.on('update-base-course-table', updateData)
 </script>
 <style>
 </style>

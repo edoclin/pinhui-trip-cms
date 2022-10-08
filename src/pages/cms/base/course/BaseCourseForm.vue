@@ -163,24 +163,24 @@ const handleChangeFileUpload = (uploadFile) => {
   }).catch(err => {
     ElMessage({
       type: 'error',
-      message: err
+      message: '服务器繁忙,请重试!'
     })
   })
 }
 
 const emit = defineEmits(['onUpdate'])
 
-const onSubmit = (formEl) => {
+const onSubmit = async (formEl) => {
   // update
   if (props.data) {
-    putBaseCourse(form).then(res => {
+    await putBaseCourse(form).then(res => {
       ElMessage({
         type: 'success',
         message: res.data,
       })
     })
   } else {
-    postBaseCourse(form).then(res => {
+    await postBaseCourse(form).then(res => {
       ElMessage({
         type: 'success',
         message: res.data,

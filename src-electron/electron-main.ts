@@ -34,8 +34,8 @@ app.whenReady().then(() => {
 function createWindow () {
   mainWindow = new BrowserWindow({
     icon: path.resolve(__dirname, 'icons/icon.png'), // tray icon
-    width: 1280,
-    height: 720,
+    width: 1920,
+    height: 1080,
     useContentSize: true,
     frame: false,
     webPreferences: {

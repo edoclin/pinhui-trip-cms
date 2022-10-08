@@ -579,7 +579,7 @@ const onCancel = () => {
 
 .form-main {
   position: absolute;
-  margin: auto 10%;
+  margin: auto 6%;
   top: 180px;
   bottom: 0;
 }

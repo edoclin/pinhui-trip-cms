@@ -89,21 +89,21 @@ const onResetForm = (formEl) => {
     formEl.resetFields()
   }
 }
-const emit = defineEmits(['onUpdate'])
+// const emit = defineEmits(['onUpdate'])
 
+const bus = inject('bus')
 
-const onSubmit = (formEl) => {
+const onSubmit = async (formEl) => {
   // update
   if (props.data) {
-    putViewCarousel(form).then(res => {
+    await putViewCarousel(form).then(res => {
       ElMessage({
         type: 'success',
         message: res.data,
       })
-      onResetForm(formEl)
     })
   } else {
-    postViewCarousel(form).then(res => {
+    await postViewCarousel(form).then(res => {
       ElMessage({
         type: 'success',
         message: res.data,
@@ -112,7 +112,7 @@ const onSubmit = (formEl) => {
     })
   }
 
-  emit('onUpdate', 'CourseCarouselTable')
+  bus.emit('update-course-carousel-table')
 }
 
 const props = defineProps({
