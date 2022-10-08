@@ -33,10 +33,17 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination small background layout="total, sizes, prev, pager, next" :total="page.total"
-                   :page-sizes="[10, 20, 50, 100]" v-model:currentPage="page.current" v-model:page-size="page.size"/>
-
-
+    <!--    modify_flag-->
+    <el-row style="margin-top: 10px">
+      <el-col :span="12">
+        <el-pagination small background layout="total, sizes, prev, pager, next" :total="page.total"
+                       :page-sizes="[10, 20, 50, 100]" v-model:currentPage="page.current"
+                       v-model:page-size="page.size"/>
+      </el-col>
+      <el-col style="position: absolute;right: 0;color: #919398;font-size: 12px;margin-top: 5px">数据更新时间:
+        {{ fetchTime }}
+      </el-col>
+    </el-row>
   </div>
 </template>
 <script setup>
@@ -50,6 +57,11 @@ import {
 import AdvanceQuery from 'src/components/AdvanceQuery.vue'
 import BaseCourseFormVue from './BaseCourseForm.vue'
 import { getBaseSelector } from 'src/api/base'
+//modify_flag
+import { date } from 'quasar'
+
+//modify_flag
+const fetchTime = ref('')
 
 const bus = inject('bus')
 
@@ -85,12 +97,15 @@ watch(page, () => {
   listBaseCourse(page.current, page.size, queryParam).then(res => {
     tableData.data = res.data
     page.total = res.count
+    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
+
   })
 })
 
 listBaseCourse(page.current, page.size, queryParam).then(res => {
   tableData.data = res.data
   page.total = res.count
+  fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
 })
 
 getTableColumns().then(res => {
@@ -122,6 +137,7 @@ const deleteSelected = () => {
     listBaseCourse(page.current, page.size, { ...queryParam }).then(res => {
       tableData.data = res.data
       page.total = res.count
+      fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
     })
   })
 }
@@ -132,6 +148,7 @@ const sortTable = (column) => {
   listBaseCourse(page.current, page.size, queryParam).then(res => {
     tableData.data = res.data
     page.total = res.count
+    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 }
 
@@ -153,6 +170,7 @@ const queryConditions = ({
     tableData.data = res.data
     page.total = res.count
     advancedQuery.show = false
+    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 }
 
@@ -169,6 +187,7 @@ const updateData = () => {
   listBaseCourse(page.current, page.size, { ...queryParam }).then(res => {
     tableData.data = res.data
     page.total = res.count
+    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 }
 bus.on('update-base-course-table', () => {
