@@ -98,6 +98,7 @@ watch(page, () => {
     tableData.data = res.data
     page.total = res.count
     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
+
   })
 })
 

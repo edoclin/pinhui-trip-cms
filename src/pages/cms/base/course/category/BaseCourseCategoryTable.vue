@@ -173,6 +173,7 @@ const updateData = () => {
     tableData.data = res.data
     page.total = res.count
     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
+
   })
 }
 // 组件是默认关闭的, 无法通过ref获取到

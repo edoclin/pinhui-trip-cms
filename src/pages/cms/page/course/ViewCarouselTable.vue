@@ -154,6 +154,7 @@ const queryConditions = ({
     page.total = res.count
     advancedQuery.show = false
     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
+
   })
 }
 
