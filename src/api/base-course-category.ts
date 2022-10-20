@@ -7,3 +7,4 @@ export const  deleteBaseCourseCategoryByIds = (batch: {}) => DELETE(`/baseCourse
 export const  getBaseCourseCategoryConditions = () => GET(`/baseCourseCategory/conditions`)
 export const  getTableColumns = () => GET(`/baseCourseCategory/table-columns`)
 export const  getBaseCourseCategorySelector = () => GET(`/baseCourseCategory/selector`)
+export const  listRelatedCourseById = (categoryId: string) => GET(`/baseCourseCategory/related-course/${categoryId}`)

@@ -2,6 +2,10 @@ import { boot } from 'quasar/wrappers'
 import axios, { AxiosInstance } from 'axios'
 import { useUserStore } from 'src/stores/user_store'
 import { ElMessage } from 'element-plus'
+import { useMapState } from 'src/stores'
+import { router } from 'src/router'
+import { LocalStorage } from 'quasar'
+import { mapActions } from 'pinia'
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -20,7 +24,6 @@ declare module '@vue/runtime-core' {
 // console.log(process.env.CLIENT)
 // console.log(process.env.SERVER)
 
-
 const api = axios.create({
   baseURL: process.env.NODE_ENV === 'production' ? 'https://172.27.63.55/server' : 'http://172.27.63.55:8000/server'
 })
@@ -28,6 +31,7 @@ const api = axios.create({
 if (process.env.MODE === 'electron') {
   api.defaults.baseURL = 'http://172.27.63.55:8000/server'
 }
+api.defaults.baseURL = 'http://localhost:8000/server'
 
 const amapRequest = axios.create({
   baseURL: 'https://restapi.amap.com/v3/'
@@ -43,6 +47,26 @@ api.interceptors.response.use(response => {
       type: 'error',
       message: response.data.message
     })
+
+    if (response.data.code === 5100) {
+      const userAction = mapActions(useUserStore,
+        [
+          'updateToken',
+          'updateUserInfo'])
+      // @ts-ignore
+      userAction.updateUserInfo({})
+      // @ts-ignore
+      userAction.updateToken({})
+      LocalStorage.remove('token')
+      LocalStorage.remove('userInfo')
+
+      router.push({
+        path: "/cms/login"
+      }).catch(err => {
+        console.log(err)
+      })
+
+    }
     return Promise.reject(response.data)
   }
   return response
@@ -98,18 +122,18 @@ export const DELETE = (url: string, params: {}) => {
       })
   })
 }
-export default boot(({ app }) => {
+export default boot(({
+  app,
+  router
+}) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
-  const userStore = useUserStore()
+  const {
+    token
+  } = useMapState(useUserStore, ['token'])
   // 添加请求拦截器
   api.interceptors.request.use(config => {
     // @ts-ignore
-    config.headers['token'] = userStore.token
-
-    // todo 在发送请求之前做些什么
-    // @ts-ignore
-    console.log(`headers['token']=${config.headers['token']}`)
-
+    config.headers[token.value.name] = token.value.value
     return config
   }, error => {
     // 对请求错误做些什么

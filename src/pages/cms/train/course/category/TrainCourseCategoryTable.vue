@@ -6,8 +6,17 @@
               @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="30"/>
       <el-table-column v-for="(item, index) in tableData.columns" :key="index" :sortable="item.sortable"
-                       :fixed="item.fixed" :prop="item.column" :label="item.label"></el-table-column>
-      <el-table-column fixed="right" label="操作">
+                       :fixed="item.fixed" :prop="item.column" :label="item.label">
+        <template #default="scope" v-if="item.column === 'color'">
+          <el-tag
+              :color="scope.row.color"
+              effect="dark"
+          >
+            {{ scope.row.color }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column :fixed="'right'" label="操作">
         <template #header v-if="selectedData.data.length !== 0">
           <el-popconfirm @confirm="deleteSelected" :title="`确定删除所选中的${selectedData.data.length}条记录?`">
             <template #reference>
@@ -23,29 +32,23 @@
         </template>
       </el-table-column>
     </el-table>
-    <!--    modify_flag-->
-    <el-row style="margin-top: 10px">
-      <el-col :span="12">
-        <el-pagination small background layout="total, sizes, prev, pager, next" :total="page.total"
-                       :page-sizes="[10, 20, 50, 100]" v-model:currentPage="page.current"
-                       v-model:page-size="page.size"/>
-      </el-col>
-      <el-col style="position: absolute;right: 0;color: #919398;font-size: 12px;margin-top: 5px">数据更新时间:
-        {{ fetchTime }}
-      </el-col>
-    </el-row>
+    <el-pagination small background layout="total, sizes, prev, pager, next" :total="page.total"
+                   :page-sizes="[10, 20, 50, 100]" v-model:currentPage="page.current" v-model:page-size="page.size"/>
+
+
   </div>
 </template>
 <script setup>
 import { ElMessage } from 'element-plus'
 import { reactive, watch } from 'vue'
-import { listUser, deleteUserByIds, getUserConditions, getTableColumns } from '../../../api/user'
-import AdvanceQuery from '../../../components/AdvanceQuery.vue'
-import UserFormVue from './UserForm.vue'
-
-import { date } from 'quasar'
-
-const fetchTime = ref('')
+import {
+  listTrainCourseCategory,
+  deleteTrainCourseCategoryByIds,
+  getTrainCourseCategoryConditions,
+  getTableColumns
+} from 'src/api/train-course-category'
+import AdvanceQuery from 'src/components/AdvanceQuery.vue'
+import TrainCourseCategoryFormVue from './TrainCourseCategoryForm.vue'
 
 const page = reactive({
   current: 1,
@@ -57,7 +60,7 @@ const conditions = reactive({
   map: []
 })
 
-getUserConditions().then(res => {
+getTrainCourseCategoryConditions().then(res => {
   conditions.map = res.data
 })
 
@@ -68,17 +71,15 @@ const queryParam = reactive({
 })
 
 watch(page, () => {
-  listUser(page.current, page.size, queryParam).then(res => {
+  listTrainCourseCategory(page.current, page.size, queryParam).then(res => {
     tableData.data = res.data
     page.total = res.count
-    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 })
 
-listUser(page.current, page.size, queryParam).then(res => {
+listTrainCourseCategory(page.current, page.size, queryParam).then(res => {
   tableData.data = res.data
   page.total = res.count
-  fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
 })
 
 getTableColumns().then(res => {
@@ -100,17 +101,16 @@ const handleSelectionChange = (value) => {
 const deleteSelected = () => {
   let ids = []
 
-  selectedData.data.forEach(item => ids.push(item.UserId))
+  selectedData.data.forEach(item => ids.push(item.categoryId))
 
-  deleteUserByIds({ ids }).then(res => {
+  deleteTrainCourseCategoryByIds({ ids }).then(res => {
     ElMessage({
       type: 'success',
       message: res.data
     })
-    listUser(page.current, page.size, { ...queryParam }).then(res => {
+    listTrainCourseCategory(page.current, page.size, { ...queryParam }).then(res => {
       tableData.data = res.data
       page.total = res.count
-      fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
     })
   })
 }
@@ -118,10 +118,9 @@ const deleteSelected = () => {
 const sortTable = (column) => {
   queryParam.isAsc = column.order === 'ascending'
   queryParam.orderColumns = [column.prop]
-  listUser(page.current, page.size, queryParam).then(res => {
+  listTrainCourseCategory(page.current, page.size, queryParam).then(res => {
     tableData.data = res.data
     page.total = res.count
-    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 }
 
@@ -137,12 +136,10 @@ const queryConditions = ({
   queryParam.createdBetween = createdBetween
   queryParam.updatedBetween = updatedBetween
   queryParam.conditions = conditions
-  listUser(page.current, page.size, { ...queryParam }).then(res => {
+  listTrainCourseCategory(page.current, page.size, { ...queryParam }).then(res => {
     tableData.data = res.data
     page.total = res.count
     advancedQuery.show = false
-    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
-
   })
 }
 
@@ -153,12 +150,11 @@ const onEdit = (record) => {
   console.log(record)
   bus.emit('edit-item', {
     record,
-    component: UserFormVue,
-    title: '用户编辑',
-    name: record.mobile
+    component: TrainCourseCategoryFormVue,
+    title: '培训课程分类编辑',
+    name: record.categoryId
   })
 }
 </script>
 <style>
 </style>
-

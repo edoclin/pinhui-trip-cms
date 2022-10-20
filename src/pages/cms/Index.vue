@@ -3,144 +3,177 @@
     <el-config-provider :locale="zhCn">
       <el-container>
         <el-aside width="220px">
-            <el-menu style="height: calc(100vh - 70px)">
-              <el-sub-menu index="base">
-                <template #title>
+          <el-menu style="height: calc(100vh - 70px)">
+            <el-sub-menu index="base">
+              <template #title>
+                <el-icon>
+                  <Location/>
+                </el-icon>
+                <span>基地管理</span>
+              </template>
+              <el-menu-item-group title="基地">
+                <el-menu-item index="base/table"
+                              @click="clickMenuItem('基地列表', 'BaseTable', 'BaseTable', './base/BaseTable')">
                   <el-icon>
-                    <Location/>
+                    <Document/>
                   </el-icon>
-                  <span>基地管理</span>
-                </template>
-                <el-menu-item-group title="基地">
-                  <el-menu-item index="base/table"
-                                @click="clickMenuItem('基地列表', 'BaseTable', 'BaseTable', './base/BaseTable')">
+                  基地列表
+                </el-menu-item>
+                <el-menu-item index="base/form"
+                              @click="clickMenuItem('新增基地', 'BaseForm', 'BaseForm', './base/BaseForm')">
+                  <el-icon>
+                    <FolderAdd/>
+                  </el-icon>
+                  新增基地
+                </el-menu-item>
+              </el-menu-item-group>
+              <el-menu-item-group title="课程">
+                <el-menu-item index="base/course/table"
+                              @click="clickMenuItem('课程列表', 'BaseCourseTable', 'BaseCourseTable', './base/course/BaseCourseTable')">
+                  <el-icon>
+                    <Document/>
+                  </el-icon>
+                  课程列表
+                </el-menu-item>
+                <el-menu-item index="base/course/form"
+                              @click="clickMenuItem('新增课程', 'BaseCourseForm', 'BaseCourseForm', './base/course/BaseCourseForm')">
+                  <el-icon>
+                    <FolderAdd/>
+                  </el-icon>
+                  新增课程
+                </el-menu-item>
+                <el-menu-item-group title="分类">
+                  <el-menu-item index="base/course/category/table"
+                                @click="clickMenuItem('分类列表', 'BaseCourseCategoryTable', 'BaseCourseCategoryTable', './base/course/category/BaseCourseCategoryTable')">
                     <el-icon>
                       <Document/>
                     </el-icon>
-                    基地列表
+                    分类列表
                   </el-menu-item>
-                  <el-menu-item index="base/form"
-                                @click="clickMenuItem('新增基地', 'BaseForm', 'BaseForm', './base/BaseForm')">
+                  <el-menu-item index="base/course/category/form"
+                                @click="clickMenuItem('新增分类', 'BaseCourseCategoryForm', 'BaseCourseCategoryForm', './base/course/category/BaseCourseCategoryForm')">
                     <el-icon>
                       <FolderAdd/>
                     </el-icon>
-                    新增基地
+                    新增分类
                   </el-menu-item>
                 </el-menu-item-group>
-                <el-menu-item-group title="课程">
-                  <el-menu-item index="base/course/table"
-                                @click="clickMenuItem('课程列表', 'BaseCourseTable', 'BaseCourseTable', './base/course/BaseCourseTable')">
-                    <el-icon>
-                      <Document/>
-                    </el-icon>
-                    课程列表
-                  </el-menu-item>
-                  <el-menu-item index="base/course/form"
-                                @click="clickMenuItem('新增课程', 'BaseCourseForm', 'BaseCourseForm', './base/course/BaseCourseForm')">
-                    <el-icon>
-                      <FolderAdd/>
-                    </el-icon>
-                    新增课程
-                  </el-menu-item>
-                  <el-menu-item-group title="分类">
-                    <el-menu-item index="base/course/category/table"
-                                  @click="clickMenuItem('课程分类', 'BaseCourseCategoryTable', 'BaseCourseCategoryTable', './base/course/category/BaseCourseCategoryTable')">
-                      <el-icon>
-                        <Document/>
-                      </el-icon>
-                      分类列表
-                    </el-menu-item>
-                    <el-menu-item index="base/course/category/form"
-                                  @click="clickMenuItem('新增分类', 'BaseCourseCategoryForm', 'BaseCourseCategoryForm', './base/course/category/BaseCourseCategoryForm')">
-                      <el-icon>
-                        <FolderAdd/>
-                      </el-icon>
-                      新增分类
-                    </el-menu-item>
-                  </el-menu-item-group>
-                </el-menu-item-group>
-              </el-sub-menu>
-              <el-sub-menu index="user">
-                <template #title>
+              </el-menu-item-group>
+            </el-sub-menu>
+            <el-sub-menu index="user">
+              <template #title>
+                <el-icon>
+                  <User/>
+                </el-icon>
+                <span>用户管理</span>
+              </template>
+              <el-menu-item-group title="用户">
+                <el-menu-item index="user/table"
+                              @click="clickMenuItem('用户列表', 'UserTable', 'UserTable', './user/UserTable')">
                   <el-icon>
-                    <User/>
+                    <Document/>
                   </el-icon>
-                  <span>用户管理</span>
-                </template>
-                <el-menu-item-group title="用户">
-                  <el-menu-item index="user/table"
-                                @click="clickMenuItem('用户列表', 'UserTable', 'UserTable', './user/UserTable')">
-                    <el-icon>
-                      <Document/>
-                    </el-icon>
-                    用户列表
-                  </el-menu-item>
-                </el-menu-item-group>
-                <el-menu-item-group title="角色">
-                  <el-menu-item index="user/role-table"
-                                @click="clickMenuItem('角色列表', 'RoleTable', 'RoleTable', './role/RoleTable')">
-                    <el-icon>
-                      <Document/>
-                    </el-icon>
-                    角色列表
-                  </el-menu-item>
-                  <el-menu-item index="user/role-form"
-                                @click="clickMenuItem('添加角色', 'RoleForm', 'RoleForm', './role/RoleForm')">
-                    <el-icon>
-                      <Document/>
-                    </el-icon>
-                    添加角色
-                  </el-menu-item>
-                </el-menu-item-group>
-              </el-sub-menu>
+                  用户列表
+                </el-menu-item>
+              </el-menu-item-group>
+              <el-menu-item-group title="角色">
+                <el-menu-item index="user/role-table"
+                              @click="clickMenuItem('角色列表', 'RoleTable', 'RoleTable', './role/RoleTable')">
+                  <el-icon>
+                    <Document/>
+                  </el-icon>
+                  角色列表
+                </el-menu-item>
+                <el-menu-item index="user/role-form"
+                              @click="clickMenuItem('添加角色', 'RoleForm', 'RoleForm', './role/RoleForm')">
+                  <el-icon>
+                    <FolderAdd/>
+                  </el-icon>
+                  添加角色
+                </el-menu-item>
+              </el-menu-item-group>
+            </el-sub-menu>
 
-              <el-sub-menu index="pages">
-                <template #title>
+            <el-sub-menu index="pages">
+              <template #title>
+                <el-icon>
+                  <House/>
+                </el-icon>
+                <span>页面管理</span>
+              </template>
+              <el-menu-item-group title="小程序端">
+                <el-menu-item index="mini/carousel/table"
+                              @click="clickMenuItem('轮播图列表', 'ViewCarouselTable', 'ViewCarouselTable', './page/course/ViewCarouselTable')">
                   <el-icon>
-                    <House/>
+                    <Document/>
                   </el-icon>
-                  <span>页面管理</span>
-                </template>
-                <el-menu-item-group title="小程序端">
-                  <el-menu-item index="mini/carousel/table"
-                                @click="clickMenuItem('轮播图列表', 'ViewCarouselTable', 'ViewCarouselTable', './page/course/ViewCarouselTable')">
-                    <el-icon>
-                      <Document/>
-                    </el-icon>
-                    轮播图列表
-                  </el-menu-item>
-                  <el-menu-item index="mini/carousel/form"
-                                @click="clickMenuItem('新增轮播图', 'ViewCarouselForm', 'ViewCarouselForm', './page/course/ViewCarouselForm')">
-                    <el-icon>
-                      <Document/>
-                    </el-icon>
-                    新增轮播图
-                  </el-menu-item>
-                  <el-menu-item index="mini/carousel/list"
-                                @click="clickMenuItem('展示状态编辑', 'ViewCarouselList', 'ViewCarouselList', './page/course/ViewCarouselList')">
-                    <el-icon>
-                      <DataBoard/>
-                    </el-icon>
-                    展示状态编辑
-                  </el-menu-item>
-                </el-menu-item-group>
-              </el-sub-menu>
-              <el-sub-menu index="manage">
-                <template #title>
+                  轮播图列表
+                </el-menu-item>
+                <el-menu-item index="mini/carousel/form"
+                              @click="clickMenuItem('新增轮播图', 'ViewCarouselForm', 'ViewCarouselForm', './page/course/ViewCarouselForm')">
                   <el-icon>
-                    <Setting/>
+                    <FolderAdd/>
                   </el-icon>
-                  <span>系统管理</span>
-                </template>
-                <!--            <el-menu-item index="manage/server"-->
-                <!--                          @click="clickMenuItem('服务器状态', 'Server', 'Server', './manage/Server')">-->
-                <!--              <el-icon>-->
-                <!--                <Document/>-->
-                <!--              </el-icon>-->
-                <!--              服务器状态-->
-                <!--            </el-menu-item>-->
-              </el-sub-menu>
-            </el-menu>
+                  新增轮播图
+                </el-menu-item>
+                <el-menu-item index="mini/carousel/list"
+                              @click="clickMenuItem('展示状态编辑', 'ViewCarouselList', 'ViewCarouselList', './page/course/ViewCarouselList')">
+                  <el-icon>
+                    <DataBoard/>
+                  </el-icon>
+                  展示状态编辑
+                </el-menu-item>
+              </el-menu-item-group>
+            </el-sub-menu>
+            <el-sub-menu index="train">
+              <template #title>
+                <el-icon>
+                  <Calendar/>
+                </el-icon>
+                <span>培训管理</span>
+              </template>
+              <el-menu-item-group title="课程">
+                <el-menu-item index="mini/train/course/table"
+                              @click="clickMenuItem('课程列表', 'ViewCarouselTable', 'ViewCarouselTable', './page/course/ViewCarouselTable')">
+                  <el-icon>
+                    <Document/>
+                  </el-icon>
+                  课程列表
+                </el-menu-item>
+                <el-menu-item index="mini/train/course/form"
+                              @click="clickMenuItem('新增课程', 'TrainCourseForm', 'TrainCourseForm', './train/course/TrainCourseForm')">
+                  <el-icon>
+                    <FolderAdd/>
+                  </el-icon>
+                  新增课程
+                </el-menu-item>
+              </el-menu-item-group>
+              <el-menu-item-group title="分类">
+                <el-menu-item index="mini/train/category/table"
+                              @click="clickMenuItem('培训课程分类列表', 'TrainCourseCategoryTable', 'TrainCourseCategoryTable', './train/course/category/TrainCourseCategoryTable')">
+                  <el-icon>
+                    <Document/>
+                  </el-icon>
+                  分类列表
+                </el-menu-item>
+                <el-menu-item index="mini/train/category/form"
+                              @click="clickMenuItem('培训课程新增分类', 'TrainCourseCategoryForm', 'TrainCourseCategoryForm', './train/course/category/TrainCourseCategoryForm')">
+                  <el-icon>
+                    <FolderAdd/>
+                  </el-icon>
+                  新增分类
+                </el-menu-item>
+              </el-menu-item-group>
+            </el-sub-menu>
+            <el-sub-menu index="manage">
+              <template #title>
+                <el-icon>
+                  <Setting/>
+                </el-icon>
+                <span>系统管理</span>
+              </template>
+            </el-sub-menu>
+          </el-menu>
         </el-aside>
         <el-container>
           <el-header>
@@ -150,7 +183,7 @@
                 :ellipsis="false">
               <el-menu-item index="logo">
                 <el-avatar shape="square" :size="50"
-                           src="https://dev-edoclin-1304812488.cos.ap-chongqing.myqcloud.com/static/pinhui.trip.logo.jpg"/>
+                           src="https://prod-cdn.tugezigui1.com/static/pinhui.trip.logo.trip"/>
               </el-menu-item>
               <el-menu-item index="info">
                 <div style="font-size: 3ch">
@@ -186,27 +219,28 @@
               <el-sub-menu index="setting">
                 <template #title>个人中心</template>
                 <el-menu-item index="change-password">修改密码</el-menu-item>
+                <el-menu-item index="logout" @click="logout">退出登录</el-menu-item>
               </el-sub-menu>
             </el-menu>
           </el-header>
           <el-main>
-              <el-tabs
-                  id="el-tabs"
-                  stretch
-                  style="height: calc(100vh - 100px - 12px)"
-                  v-model="currentTab.name"
-                  type="card"
-                  closable
-                  @tab-remove="removeTab">
-                <el-tab-pane
-                    v-for="item in editableTabs"
-                    :key="item.key"
-                    :label="item.title"
-                    :name="item.name">
-                  <component
-                      :is="item.component" :data="children[item.name]"></component>
-                </el-tab-pane>
-              </el-tabs>
+            <el-tabs
+                id="el-tabs"
+                stretch
+                style="height: calc(100vh - 100px - 12px)"
+                v-model="currentTab.name"
+                type="card"
+                closable
+                @tab-remove="removeTab">
+              <el-tab-pane
+                  v-for="item in editableTabs"
+                  :key="item.key"
+                  :label="item.title"
+                  :name="item.name">
+                <component
+                    :is="item.component" :data="children[item.name]"></component>
+              </el-tab-pane>
+            </el-tabs>
             <el-footer>
               © 2022 武汉图歌信息技术有限责任公司
             </el-footer>
@@ -249,12 +283,12 @@ import { useDark, useToggle } from '@vueuse/core'
 import SvgExitFullScreen from 'src/components/SvgExitFullScreen.vue'
 import screenfull from 'screenfull'
 
-import Driver from 'driver.js'
 import 'driver.js/dist/driver.min.css'
-import steps from 'src/api/steps'
-import { useQuasar } from 'quasar'
 import { useCommonStore } from 'src/stores/common_store'
 import { getCourseVersion, getPreparedRole, getStatusEnum } from 'src/api/common'
+import { webLogout } from '../../api/user'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '../../stores/user_store'
 
 const bus = inject('bus')
 
@@ -264,19 +298,24 @@ const commonActions = mapActions(useCommonStore,
       'updatePreparedRole',
       'updateCourseVersion'])
 
-getStatusEnum().then(res => {
-  commonActions.updateStatusEnum(res.data)
-})
-
-getPreparedRole().then(res => {
-  commonActions.updatePreparedRole(res.data)
-})
-
-getCourseVersion().then(res => {
-  commonActions.updateCourseVersion(res.data)
-})
-
 const isElectron = ref(process.env.MODE === 'electron')
+
+if (isElectron.value) {
+  const CtrlWCloseTab = () => {
+    removeTab(currentTab.name)
+  }
+
+  const switchCloseTab = () => {
+    let findIndex = editableTabs.findIndex(item => item.name === currentTab.name)
+    if (editableTabs.length === 1) {
+      return
+    }
+    currentTab.name = editableTabs[(findIndex + 1) % editableTabs.length].name
+  }
+
+  window.$electron.closeTab(CtrlWCloseTab)
+  window.$electron.switchTab(switchCloseTab)
+}
 
 const isFullscreen = ref(false)
 
@@ -306,26 +345,37 @@ const onToggle = (evt) => {
 
 const itemRefs = ref([])
 
-const { proxy } = getCurrentInstance()
+const router = useRouter()
+const userAction = mapActions(useUserStore,
+    [
+      'updateToken',
+      'updateUserInfo'])
+
+const localStorage = inject('localStorage')
+
+const logout = () => {
+  webLogout().then(res => {
+    userAction.updateToken({})
+    userAction.updateUserInfo({})
+    localStorage.remove('token')
+    localStorage.remove('userInfo')
+    router.push({
+      path: "/cms/login"
+    })
+  })
+}
 
 onMounted(() => {
   screenfull.on('change', change)
-  let $q = useQuasar()
-  if ($q.localStorage.getItem('first') === null) {
-    let driver = new Driver({
-      // 禁止点击蒙版关闭
-      allowClose: false,
-      animate: true,
-      closeBtnText: '关闭',
-      doneBtnText: '完成',
-      keyboardControl: true,
-      nextBtnText: '下一个',
-      prevBtnText: '上一个'
+  getStatusEnum().then(res => {
+    commonActions.updateStatusEnum(res.data)
+    getPreparedRole().then(res => {
+      commonActions.updatePreparedRole(res.data)
+      getCourseVersion().then(res => {
+        commonActions.updateCourseVersion(res.data)
+      })
     })
-    driver.defineSteps(steps())
-    driver.start()
-    $q.localStorage.set('first', false)
-  }
+  })
 })
 
 // 删除侦听器
@@ -334,9 +384,6 @@ onUnmounted(() => {
 })
 
 const elTabRef = ref(null)
-
-onMounted(() => {
-})
 
 const isDark = useDark()
 
@@ -379,7 +426,7 @@ const clickMenuItem = (title, name, key, componentPath) => {
 
 const removeTab = (name) => {
   let index = editableTabs.findIndex(item => item.name === name)
-  // chrome 标签逻辑
+  // chrome 标签
   if (index === 0) {
     // 打开引导页
   } else if (index === editableTabs.length - 1) {
@@ -458,5 +505,4 @@ bus.on('edit-item', ({
   top: 70px;
   bottom: 0;
 }
-
 </style>

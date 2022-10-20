@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeTheme, ipcMain, globalShortcut } from 'electron'
+import { app, BrowserWindow, nativeTheme, ipcMain, globalShortcut, Menu, MenuItem } from 'electron'
 import path from 'path'
 import os from 'os'
 
@@ -15,21 +15,35 @@ try {
       path.join(app.getPath('userData'), 'DevTools Extensions')
     )
   }
-} catch (_) {}
+} catch (_) {
+}
 
 let mainWindow: BrowserWindow | undefined
 
-function registryShortcut() {
+
+function registryShortcut () {
   globalShortcut.register('CommandOrControl+J+K', () => {
     // 获取当前窗口
     // @ts-ignore
-    BrowserWindow.getFocusedWindow().webContents.openDevTools();
-  });
+    mainWindow.webContents.openDevTools()
+  })
+
+  globalShortcut.register('CommandOrControl+W', () => {
+    // @ts-ignore
+    mainWindow.webContents.send('close-tab')
+  })
+
+  globalShortcut.register('Control+Tab', () => {
+    // @ts-ignore
+    mainWindow.webContents.send('switch-tab')
+  })
 }
+
+
 app.whenReady().then(() => {
   // 注册快捷键
-    registryShortcut();
-});
+  registryShortcut()
+})
 
 function createWindow () {
   mainWindow = new BrowserWindow({
@@ -42,13 +56,15 @@ function createWindow () {
       // isTrue -> nodeIntegration is valid!
       contextIsolation: true,
       // More info: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/electron-preload-script
+      // @ts-ignore
       preload: path.resolve(__dirname, process.env.QUASAR_ELECTRON_PRELOAD),
       nodeIntegration: true
     },
   })
 
-  mainWindow.loadURL(process.env.APP_URL).then(r => {})
-
+  // @ts-ignore
+  mainWindow.loadURL(process.env.APP_URL).then(r => {
+  })
 
   if (process.env.DEBUGGING) {
     mainWindow.webContents.openDevTools()
@@ -77,4 +93,7 @@ app.on('activate', () => {
   if (mainWindow === undefined) {
     createWindow()
   }
+})
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll()
 })

@@ -13,6 +13,7 @@
       <div style="height: 60vh;width: 100%;">
         <el-amap :center="amapParam.center" :zoom="amapParam.zoom">
           <el-amap-search-box :visible="true" @select="selectPoi" @choose="choosePoi"/>
+          <el-amap-control-map-type :visible="true" ></el-amap-control-map-type>
           <el-amap-control-geolocation :visible="true" @complete="getLocation"/>
           <el-amap-mouse-tool v-if="form.polygonGeometry.length === 0" type="polygon" :auto-clear="true"
                               @draw="drawMouseTool"/>

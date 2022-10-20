@@ -9,11 +9,45 @@
 <script setup>
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import { useRouter } from 'vue-router'
+import { webCheck } from 'src/api/user'
+
+const isElectron = ref(process.env.MODE === 'electron')
+
+const timer = ref(null)
+
+// electron 平台自动续签
+onMounted(() => {
+  if (isElectron) {
+    timer.value = setInterval(() => {
+      webCheck().then(res => {
+        router.push({
+          path: '/cms'
+        })
+      }).catch(err => {
+        console.log(err)
+        router.push({
+          path: '/cms/login'
+        })
+      })
+    }, 1000 * 60 * 30)
+  }
+})
+
+onUnmounted(() => {
+  clearInterval(timer.value)
+})
 
 const router = useRouter()
 
-router.push({
-  path: '/cms/login'
+webCheck().then(res => {
+  router.push({
+    path: '/cms'
+  })
+}).catch(err => {
+  console.log(err)
+  router.push({
+    path: '/cms/login'
+  })
 })
 
 

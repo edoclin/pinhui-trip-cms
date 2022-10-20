@@ -1,6 +1,6 @@
 <template>
-  <course-version-form v-if="courseVersionForm.show" :form="courseVersionForm.form" @onSubmit="onSubmitCourseVersion"
-                 @onCancel="courseVersionForm.show = false"></course-version-form>
+  <course-version-form v-if="courseVersionForm['show']" :form="courseVersionForm['form']" @onSubmit="onSubmitCourseVersion"
+                       @onCancel="courseVersionForm['show'] = false"></course-version-form>
   <el-form :model="form" label-width="120px" ref="formRef">
     <el-form-item label="课程名称" prop="courseName">
       <el-input v-model="form['courseName']"/>
@@ -19,14 +19,18 @@
     </el-form-item>
     <el-form-item label="所属分类" prop="categoryIds">
       <el-select multiple v-model="form['categoryIds']" placeholder="请选择所属分类" style="width: 100%">
-        <el-option v-for="category in selectorData.baseCourseCategorySelector" :key="category.categoryId" :label="category.categoryName"
+        <el-option v-for="category in selectorData.baseCourseCategorySelector" :key="category.categoryId"
+                   :label="category.categoryName"
                    :value="category.categoryId"/>
       </el-select>
     </el-form-item>
     <el-form-item prop="defaultCoverResourcePath" label="课程封面图">
-      <el-upload :on-preview="handlePreviewUpload" list-type="picture-card" v-model:file-list="fileList" :auto-upload="false" accept="image/*"
+      <el-upload :on-preview="handlePreviewUpload" list-type="picture-card" v-model:file-list="fileList"
+                 :auto-upload="false" accept="image/*"
                  :on-change="handleChangeFileUpload">
-        <el-button type="primary" :loading="uploading">{{ uploading ? '上传中...' : (fileList.length === 1 ? '重新上传' : '点击上传') }}</el-button>
+        <el-button type="primary" :loading="uploading">
+          {{ uploading ? '上传中...' : (fileList.length === 1 ? '重新上传' : '点击上传') }}
+        </el-button>
         <template #tip>
           <div class="el-upload__tip">
             <el-progress
@@ -54,13 +58,16 @@
       />
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="onSubmit(formRef)" :disabled="uploading">{{ data ? '更新' : '创建' }}</el-button>
+      <el-button type="primary" @click="onSubmit(formRef)" :disabled="uploading">{{
+          data ? '更新' : '创建'
+        }}
+      </el-button>
       <el-button v-if="!data" @click="onResetForm(formRef)">重置</el-button>
     </el-form-item>
   </el-form>
 </template>
 <script setup>
-import { postBaseCourse, putBaseCourse } from 'src/api/base-course'
+import { getBaseCourseById, postBaseCourse, putBaseCourse } from 'src/api/base-course'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 import { useMapState } from 'src/stores'
@@ -71,8 +78,10 @@ import CourseVersionForm from 'src/components/CourseVersionForm.vue'
 import { generateAccessUrl } from 'src/api/common'
 import { getBaseCourseCategorySelector } from 'src/api/base-course-category'
 
-const { statusEnum, courseVersion } = useMapState(useCommonStore, ['statusEnum', 'courseVersion'])
-
+const {
+  statusEnum,
+  courseVersion
+} = useMapState(useCommonStore, ['statusEnum', 'courseVersion'])
 
 const bus = inject('bus')
 
@@ -91,7 +100,7 @@ const handleTransfer = (current, direction, value) => {
 const onSubmitCourseVersion = version => {
   courseVersionForm.show = false
   if (form.versions.find(item => item.version === version.result.version) !== undefined) {
-    form.versions.splice(form.versions.findIndex(item => item.version === version.result.version),1, { ...version.result })
+    form.versions.splice(form.versions.findIndex(item => item.version === version.result.version), 1, { ...version.result })
     return
   }
   form.versions.push({ ...version.result })
@@ -99,7 +108,7 @@ const onSubmitCourseVersion = version => {
 
 const courseVersionForm = reactive({
   form: {
-    versions: []
+    data: {},
   },
   show: false,
 })
@@ -109,6 +118,7 @@ const addCourseVersion = (selected, current) => {
     return
   }
   courseVersionForm.form['courseVersion'] = current[0]
+  courseVersionForm.form['data'] = form['versions'].find(item => item['courseVersion'] === current[0])
   courseVersionForm.show = true
 }
 
@@ -116,7 +126,6 @@ const selectorData = reactive({
   baseSelector: [],
   baseCourseCategorySelector: [],
 })
-
 
 getBaseSelector().then(res => {
   selectorData.baseSelector = res.data
@@ -129,7 +138,8 @@ getBaseCourseCategorySelector().then(res => {
 const formRef = ref()
 
 const form = reactive({
-  versions: []
+  versions: [],
+  versionNames: []
 })
 
 const onResetForm = (formEl) => {
@@ -141,7 +151,7 @@ const onResetForm = (formEl) => {
 const uploading = ref(false)
 const fileList = ref([])
 const handlePreviewUpload = (e) => {
-  window.open(e.url, "_black")
+  window.open(e.url, '_black')
 }
 
 const handleChangeFileUpload = (uploadFile) => {
@@ -195,19 +205,23 @@ const props = defineProps({
   data: {}
 })
 if (props.data) {
-    form["courseId"] = props.data["courseId"]
-    form["baseId"] = props.data["baseId"]
-    form["baseName"] = props.data["baseName"]
-    form["courseName"] = props.data["courseName"]
-    form["defaultCoverResourcePath"] = props.data["defaultCoverResourcePath"]
-    form["status"] = statusEnum.value.find(item => item.name === props.data["status"]).key
-    fileList.value = [{
-      name: '',
-      url: props.data["defaultCoverResourcePathUrl"]
-    }]
+  form['courseId'] = props.data['courseId']
+  form['baseId'] = props.data['baseId']
+  form['baseName'] = props.data['baseName']
+  form['courseName'] = props.data['courseName']
+  form['defaultCoverResourcePath'] = props.data['defaultCoverResourcePath']
+  form['status'] = statusEnum.value.find(item => item.name === props.data['status']).key
+  fileList.value = [{
+    name: '',
+    url: props.data['defaultCoverResourcePathUrl']
+  }]
+  getBaseCourseById(form['courseId']).then(res => {
+    form['versions'] = res.data.versions
+
+    form['versions'].forEach(item => form['versionNames'].push(item.courseVersion))
+    form['categoryIds'] = res.data.categoryIds
+  })
 }
-
-
 
 
 </script>

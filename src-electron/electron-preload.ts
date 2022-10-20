@@ -15,5 +15,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
 contextBridge.exposeInMainWorld('$electron', {
-  exitApp: () => ipcRenderer.send("app-quit")
+  exitApp: () => ipcRenderer.send("app-quit"),
+  closeTab: (callback: any) => ipcRenderer.on('close-tab', callback),
+  switchTab: (callback: any) => ipcRenderer.on('switch-tab', callback)
 })

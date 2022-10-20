@@ -1,0 +1,120 @@
+<template>
+  <!--  modify_form    :rules="rules"-->
+  <el-form :rules="rules" :model="form" label-width="120px" ref="formRef">
+    <!--  modify_form    prop="categoryTitle" categoryTitle 同 form['categoryTitle'] 所有el-form-item都加上-->
+    <el-form-item label="分类标题" prop="categoryTitle">
+      <el-input v-model="form['categoryTitle']"/>
+    </el-form-item>
+    <el-form-item label="分类副标题" prop="categorySubTitle">
+      <el-input v-model="form['categorySubTitle']"/>
+    </el-form-item>
+    <el-form-item label="分类展示颜色" prop="color">
+      <el-color-picker v-model="form['color']" show-alpha color-format="hex"/>
+    </el-form-item>
+    <el-form-item label="当前状态" prop="status">
+      <el-select v-model="form['status']" placeholder="请选择状态" style="width: 100%">
+        <el-option v-for="status in statusEnum" :key="status.key" :label="status.name"
+                   :value="status.key"/>
+      </el-select>
+    </el-form-item>
+    <el-form-item>
+      <el-button type="primary" @click="onSubmit(formRef)">{{ data ? '更新' : '创建' }}</el-button>
+      <el-button v-if="!data" @click="onResetForm(formRef)">重置</el-button>
+    </el-form-item>
+  </el-form>
+</template>
+<script setup>
+import { reactive, ref } from 'vue'
+import { postTrainCourseCategory, putTrainCourseCategory } from 'src/api/train-course-category'
+import { ElMessage } from 'element-plus'
+
+import { useMapState } from 'src/stores'
+import { useCommonStore } from 'src/stores/common_store'
+
+const { statusEnum } = useMapState(useCommonStore, ['statusEnum'])
+
+// modify_form 没有这个变量的定义上
+const formRef = ref(null)
+
+
+// modify_form 定义rules key: [...], key为form-item的prop [...]内容不用修改
+const rules = reactive({
+  categoryTitle: [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请输入分类标题'
+    },
+  ],
+  categorySubTitle: [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请输入分类副标题'
+    }
+  ],
+  color: [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请选择分类展示颜色'
+    },
+  ],
+  status: [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请输入分类状态'
+    },
+  ],
+})
+
+const form = reactive({})
+
+const onResetForm = (formEl) => {
+  if (formEl) {
+    formEl.resetFields()
+  }
+}
+
+const onSubmit = (formEl) => {
+
+  // modify_form
+
+  /**
+   *
+   * formEl.validate((valid) => {
+   *     if (valid) {
+   *     // 原有的代码放进来
+   *     }
+   * })
+   *
+   */
+  formEl.validate((valid) => {
+    if (valid) {
+      if (props.data) {
+        putTrainCourseCategory(form).then(res => {
+          ElMessage({
+            type: 'success',
+            message: res.data,
+          })
+        })
+      } else {
+        postTrainCourseCategory(form).then(res => {
+          ElMessage({
+            type: 'success',
+            message: res.data,
+          })
+          onResetForm(formEl)
+        })
+      }
+    }
+  })
+}
+const props = defineProps({
+  data: {}
+})
+if (props.data) {
+}
+
+</script>

@@ -1,5 +1,5 @@
 <template style="height: 100%">
-  <el-dialog show-close fullscreen v-model="show" title="课程内容" destroy-on-close center align-center
+  <el-dialog :z-index="100" append-to-body show-close fullscreen v-model="show" title="课程内容" destroy-on-close center align-center
              @close="onCancel"
              :close-on-click-modal="false">
     <div class="step-header">
@@ -212,7 +212,7 @@
         </el-form>
       </el-scrollbar>
     </div>
-    <el-dialog v-model="route.showPointDialog" title="点位详情" destroy-on-close center align-center>
+    <el-dialog append-to-body v-model="route.showPointDialog" title="点位详情" destroy-on-close center align-center>
       <el-form-item label="点位坐标">
         <el-form-item label="经度">
           <el-input-number v-model="route.dialogForm.lng" :precision="5" :step="0.00001" :min="0" :max="180"/>
@@ -396,19 +396,56 @@ const courseVersionForm = reactive({
 
 if (props.form) {
   getCourseVersionPartByVersion(props.form['courseVersion']).then(res => {
-    courseVersionForm.partNames = res.data
+    courseVersionForm['partNames'] = res.data
+
+    courseVersionForm.info['descSimple'] = props.form['data']['descSimple']
+    courseVersionForm.info['descRichText'] = props.form['data']['descRichText']
+    valueHtml.html = courseVersionForm.info['descRichText']
+
+    let part = props.form['data']['parts'][0]
+
+    courseVersionForm.part1['descSimple'] = part['descSimple']
+    courseVersionForm.part1['descRichText'] = part['descRichText']
+
+    part = props.form['data']['parts'][1]
+    courseVersionForm.part2['descSimple'] = part['descSimple']
+    courseVersionForm.part2['descRichText'] = part['descRichText']
+
+    part = props.form['data']['parts'][3]
+    courseVersionForm.part4['descSimple'] = part['descSimple']
+    courseVersionForm.part4['descRichText'] = part['descRichText']
+
+    part = props.form['data']['parts'][2]
+
+
+    courseVersionForm.part3['routeName'] = part['route']['routeName']
+    courseVersionForm.part3['descSimple'] = part['route']['descSimple']
+    courseVersionForm.part3['descRichText'] = part['route']['descRichText']
+    route.polyline.path = part['route']['polylineGeometry']
+    route.polyline.editable = false
+    route.polyline.draggable = false
+
+
+    route.markers = part['route']['points']
+
+
+    amapParam.center = [part['route']['polylineCentroid'].lng, part['route']['polylineCentroid'].lat]
+    amapParam.zoom = 18
+    mouseToolUnlock.value = false
   })
+
 }
-const show = reactive(true)
+const show = ref(true)
 
 const scrollbarRef = ref(null)
+
 
 
 const nextStep = () => {
   if (active.value === 0) {
     courseVersionForm[`info`]['descRichText'] = valueHtml.html
-    valueHtml.html = ''
     active.value += 1
+    valueHtml.html = courseVersionForm[`part${active.value}`]['descRichText']
   } else if (active.value === 3 && mouseToolUnlock.value) {
     ElMessage({
       type: 'error',
@@ -417,8 +454,9 @@ const nextStep = () => {
   } else {
     courseVersionForm[`part${active.value}`]['descRichText'] = valueHtml.html
     active.value += 1
-    valueHtml.html = ''
+    valueHtml.html = courseVersionForm[`part${active.value}`]['descRichText']
   }
+
   scrollbarRef.value.setScrollTop(0)
 
 }
@@ -435,6 +473,7 @@ const preStep = () => {
   } else {
     valueHtml.html = courseVersionForm[`part${active.value -= 1}`]['descRichText']
   }
+
   scrollbarRef.value.setScrollTop(0)
 }
 

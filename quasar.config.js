@@ -1,28 +1,24 @@
 /* eslint-env node */
-
 /*
  * This file runs in a Node context (it's NOT transpiled by Babel), so use only
  * the ES6 features that are supported by your Node version. https://node.green/
  */
-
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
-
-
 
 const { configure } = require('quasar/wrappers')
 const path = require('path')
 const pathSrc = path.resolve(__dirname, 'src')
 
-const Icons =  require('unplugin-icons/vite')
-const IconsResolver =  require('unplugin-icons/resolver')
+const Icons = require('unplugin-icons/vite')
+const IconsResolver = require('unplugin-icons/resolver')
 const AutoImport = require('unplugin-auto-import/vite')
 const Components = require('unplugin-vue-components/vite')
 const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
 const Inspect = require('vite-plugin-inspect')
 const { VueAmapResolver } = require('@vuemap/unplugin-resolver')
 const viteCompression = require('vite-plugin-compression')
-const Pages =  require('vite-plugin-pages')
+const Pages = require('vite-plugin-pages')
 
 module.exports = configure((ctx) => {
   return {
@@ -46,30 +42,21 @@ module.exports = configure((ctx) => {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: [
-      'axios',
-      'element-plus',
-      'amap',
-      'bus',
-    ],
+    boot: ['axios', 'element-plus', 'amap', 'quasar',],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
-    css: [
-      'app.scss'
-    ],
+    css: ['app.scss'],
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
-    extras: [
-      // 'ionicons-v4',
+    extras: [// 'ionicons-v4',
       // 'mdi-v5',
       // 'fontawesome-v6',
       // 'eva-icons',
       // 'themify',
       // 'line-awesome',
       // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
-
-      'roboto-font', // optional, you are not bound to it
-      'material-icons' // optional, you are not bound to it
+      // 'roboto-font', // optional, you are not bound to it
+      // 'material-icons' // optional, you are not bound to it
     ],
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
@@ -110,59 +97,32 @@ module.exports = configure((ctx) => {
         }
       },
 
-      vitePlugins: [
-        [
-          AutoImport({
-            imports: ['vue'],
-            resolvers: [
-              ElementPlusResolver({
-                exclude: /^ElAmap[A-Z]*/
-              }),
-              IconsResolver({
-                prefix: 'icon',
-              }),
-              VueAmapResolver()
-            ],
-            dts: path.resolve(pathSrc, 'auto-imports.d.ts'),
-          }),
-        ],
-        [
-          Components({
-            resolvers: [
-              ElementPlusResolver({
-                exclude: /^ElAmap[A-Z]*/
-              }),
-              IconsResolver({
-                enabledCollections: ['ep'],
-              }),
-              VueAmapResolver()
-            ],
-            dts: path.resolve(pathSrc, 'components.d.ts'),
-          }),
-        ],
-        [
-          Icons({
-            autoInstall: true,
-          }),
-        ],
-        [
-          Inspect(),
-        ],
-        [
-          viteCompression({
-            verbose: true,
-            disable: false,
-            threshold: 10240,
-            algorithm: 'gzip',
-            ext: '.gz',
-          })
-        ],
-        [
-          Pages.default({
-            importMode: "async"
-          })
-        ]
-      ]
+      vitePlugins: [[AutoImport({
+        imports: ['vue'],
+        resolvers: [ElementPlusResolver({
+          exclude: /^ElAmap[A-Z]*/
+        }), IconsResolver({
+          prefix: 'icon',
+        }), VueAmapResolver()],
+        dts: path.resolve(pathSrc, 'auto-imports.d.ts'),
+      }),], [Components({
+        resolvers: [ElementPlusResolver({
+          exclude: /^ElAmap[A-Z]*/
+        }), IconsResolver({
+          enabledCollections: ['ep'],
+        }), VueAmapResolver()],
+        dts: path.resolve(pathSrc, 'components.d.ts'),
+      }),], [Icons({
+        autoInstall: true,
+      }),], [Inspect(),], [viteCompression({
+        verbose: true,
+        disable: false,
+        threshold: 10240,
+        algorithm: 'gzip',
+        ext: '.gz',
+      })], [Pages.default({
+        importMode: 'async'
+      })]]
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
@@ -186,10 +146,7 @@ module.exports = configure((ctx) => {
       // directives: [],
 
       // Quasar plugins
-      plugins: [
-        'LocalStorage',
-        'SessionStorage'
-      ]
+      plugins: ['LocalStorage', 'SessionStorage']
     },
 
     // animations: 'all', // --- includes all animations
@@ -224,8 +181,7 @@ module.exports = configure((ctx) => {
       prodPort: 3000, // The default port that the production server should use
       // (gets superseded if process.env.PORT is specified at runtime)
 
-      middlewares: [
-        'render' // keep this as last one
+      middlewares: ['render' // keep this as last one
       ]
     },
 
@@ -277,8 +233,7 @@ module.exports = configure((ctx) => {
         // Full list of options: https://www.electron.build/configuration/configuration
 
         appId: 'pinhui.trip',
-        copyright: '武汉图歌信息技术有限责任公司',
-        // see https://www.electron.build/configuration/configuration
+        copyright: '武汉图歌信息技术有限责任公司', // see https://www.electron.build/configuration/configuration
         electronDownload: {
           cache: '/Users/edoclin/Downloads',
           mirror: 'https://npm.taobao.org/mirrors/electron/'
@@ -291,10 +246,7 @@ module.exports = configure((ctx) => {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-browser-extensions/configuring-bex
     bex: {
-      contentScripts: [
-        'my-content-script'
-      ]
-
+      contentScripts: ['my-content-script']
       // extendBexScriptsConf (esbuildConf) {}
       // extendBexManifestJson (json) {}
     }

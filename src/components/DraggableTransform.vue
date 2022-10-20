@@ -24,13 +24,12 @@ const props = defineProps({
 })
 
 
-
 const result = ref([])
 const currentModel = ref([])
 
 if (props) {
-  console.log(props.right)
   currentModel.value = props.right
+  result.value = props.right
 }
 
 const emit = defineEmits(['onDraggableChange'])

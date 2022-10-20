@@ -20,10 +20,26 @@
         </template>
         <template #default="scope">
           <el-button type="success" link @click="onEdit(scope.row)" size="small">编辑</el-button>
+          <el-popover placement="left" :width="626" trigger="click" @after-leave="resetRelatedCourseData">
+            <template #reference>
+              <el-button type="primary" link size="small" style="margin-right: 16px"
+                         @click="fetchRelatedCourse(scope.row.categoryId)">课程
+              </el-button>
+            </template>
+            <el-table :data="relatedCourse">
+              <el-table-column width="300" property="baseName" label="所属基地"></el-table-column>
+              <el-table-column width="300" property="courseName" label="课程名称">
+                <template #default="scope">
+                  <el-button type="success" link size="small" @click="copyCourseId(scope.row.courseId)">
+                    {{ scope.row.courseName }}
+                  </el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-popover>
         </template>
       </el-table-column>
     </el-table>
-    <!--    modify_flag-->
     <el-row style="margin-top: 10px">
       <el-col :span="12">
         <el-pagination small background layout="total, sizes, prev, pager, next" :total="page.total"
@@ -43,19 +59,41 @@ import {
   listBaseCourseCategory,
   deleteBaseCourseCategoryByIds,
   getBaseCourseCategoryConditions,
-  getTableColumns
+  getTableColumns, listRelatedCourseById
 } from 'src/api/base-course-category'
 import AdvanceQuery from 'src/components/AdvanceQuery.vue'
 import BaseCourseCategoryFormVue from './BaseCourseCategoryForm.vue'
 
 const bus = inject('bus')
 
-//modify_flag
 import { date } from 'quasar'
 
-//modify_flag
 const fetchTime = ref('')
+const relatedCourse = ref([])
 
+const resetRelatedCourseData = () => {
+  relatedCourse.value = []
+}
+
+import { copyToClipboard } from 'quasar'
+
+const copyCourseId = (courseId) => {
+  copyToClipboard(courseId)
+      .then(() => {
+        ElMessage({
+          type: 'success',
+          message: '课程编号已复制'
+        })
+      })
+      .catch(() => {
+      })
+}
+
+const fetchRelatedCourse = (categoryId) => {
+  listRelatedCourseById(categoryId).then(res => {
+    relatedCourse.value = res.data
+  })
+}
 
 const page = reactive({
   current: 1,
@@ -66,8 +104,6 @@ const page = reactive({
 const conditions = reactive({
   map: []
 })
-
-
 
 getBaseCourseCategoryConditions().then(res => {
   conditions.map = res.data
