@@ -25,7 +25,6 @@ const createHistory = process.env.SERVER
   ? createMemoryHistory
   : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory)
 
-
 generatedRoutes.push({
   path: '/:pathMatch(.*)*',
   name: '404',
@@ -44,11 +43,9 @@ export const router = createRouter({
   history: createHistory(process.env.VUE_ROUTER_BASE)
 })
 
-
 router.beforeEach(async (to, from, next) => {
   NProgress.start() // 开启顶部加载动画
   if (to.path == '/cms/login') {
-    // 登录或者注册才可以往下进行
     next()
   } else if (JSON.stringify(token.value) == '{}') {
     next('/cms/login')

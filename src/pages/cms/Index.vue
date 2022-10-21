@@ -194,7 +194,6 @@
                 后台管理系统
               </el-menu-item>
               <div class="flex-grow"/>
-
               <div id="guide-dark">
                 <el-switch
                     style="margin-top: 12px"
@@ -202,15 +201,14 @@
                     inline-prompt
                     :active-icon="Moon"
                     :inactive-icon="Sunny"
-                    active-color="#2c2c2c"
-                />
+                    active-color="#2c2c2c"/>
               </div>
 
               <el-button size="large" text style="margin-top: 8px;" id="guide-fullscreen"
                          :icon="isFullscreen ? SvgExitFullScreen : FullScreen" @click="onToggle($event)"></el-button>
 
               <el-button v-if="isElectron" size="large" text style="margin-top: 8px;" id="guide-quit"
-                         :icon="SwitchButton" @click="onBlur($event); electronExitDialog = true"></el-button>
+                         :icon="SwitchButton" @click="onBlur($event); electronExitDialog.value = true"></el-button>
               <el-badge :value="99" style="margin-top: 20px;margin-right: 15px;margin-left: 18px">
                 <el-icon :size="17">
                   <ChatDotSquare/>
@@ -247,7 +245,6 @@
           </el-main>
         </el-container>
       </el-container>
-
       <el-dialog
           v-if="isElectron"
           v-model="electronExitDialog"
@@ -260,11 +257,10 @@
           align-center>
         <el-result
             icon="warning"
-            title="是否退出当前程序？"
-        />
+            title="是否退出当前程序？"/>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="electronExitDialog = false">取消</el-button>
+                <el-button @click="electronExitDialog.value = false">取消</el-button>
                 <el-button type="primary" @click="onElectronQuit">确认</el-button>
             </span>
         </template>

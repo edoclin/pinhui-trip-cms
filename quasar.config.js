@@ -24,7 +24,7 @@ module.exports = configure((ctx) => {
   return {
     htmlVariables: {
       title: '游品慧',
-      desc: 'DESC',
+      desc: '游品慧后台管理系统',
     },
     server: {},
     eslint: {
@@ -33,7 +33,7 @@ module.exports = configure((ctx) => {
       // exclude = [],
       // rawOptions = {},
       warnings: false,
-      errors: true
+      errors: false
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature

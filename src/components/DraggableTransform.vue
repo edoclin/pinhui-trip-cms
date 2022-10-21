@@ -23,7 +23,6 @@ const props = defineProps({
   right: [],
 })
 
-
 const result = ref([])
 const currentModel = ref([])
 
@@ -48,7 +47,6 @@ onMounted(() => {
       emit('onDraggableChange', toRaw(result.value))
     }
   })
-
 })
 
 const handleTransferChange = (selectedKeys, direction, currentKeys) => {
@@ -65,6 +63,3 @@ const handleTransferChange = (selectedKeys, direction, currentKeys) => {
   emit('onDraggableChange', toRaw(result.value))
 }
 </script>
-<style scoped>
-
-</style>

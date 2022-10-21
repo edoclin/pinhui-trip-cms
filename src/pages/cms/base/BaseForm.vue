@@ -10,7 +10,7 @@
       </el-select>
     </el-form-item>
     <el-form-item label="基地位置" prop="polygonGeometry">
-      <div style="height: 60vh;width: 100%;">
+      <div style="height: calc(100vh - 80px);width: 100%;">
         <el-amap :center="amapParam.center" :zoom="amapParam.zoom">
           <el-amap-search-box :visible="true" @select="selectPoi" @choose="choosePoi"/>
           <el-amap-control-map-type :visible="true" ></el-amap-control-map-type>
@@ -58,7 +58,7 @@
       <div style="border: 1px solid #ccc">
         <Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :defaultConfig="toolbarConfig"
                  mode="default"/>
-        <Editor style="height: 1000px;width: 100%; overflow-y: hidden;" v-model="valueHtml.html"
+        <Editor style="height:  calc(100vh - 120px);width: 100%; overflow-y: hidden;" v-model="valueHtml.html"
                 :defaultConfig="editorConfig" mode="default" @onCreated="handleCreated"/>
       </div>
     </el-form-item>
@@ -73,14 +73,13 @@ import { regeo } from 'src/api/amap'
 import { sliceUploadFile, getAccessUrl } from 'src/api/cos'
 import { postBase, putBase } from 'src/api/base'
 import { ElMessage } from 'element-plus'
-import '@wangeditor/editor/dist/css/style.css' // 引入 css
+import '@wangeditor/editor/dist/css/style.css'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
-
 import { useMapState } from 'src/stores'
 import { useCommonStore } from 'src/stores/common_store'
 import { generateAccessUrl } from 'src/api/common'
-
 import { openURL } from 'quasar'
+
 const { statusEnum } = useMapState(useCommonStore, ['statusEnum'])
 const bus = inject('bus')
 const valueHtml = reactive({
@@ -118,6 +117,11 @@ const editorConfig = reactive({
           getAccessUrl(600, res.Key).then(res => {
             insertFn(res.data, '', res.data)
           })
+        }).catch(err => {
+          ElMessage({
+            type: 'error',
+            message: '服务器繁忙,请重试!'
+          })
         })
       }
     },
@@ -132,6 +136,11 @@ const editorConfig = reactive({
         sliceUploadFile(file, 'rich_text').then(res => {
           getAccessUrl(600, res.Key).then(res => {
             insertFn(res.data, '', res.data)
+          })
+        }).catch(err => {
+          ElMessage({
+            type: 'error',
+            message: '服务器繁忙,请重试!'
           })
         })
       }
@@ -230,6 +239,7 @@ const handleChangeFileUpload = (uploadFile) => {
       })
     })
   }).catch(err => {
+    uploading.value = false
     ElMessage({
       type: 'error',
       message: '服务器繁忙,请重试!'

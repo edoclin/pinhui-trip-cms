@@ -36,32 +36,25 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
-
 import { useMapState } from 'src/stores'
 import { useCommonStore } from 'src/stores/common_store'
 
 const { statusEnum } = useMapState(useCommonStore, ['statusEnum'])
-
 const props = defineProps({
   conditions: []
 })
-
 const form = reactive({
   selector: {}
 })
-const show = reactive(true)
-
+const show = ref(true)
 const isAnd = reactive({})
 
-// 使用defineEmits创建名称，接受一个数组
 const emit = defineEmits(['onSubmit', 'onCancel'])
 const onSubmit = () => {
   let result = []
   let createdBetween = {}
   let updatedBetween = {}
   let selector = {}
-
   if (form.createdBetween) {
     createdBetween = {
       start: form.createdBetween[0],
@@ -93,7 +86,7 @@ const onSubmit = () => {
       isAnd: isAnd[key] === undefined ? false : isAnd[key]
     })
   })
-  console.log(selector)
+
   emit('onSubmit', {
     conditions: result,
     createdBetween,
@@ -105,5 +98,4 @@ const onSubmit = () => {
 const onCancel = () => {
   emit('onCancel', true)
 }
-
 </script>

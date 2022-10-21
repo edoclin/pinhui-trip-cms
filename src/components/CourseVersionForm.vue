@@ -1,5 +1,6 @@
 <template style="height: 100%">
-  <el-dialog :z-index="100" append-to-body show-close fullscreen v-model="show" title="课程内容" destroy-on-close center align-center
+  <el-dialog :z-index="100" append-to-body show-close fullscreen v-model="show" title="课程内容" destroy-on-close center
+             align-center
              @close="onCancel"
              :close-on-click-modal="false">
     <div class="step-header">
@@ -9,10 +10,8 @@
       </el-steps>
       <el-divider/>
     </div>
-
     <div class="form-main">
       <el-scrollbar ref="scrollbarRef">
-        <!--    基本信息-->
         <el-form v-if="active === 0" :model="form" label-width="120px">
           <el-form-item label="简单描述" prop="descSimple">
             <el-input v-model="courseVersionForm.info['descSimple']" :rows="2" type="textarea"
@@ -22,7 +21,7 @@
             <div style="border: 1px solid #ccc">
               <Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :defaultConfig="toolbarConfig"
                        mode="default"/>
-              <Editor style="height: 57vh;width: 100%; overflow-y: hidden;" v-model="valueHtml.html"
+              <Editor style="height: 69vh;width: 100%; overflow-y: hidden;" v-model="valueHtml.html"
                       :defaultConfig="editorConfig" mode="default" @onCreated="handleCreated"/>
             </div>
           </el-form-item>
@@ -43,8 +42,7 @@
                       :percentage="100"
                       :indeterminate="true"
                       :duration="1"
-                      :format="() => ''"
-                  />
+                      :format="() => ''"/>
                   <span v-else>请选择视频文件上传</span>
                 </div>
               </template>
@@ -58,7 +56,7 @@
             <div style="border: 1px solid #ccc">
               <Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :defaultConfig="toolbarConfig"
                        mode="default"/>
-              <Editor style="height: 48vh;width: 100%; overflow-y: hidden;" v-model="valueHtml.html"
+              <Editor style="height: 69vh;width: 100%; overflow-y: hidden;" v-model="valueHtml.html"
                       :defaultConfig="editorConfig" mode="default" @onCreated="handleCreated"/>
             </div>
           </el-form-item>
@@ -80,8 +78,7 @@
                       :percentage="100"
                       :indeterminate="true"
                       :duration="1"
-                      :format="() => ''"
-                  />
+                      :format="() => ''"/>
                   <span v-else>请选择视频文件上传</span>
                 </div>
               </template>
@@ -95,7 +92,7 @@
             <div style="border: 1px solid #ccc">
               <Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :defaultConfig="toolbarConfig"
                        mode="default"/>
-              <Editor style="height: 48vh;width: 100%; overflow-y: hidden;" v-model="valueHtml.html"
+              <Editor style="height: 69vh;width: 100%; overflow-y: hidden;" v-model="valueHtml.html"
                       :defaultConfig="editorConfig" mode="default" @onCreated="handleCreated"/>
             </div>
           </el-form-item>
@@ -109,7 +106,7 @@
             <el-input v-model="courseVersionForm.part3['routeName']"></el-input>
           </el-form-item>
           <el-form-item label="地图工具" prop="polygonGeometry">
-            <div style="height: 60vh;width: 100%;">
+            <div style="height: 66vh;width: 100%;">
               <el-amap :center="amapParam.center" :zoom="amapParam.zoom">
                 <el-amap-control-map-type :visible="true"></el-amap-control-map-type>
                 <el-amap-search-box :visible="true" @select="selectPoi"/>
@@ -163,7 +160,7 @@
             <div style="border: 1px solid #ccc">
               <Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :defaultConfig="toolbarConfig"
                        mode="default"/>
-              <Editor style="height: 600px;width: 100%; overflow-y: hidden;" v-model="valueHtml.html"
+              <Editor style="height: 69vh;width: 100%; overflow-y: hidden;" v-model="valueHtml.html"
                       :defaultConfig="editorConfig" mode="default" @onCreated="handleCreated"/>
             </div>
           </el-form-item>
@@ -200,13 +197,12 @@
             <div style="border: 1px solid #ccc">
               <Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :defaultConfig="toolbarConfig"
                        mode="default"/>
-              <Editor style="height: 48vh;width: 100%; overflow-y: hidden;" v-model="valueHtml.html"
+              <Editor style="height: 69vh;width: 100%; overflow-y: hidden;" v-model="valueHtml.html"
                       :defaultConfig="editorConfig" mode="default" @onCreated="handleCreated"/>
             </div>
           </el-form-item>
           <el-form-item label="操作">
             <el-button type="success" @click="preStep" :disabled="uploading">上一步</el-button>
-
             <el-button type="primary" @click="onSubmit" :disabled="uploading">提交</el-button>
           </el-form-item>
         </el-form>
@@ -393,17 +389,14 @@ const courseVersionForm = reactive({
   part3: {},
   part4: {},
 })
-
 if (props.form) {
   getCourseVersionPartByVersion(props.form['courseVersion']).then(res => {
     courseVersionForm['partNames'] = res.data
-
     courseVersionForm.info['descSimple'] = props.form['data']['descSimple']
     courseVersionForm.info['descRichText'] = props.form['data']['descRichText']
     valueHtml.html = courseVersionForm.info['descRichText']
 
     let part = props.form['data']['parts'][0]
-
     courseVersionForm.part1['descSimple'] = part['descSimple']
     courseVersionForm.part1['descRichText'] = part['descRichText']
 
@@ -416,30 +409,21 @@ if (props.form) {
     courseVersionForm.part4['descRichText'] = part['descRichText']
 
     part = props.form['data']['parts'][2]
-
-
     courseVersionForm.part3['routeName'] = part['route']['routeName']
     courseVersionForm.part3['descSimple'] = part['route']['descSimple']
     courseVersionForm.part3['descRichText'] = part['route']['descRichText']
     route.polyline.path = part['route']['polylineGeometry']
     route.polyline.editable = false
     route.polyline.draggable = false
-
-
     route.markers = part['route']['points']
-
 
     amapParam.center = [part['route']['polylineCentroid'].lng, part['route']['polylineCentroid'].lat]
     amapParam.zoom = 18
     mouseToolUnlock.value = false
   })
-
 }
 const show = ref(true)
-
 const scrollbarRef = ref(null)
-
-
 
 const nextStep = () => {
   if (active.value === 0) {
@@ -456,9 +440,7 @@ const nextStep = () => {
     active.value += 1
     valueHtml.html = courseVersionForm[`part${active.value}`]['descRichText']
   }
-
   scrollbarRef.value.setScrollTop(0)
-
 }
 
 const preStep = () => {
@@ -473,7 +455,6 @@ const preStep = () => {
   } else {
     valueHtml.html = courseVersionForm[`part${active.value -= 1}`]['descRichText']
   }
-
   scrollbarRef.value.setScrollTop(0)
 }
 
@@ -501,6 +482,16 @@ const handleChangeFileUpload = (uploadFile) => {
       })
       uploading.value = false
     }
+  }).catch(err => {
+    if (route.showPointDialog) {
+      route.dialogForm['uploading'] = false
+    } else {
+      uploading.value = false
+    }
+    ElMessage({
+      type: 'error',
+      message: '服务器繁忙,请重试!'
+    })
   })
 }
 
@@ -508,7 +499,7 @@ const valueHtml = reactive({
   html: ''
 })
 const editorRef = shallowRef()
-const formRef = ref()
+const formRef = ref(null)
 
 onBeforeUnmount(() => {
   const editor = editorRef.value
@@ -539,6 +530,11 @@ const editorConfig = reactive({
           getAccessUrl(600, res.Key).then(res => {
             insertFn(res.data, '', res.data)
           })
+        }).catch(err => {
+          ElMessage({
+            type: 'error',
+            message: '服务器繁忙,请重试!'
+          })
         })
       }
     },
@@ -553,6 +549,11 @@ const editorConfig = reactive({
         sliceUploadFile(file, 'rich_text').then(res => {
           getAccessUrl(600, res.Key).then(res => {
             insertFn(res.data, '', res.data)
+          })
+        }).catch(err => {
+          ElMessage({
+            type: 'error',
+            message: '服务器繁忙,请重试!'
           })
         })
       }

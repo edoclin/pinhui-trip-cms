@@ -7,7 +7,7 @@
       <el-table-column type="selection" width="30"/>
       <el-table-column v-for="(item, index) in tableData.columns" :key="index" :sortable="item.sortable"
                        :fixed="item.fixed" :prop="item.column" :label="item.label"></el-table-column>
-      <el-table-column fixed="right" label="操作">
+      <el-table-column :fixed="'right'" label="操作">
         <template #header v-if="selectedData.data.length !== 0">
           <el-popconfirm @confirm="deleteSelected" :title="`确定删除所选中的${selectedData.data.length}条记录?`">
             <template #reference>
@@ -101,9 +101,7 @@ const handleSelectionChange = (value) => {
 
 const deleteSelected = () => {
   let ids = []
-
   selectedData.data.forEach(item => ids.push(item.courseId))
-
   deleteTrainCourseByIds({ ids }).then(res => {
     ElMessage({
       type: 'success',
@@ -148,7 +146,6 @@ const queryConditions = ({
 }
 
 const bus = inject('bus')
-
 const onEdit = (record) => {
   bus.emit('edit-item', {
     record,
@@ -165,9 +162,7 @@ const updateData = () => {
     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 }
-
 bus.on('update-train-course-table', () => updateData())
-
 </script>
 <style>
 </style>

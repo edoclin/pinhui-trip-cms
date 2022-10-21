@@ -9,5 +9,4 @@ export const regeo  = (lng:number, lat:number) => {
                 }
         }).catch(err => reject(err))
     })
-    
 }

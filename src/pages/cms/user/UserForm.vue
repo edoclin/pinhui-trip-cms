@@ -31,26 +31,21 @@
   </el-form>
 </template>
 <script setup>
-import { reactive, ref } from 'vue'
-import { postUser, putUser } from 'src/api/user'
+import { putUser } from 'src/api/user'
 import { ElMessage } from 'element-plus'
-
 import { useMapState } from 'src/stores'
 import { useCommonStore } from 'src/stores/common_store'
-import { getCustomRoleSelector } from '../../../api/role'
+import { getCustomRoleSelector } from 'src/api/role'
 
 const { statusEnum } = useMapState(useCommonStore, ['statusEnum'])
-
-const formRef = ref()
-
+const formRef = ref(null)
 const form = reactive({})
-
 const onResetForm = (formEl) => {
   if (formEl) {
     formEl.resetFields()
   }
 }
-
+const bus = inject('bus')
 const onSubmit = (formEl) => {
   if (props.data) {
     putUser(form).then(res => {

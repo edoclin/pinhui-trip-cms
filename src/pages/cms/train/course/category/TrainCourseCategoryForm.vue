@@ -1,8 +1,6 @@
 <template>
-  <!--  modify_form    :rules="rules"-->
   <el-form :rules="rules" :model="form" label-width="120px" ref="formRef">
-    <!--  modify_form    prop="categoryTitle" categoryTitle 同 form['categoryTitle'] 所有el-form-item都加上-->
-    <el-form-item label="分类标题" prop="categoryTitle">
+   <el-form-item label="分类标题" prop="categoryTitle">
       <el-input v-model="form['categoryTitle']"/>
     </el-form-item>
     <el-form-item label="分类副标题" prop="categorySubTitle">
@@ -24,21 +22,15 @@
   </el-form>
 </template>
 <script setup>
-import { reactive, ref } from 'vue'
 import { postTrainCourseCategory, putTrainCourseCategory } from 'src/api/train-course-category'
 import { ElMessage } from 'element-plus'
-
 import { useMapState } from 'src/stores'
 import { useCommonStore } from 'src/stores/common_store'
-
 const { statusEnum } = useMapState(useCommonStore, ['statusEnum'])
 
-// modify_form 没有这个变量的定义上
 const formRef = ref(null)
 const bus = inject('bus')
 
-
-// modify_form 定义rules key: [...], key为form-item的prop [...]内容不用修改
 const rules = reactive({
   categoryTitle: [
     {
@@ -69,9 +61,7 @@ const rules = reactive({
     },
   ],
 })
-
 const form = reactive({})
-
 const onResetForm = (formEl) => {
   if (formEl) {
     formEl.resetFields()
@@ -79,18 +69,6 @@ const onResetForm = (formEl) => {
 }
 
 const onSubmit = (formEl) => {
-
-  // modify_form
-
-  /**
-   *
-   * formEl.validate((valid) => {
-   *     if (valid) {
-   *     // 原有的代码放进来
-   *     }
-   * })
-   *
-   */
   formEl.validate(async (valid) => {
     if (valid) {
       if (props.data) {
@@ -113,16 +91,15 @@ const onSubmit = (formEl) => {
     }
   })
 }
+
 const props = defineProps({
   data: {}
 })
 if (props.data) {
-  console.log(props.data)
   form['categoryId'] = props.data['categoryId']
   form['categorySubTitle'] = props.data['categorySubTitle']
   form['categoryTitle'] = props.data['categoryTitle']
   form['color'] = props.data['color']
   form['status'] = statusEnum.value.find(item => item.name === props.data['status']).key
 }
-
 </script>

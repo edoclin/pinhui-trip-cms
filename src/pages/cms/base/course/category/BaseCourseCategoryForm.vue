@@ -99,6 +99,11 @@ const editorConfig = reactive({
           getAccessUrl(600, res.Key).then(res => {
             insertFn(res.data, '', res.data)
           })
+        }).catch(err => {
+          ElMessage({
+            type: 'error',
+            message: '服务器繁忙,请重试!'
+          })
         })
       }
     },
@@ -113,6 +118,11 @@ const editorConfig = reactive({
         sliceUploadFile(file, 'rich_text').then(res => {
           getAccessUrl(600, res.Key).then(res => {
             insertFn(res.data, '', res.data)
+          })
+        }).catch(err => {
+          ElMessage({
+            type: 'error',
+            message: '服务器繁忙,请重试!'
           })
         })
       }
@@ -138,13 +148,17 @@ const handleChangeFileUpload = (uploadFile) => {
         url: res.data
       })
     })
+  }).catch(err => {
+    uploading.value = false
+    ElMessage({
+      type: 'error',
+      message: '服务器繁忙,请重试!'
+    })
   })
 }
 
-const formRef = ref()
-
+const formRef = ref(null)
 const form = reactive({})
-
 const onResetForm = (formEl) => {
   if (formEl) {
     formEl.resetFields()
@@ -152,7 +166,6 @@ const onResetForm = (formEl) => {
 }
 
 const bus = inject('bus')
-
 const onSubmit = async (formEl) => {
   form.descRichText = valueHtml.html
   // update
@@ -193,5 +206,4 @@ if (props.data) {
     url: props.data['coverResourcePathUrl']
   })
 }
-
 </script>

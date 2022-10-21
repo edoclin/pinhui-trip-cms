@@ -1,15 +1,10 @@
 import { GET } from 'boot/axios'
+import COS from 'cos-js-sdk-v5'
 
 export let TENCENT_COS_BUCKET = ''
 export let TENCENT_COS_REGION = ''
-
 export const getTemporaryToken = (duration: number = 600, prefix: string = "*") => GET(`/tencent-cos/temporary-token?duration=${duration}&prefix=${prefix}`)
 export const getAccessUrl = (duration: number = 600, key: string = "*") => GET(`/tencent-cos/access?duration=${duration}&key=${key}`)
-
-
-// const COS = require('cos-js-sdk-v5');
-
-import COS from 'cos-js-sdk-v5'
 
 export const getCOSInstance = () => {
     return new COS({
@@ -34,7 +29,7 @@ export const sliceUploadFile = async(file: any, prefix: string = "") => {
         TENCENT_COS_BUCKET = res.data.bucket
         TENCENT_COS_REGION = res.data.region
     }
-    
+
     return getCOSInstance().sliceUploadFile({
         Body: file,
         Bucket: TENCENT_COS_BUCKET,

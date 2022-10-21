@@ -171,6 +171,7 @@ const handleChangeFileUpload = (uploadFile) => {
       })
     })
   }).catch(err => {
+    uploading.value = false
     ElMessage({
       type: 'error',
       message: '服务器繁忙,请重试!'

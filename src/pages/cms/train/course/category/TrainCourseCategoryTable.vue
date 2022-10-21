@@ -10,8 +10,7 @@
         <template #default="scope" v-if="item.column === 'color'">
           <el-tag
               :color="scope.row.color"
-              effect="dark"
-          >
+              effect="dark">
             {{ scope.row.color }}
           </el-tag>
         </template>
@@ -42,7 +41,6 @@
         {{ fetchTime }}
       </el-col>
     </el-row>
-
   </div>
 </template>
 <script setup>
@@ -111,9 +109,7 @@ const handleSelectionChange = (value) => {
 
 const deleteSelected = () => {
   let ids = []
-
   selectedData.data.forEach(item => ids.push(item.categoryId))
-
   deleteTrainCourseCategoryByIds({ ids }).then(res => {
     ElMessage({
       type: 'success',
@@ -157,9 +153,7 @@ const queryConditions = ({
   })
 }
 
-// 使用defineEmits创建名称，接受一个数组
 const bus = inject('bus')
-
 const onEdit = (record) => {
   console.log(record)
   bus.emit('edit-item', {
@@ -177,9 +171,7 @@ const updateData = () => {
     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 }
-
 bus.on('update-train-course-category-table', () => updateData())
-
 </script>
 <style>
 </style>

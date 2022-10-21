@@ -80,7 +80,7 @@
       <div style="border: 1px solid #ccc">
         <Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :defaultConfig="toolbarConfig"
                  mode="default"/>
-        <Editor style="height: 1000px;width: 100%; overflow-y: hidden;" v-model="valueHtml.html"
+        <Editor style="height: 80vh;width: 100%; overflow-y: hidden;" v-model="valueHtml.html"
                 :defaultConfig="editorConfig" mode="default" @onCreated="handleCreated"/>
       </div>
     </el-form-item>
@@ -94,24 +94,19 @@
 import { onBeforeUnmount, reactive, ref, shallowRef } from 'vue'
 import { postTrainCourse, putTrainCourse } from 'src/api/train-course'
 import { ElMessage } from 'element-plus'
-
 import { useMapState } from 'src/stores'
 import { useCommonStore } from 'src/stores/common_store'
 import { openURL } from 'quasar'
 import { getAccessUrl, sliceUploadFile } from 'src/api/cos'
 import { generateAccessUrl } from 'src/api/common'
 import { getTrainCourseCategorySelector } from 'src/api/train-course-category'
-import '@wangeditor/editor/dist/css/style.css' // 引入 css
+import '@wangeditor/editor/dist/css/style.css'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 
 const { statusEnum } = useMapState(useCommonStore, ['statusEnum'])
-
 const bus = inject('bus')
-
-const formRef = ref()
-
+const formRef = ref(null)
 const form = reactive({})
-
 const uploading = ref(false)
 const videoUploading = ref(false)
 const fileList = ref([])
@@ -121,7 +116,6 @@ const valueHtml = reactive({
   html: ''
 })
 const editorRef = shallowRef()
-
 onBeforeUnmount(() => {
   const editor = editorRef.value
   if (editor == null) return
@@ -135,7 +129,6 @@ const toolbarConfig = reactive({
     'fullScreen'
   ]
 })
-
 const editorConfig = reactive({
   placeholder: '请输入内容',
   MENU_CONF: {
@@ -148,7 +141,7 @@ const editorConfig = reactive({
       timeout: 10 * 1000,
       async customUpload (file, insertFn) {
         sliceUploadFile(file, 'rich_text').then(res => {
-          getAccessUrl(600, res.Key).then(res => {
+          getAccessUrl(600, res['Key']).then(res => {
             insertFn(res.data, '', res.data)
           })
         }).catch(err => {
@@ -169,11 +162,10 @@ const editorConfig = reactive({
       timeout: 20 * 1000,
       async customUpload (file, insertFn) {
         sliceUploadFile(file, 'rich_text').then(res => {
-          getAccessUrl(600, res.Key).then(res => {
+          getAccessUrl(600, res['Key']).then(res => {
             insertFn(res.data, '', res.data)
           })
         }).catch(err => {
-          uploading.value = false
           ElMessage({
             type: 'error',
             message: '服务器繁忙,请重试!'
@@ -198,7 +190,7 @@ const handleChangeFileUpload = (uploadFile) => {
       message: '上传成功'
     })
     uploading.value = false
-    generateAccessUrl(data.Key).then(res => {
+    generateAccessUrl(data['Key']).then(res => {
       fileList.value.push({
         name: '',
         url: res.data
@@ -223,7 +215,7 @@ const handleChangeVideoFileUpload = (uploadFile) => {
       message: '上传成功'
     })
     videoUploading.value = false
-    generateAccessUrl(data.Key).then(res => {
+    generateAccessUrl(data['Key']).then(res => {
       videoFileList.value.push({
         name: '',
         url: res.data
@@ -239,10 +231,10 @@ const handleChangeVideoFileUpload = (uploadFile) => {
 }
 
 const trainCourseCategorySelector = ref([])
-
 getTrainCourseCategorySelector().then(res => {
   trainCourseCategorySelector.value = res.data
 })
+
 const validateDescRichText = (rule, value, cb) => {
   if (form['descRichText'] === '') {
     cb(new Error('请输入富文本描述'))
@@ -301,6 +293,7 @@ const rules = reactive({
     }
   ]
 })
+
 const onResetForm = (formEl) => {
   if (formEl) {
     formEl.resetFields()
@@ -337,7 +330,6 @@ const props = defineProps({
   data: {}
 })
 if (props.data) {
-  // console.log(props.data)
   form['categoryId'] = props.data['categoryId']
   form['categoryTitle'] = props.data['categoryTitle']
   form['courseId'] = props.data['courseId']
@@ -347,14 +339,11 @@ if (props.data) {
   form['descRichText'] = props.data['descRichText']
   valueHtml.html = props.data['descRichText']
   form['descSimple'] = props.data['descSimple']
-
   form['status'] = statusEnum.value.find(item => item.name === props.data['status']).key
-
   fileList.value = [{
     name: '',
     url: props.data['coverResourcePathUrl']
   }]
-
   videoFileList.value = [
     {
       name: '',
@@ -362,5 +351,4 @@ if (props.data) {
     }
   ]
 }
-
 </script>
