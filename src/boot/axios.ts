@@ -134,6 +134,8 @@ export default boot(({
   api.interceptors.request.use(config => {
     // @ts-ignore
     config.headers[token.value.name] = token.value.value
+    // @ts-ignore
+    console.log(config.headers[token.value.name])
     return config
   }, error => {
     // 对请求错误做些什么

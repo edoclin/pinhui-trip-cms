@@ -1,5 +1,5 @@
 <template>
-  <el-form :model="form" label-width="120px" ref="formRef">
+  <el-form :rules="rules" :model="form" label-width="120px" ref="formRef">
     <el-form-item label=""  prop="">
       <el-input v-model="" />
     </el-form-item>
@@ -26,7 +26,7 @@ import { useCommonStore } from 'src/stores/common_store';
 const { statusEnum } = useMapState(useCommonStore, ['statusEnum'])
 
 
-
+const bus = inject('bus')
 
 const formRef = ref()
 
@@ -34,7 +34,15 @@ const formRef = ref()
 const form = reactive({
 })
 
-
+const rules = reactive({
+  '': [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请输入'
+    },
+  ],
+})
 const onResetForm = (formEl) => {
   if (formEl) {
     formEl.resetFields()
@@ -43,24 +51,27 @@ const onResetForm = (formEl) => {
 
 
 const onSubmit = (formEl) => {
-  // update
-  if (props.data) {
-    put$module_name$(form).then(res => {
-      ElMessage({
-        type: 'success',
-        message: res.data,
-      })
-      onResetForm(formEl)
-    })
-  } else {
-    post$module_name$(form).then(res => {
-      ElMessage({
-        type: 'success',
-        message: res.data,
-      })
-      onResetForm(formEl)
-    })
-  }
+  formEl.validate(async (valid) => {
+    if (valid) {
+      if (props.data) {
+        await put$module_name$(form).then(res => {
+          ElMessage({
+            type: 'success',
+            message: res.data,
+          })
+        })
+      } else {
+        await post$module_name$(form).then(res => {
+          ElMessage({
+            type: 'success',
+            message: res.data,
+          })
+          onResetForm(formEl)
+        })
+      }
+      bus.emit('$update-data-bus$')
+    }
+  })
 }
 
 

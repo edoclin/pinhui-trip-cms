@@ -229,6 +229,11 @@ const handleChangeFileUpload = (uploadFile) => {
         url: res.data
       })
     })
+  }).catch(err => {
+    ElMessage({
+      type: 'error',
+      message: '服务器繁忙,请重试!'
+    })
   })
 }
 

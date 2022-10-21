@@ -32,9 +32,16 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination small background layout="total, sizes, prev, pager, next" :total="page.total"
-                   :page-sizes="[10, 20, 50, 100]" v-model:currentPage="page.current" v-model:page-size="page.size"/>
-
+    <el-row style="margin-top: 10px">
+      <el-col :span="12">
+        <el-pagination small background layout="total, sizes, prev, pager, next" :total="page.total"
+                       :page-sizes="[10, 20, 50, 100]" v-model:currentPage="page.current"
+                       v-model:page-size="page.size"/>
+      </el-col>
+      <el-col style="position: absolute;right: 0;color: #919398;font-size: 12px;margin-top: 5px">数据更新时间:
+        {{ fetchTime }}
+      </el-col>
+    </el-row>
 
   </div>
 </template>
@@ -49,7 +56,9 @@ import {
 } from 'src/api/train-course-category'
 import AdvanceQuery from 'src/components/AdvanceQuery.vue'
 import TrainCourseCategoryFormVue from './TrainCourseCategoryForm.vue'
+import { date } from 'quasar'
 
+const fetchTime = ref('')
 const page = reactive({
   current: 1,
   total: 0,
@@ -74,12 +83,14 @@ watch(page, () => {
   listTrainCourseCategory(page.current, page.size, queryParam).then(res => {
     tableData.data = res.data
     page.total = res.count
+    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 })
 
 listTrainCourseCategory(page.current, page.size, queryParam).then(res => {
   tableData.data = res.data
   page.total = res.count
+  fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
 })
 
 getTableColumns().then(res => {
@@ -111,6 +122,7 @@ const deleteSelected = () => {
     listTrainCourseCategory(page.current, page.size, { ...queryParam }).then(res => {
       tableData.data = res.data
       page.total = res.count
+      fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
     })
   })
 }
@@ -121,6 +133,7 @@ const sortTable = (column) => {
   listTrainCourseCategory(page.current, page.size, queryParam).then(res => {
     tableData.data = res.data
     page.total = res.count
+    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 }
 
@@ -140,6 +153,7 @@ const queryConditions = ({
     tableData.data = res.data
     page.total = res.count
     advancedQuery.show = false
+    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 }
 
@@ -155,6 +169,17 @@ const onEdit = (record) => {
     name: record.categoryId
   })
 }
+
+const updateData = () => {
+  listTrainCourseCategory(page.current, page.size, { ...queryParam }).then(res => {
+    tableData.data = res.data
+    page.total = res.count
+    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
+  })
+}
+
+bus.on('update-train-course-category-table', () => updateData())
+
 </script>
 <style>
 </style>

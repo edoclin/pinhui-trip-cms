@@ -1,7 +1,17 @@
 <template>
   <div>
     <advance-query v-if="advancedQuery.show" :conditions="conditions.map" @onSubmit="queryConditions"
-                   @onCancel="advancedQuery.show = false"></advance-query>
+                   @onCancel="advancedQuery.show = false">
+      <template v-slot:selector="scope">
+        <el-form-item label="轮播图类型">
+          <el-select v-model="scope.formData['selector']['carouselType']" placeholder="请选择轮播图类型"
+                     style="width: 100%">
+            <el-option v-for="carousel in carouselSelector" :key="carousel.key" :label="carousel.name"
+                       :value="carousel.key"/>
+          </el-select>
+        </el-form-item>
+      </template>
+    </advance-query>
     <el-table @sort-change='sortTable' border table-layout="auto" stripe :data="tableData.data" style="width: 100%"
               @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="30"/>
@@ -10,7 +20,7 @@
       </el-table-column>
       <el-table-column label="是否展示">
         <template #default="scope">
-          {{scope.row.displayed ? "是" : "否"}}
+          {{ scope.row.displayed ? '是' : '否' }}
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作">
@@ -55,6 +65,7 @@ import AdvanceQuery from 'src/components/AdvanceQuery.vue'
 import ViewCarouselFormVue from './ViewCarouselForm.vue'
 //modify_flag
 import { date } from 'quasar'
+import { getCarouselType } from 'src/api/common'
 
 //modify_flag
 const fetchTime = ref('')
@@ -67,6 +78,12 @@ const page = reactive({
 
 const conditions = reactive({
   map: []
+})
+
+const carouselSelector = ref([])
+
+getCarouselType().then(res => {
+  carouselSelector.value = res.data
 })
 
 getViewCarouselConditions().then(res => {
@@ -144,11 +161,13 @@ const advancedQuery = reactive({
 const queryConditions = ({
   conditions,
   createdBetween,
-  updatedBetween
+  updatedBetween,
+  selector
 }) => {
   queryParam.createdBetween = createdBetween
   queryParam.updatedBetween = updatedBetween
   queryParam.conditions = conditions
+  queryParam.selector = selector
   listViewCarouselByPage(page.current, page.size, { ...queryParam }).then(res => {
     tableData.data = res.data
     page.total = res.count
@@ -159,12 +178,7 @@ const queryConditions = ({
 
 const bus = inject('bus')
 
-
-// 使用defineEmits创建名称，接受一个数组
-// const emit = defineEmits(['onEdit'])
-
 const onEdit = (record) => {
-  console.log(record)
   bus.emit('edit-item', {
     record,
     component: ViewCarouselFormVue,

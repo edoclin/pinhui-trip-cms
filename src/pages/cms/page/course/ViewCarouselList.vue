@@ -1,5 +1,5 @@
 <template>
-  <el-tabs v-model="currentTab" stretch type="card" tab-position="left">
+  <el-tabs v-model="currentTab" stretch type="card" tab-position="left" @tab-change="handleTabChange">
     <el-tab-pane label="基地课程" name="BASE_COURSE">
       <draggable-transform :data="courseCarousel" :right="currentModel" @onDraggableChange="handleChange"></draggable-transform>
     </el-tab-pane>
@@ -28,6 +28,17 @@ const queryParam = reactive({
     }
   ]
 })
+const handleTabChange = (current) => {
+  listViewCarousel(queryParam).then(res => {
+    courseCarousel.value = res.data
+    res.data.forEach(item => {
+      if (item.displayed) {
+        currentModel.value.push(item.carouselId)
+      }
+    })
+  })
+}
+
 
 listViewCarousel(queryParam).then(res => {
   courseCarousel.value = res.data
@@ -37,6 +48,7 @@ listViewCarousel(queryParam).then(res => {
     }
   })
 })
+
 
 const updateBatch = ref([])
 

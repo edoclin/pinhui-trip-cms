@@ -60,6 +60,7 @@ import { useCommonStore } from 'src/stores/common_store'
 import { sliceUploadFile } from 'src/api/cos'
 import { generateAccessUrl, getCarouselType } from 'src/api/common'
 import { getBaseCourseSelector } from 'src/api/base-course'
+import { getTrainCourseSelector } from 'src/api/train-course'
 
 const { statusEnum } = useMapState(useCommonStore, ['statusEnum'])
 
@@ -75,7 +76,11 @@ const handleChangeSelector = (e) => {
         courseSelector.value = res.data
       })
       break;
-    case "TRAIN_COURSE": break;
+    case "TRAIN_COURSE":
+      getTrainCourseSelector().then(res => {
+        courseSelector.value = res.data
+      })
+      break;
   }
 }
 
@@ -89,12 +94,10 @@ const onResetForm = (formEl) => {
     formEl.resetFields()
   }
 }
-// const emit = defineEmits(['onUpdate'])
 
 const bus = inject('bus')
 
 const onSubmit = async (formEl) => {
-  // update
   if (props.data) {
     await putViewCarousel(form).then(res => {
       ElMessage({
@@ -111,18 +114,31 @@ const onSubmit = async (formEl) => {
       onResetForm(formEl)
     })
   }
-
   bus.emit('update-course-carousel-table')
 }
+
+const fileList = ref([])
+
 
 const props = defineProps({
   data: {}
 })
 if (props.data) {
+  form['carouselId'] = props.data['carouselId']
+  form['carouselType'] = props.data['carouselType']
+  handleChangeSelector(form['carouselType'])
+  form['imageResourcePath'] = props.data['imageResourcePath']
+  form['name'] = props.data['name']
+  form['placeholder'] = props.data['placeholder']
+  form['relatedId'] = props.data['relatedId']
+  form["status"] = statusEnum.value.find(item => item.name === props.data["status"]).key
+  fileList.value = [{
+    name: '',
+    url: props.data["imageAccessUrl"]
+  }]
 }
 
 const uploading = ref(false)
-const fileList = ref([])
 const handlePreviewUpload = (e) => {
   window.open(e.url, "_black")
 }
@@ -144,6 +160,7 @@ const handleChangeFileUpload = (uploadFile) => {
       })
     })
   }).catch(err => {
+    uploading.value = false
     ElMessage({
       type: 'error',
       message: err

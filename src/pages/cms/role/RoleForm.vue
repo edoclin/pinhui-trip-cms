@@ -61,19 +61,20 @@ const onResetForm = (formEl) => {
     formEl.resetFields()
   }
 }
-const emit = defineEmits(['onUpdate'])
 
-const onSubmit = (formEl) => {
+const bus = inject('bus')
+
+const onSubmit = async (formEl) => {
   // update
   if (props.data) {
-    putRole(form).then(res => {
+    await putRole(form).then(res => {
       ElMessage({
         type: 'success',
         message: res.data,
       })
     })
   } else {
-    postRole(form).then(res => {
+    await postRole(form).then(res => {
       ElMessage({
         type: 'success',
         message: res.data,
@@ -81,7 +82,7 @@ const onSubmit = (formEl) => {
       onResetForm(formEl)
     })
   }
-  emit('onUpdate', 'RoleTable')
+  bus.emit('update-role-table')
 }
 
 const props = defineProps({

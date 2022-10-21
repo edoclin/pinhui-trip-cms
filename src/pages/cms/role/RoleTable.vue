@@ -196,12 +196,10 @@ const queryConditions = ({
   })
 }
 
-// 使用defineEmits创建名称，接受一个数组
-const emit = defineEmits(['onEdit'])
+const bus = inject('bus')
 
 const onEdit = (record) => {
-  console.log(record)
-  emit('onEdit', {
+  emit('edit-item', {
     record,
     component: RoleFormVue,
     title: '角色编辑',
@@ -214,14 +212,10 @@ const updateData = () => {
     tableData.data = res.data
     page.total = res.count
     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
-
   })
 }
 
-defineExpose({
-  updateData,
-  name: 'RoleTable'
-})
+bus.on('update-role-table', () => updateData())
 
 </script>
 <style>

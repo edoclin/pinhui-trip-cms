@@ -282,7 +282,7 @@ const isPassing = ref(false)
 const dragWidth = ref(200)
 const isElectron = ref(process.env.MODE === 'electron')
 
-const showLoginButton = ref(false)
+const showLoginButton = ref(process.env.NODE_ENV !== 'production')
 const dialogRegisterFormVisible = ref(false)
 
 const handlePassCallback = () => {

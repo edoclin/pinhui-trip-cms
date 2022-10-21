@@ -35,6 +35,7 @@ const { statusEnum } = useMapState(useCommonStore, ['statusEnum'])
 
 // modify_form 没有这个变量的定义上
 const formRef = ref(null)
+const bus = inject('bus')
 
 
 // modify_form 定义rules key: [...], key为form-item的prop [...]内容不用修改
@@ -90,17 +91,17 @@ const onSubmit = (formEl) => {
    * })
    *
    */
-  formEl.validate((valid) => {
+  formEl.validate(async (valid) => {
     if (valid) {
       if (props.data) {
-        putTrainCourseCategory(form).then(res => {
+        await putTrainCourseCategory(form).then(res => {
           ElMessage({
             type: 'success',
             message: res.data,
           })
         })
       } else {
-        postTrainCourseCategory(form).then(res => {
+        await postTrainCourseCategory(form).then(res => {
           ElMessage({
             type: 'success',
             message: res.data,
@@ -108,6 +109,7 @@ const onSubmit = (formEl) => {
           onResetForm(formEl)
         })
       }
+      bus.emit('update-train-course-category-table')
     }
   })
 }
@@ -115,6 +117,12 @@ const props = defineProps({
   data: {}
 })
 if (props.data) {
+  console.log(props.data)
+  form['categoryId'] = props.data['categoryId']
+  form['categorySubTitle'] = props.data['categorySubTitle']
+  form['categoryTitle'] = props.data['categoryTitle']
+  form['color'] = props.data['color']
+  form['status'] = statusEnum.value.find(item => item.name === props.data['status']).key
 }
 
 </script>

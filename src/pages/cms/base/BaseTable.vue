@@ -149,17 +149,8 @@ const queryConditions = ({
   })
 }
 
-// 使用defineEmits创建名称，接受一个数组
-const emit = defineEmits(['onEdit'])
-
 const onEdit = (record) => {
   bus.emit('edit-item', {
-    record,
-    component: BaseFormVue,
-    title: '基地编辑',
-    name: record.baseId
-  })
-  emit('onEdit', {
     record,
     component: BaseFormVue,
     title: '基地编辑',
@@ -177,9 +168,7 @@ const updateData = () => {
 
 const bus = inject('bus')
 
-bus.on('update-base-table', () => {
-  updateData()
-})
+bus.on('update-base-table', () => updateData())
 </script>
 <style>
 </style>

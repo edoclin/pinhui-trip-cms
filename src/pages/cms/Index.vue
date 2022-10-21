@@ -134,7 +134,7 @@
               </template>
               <el-menu-item-group title="课程">
                 <el-menu-item index="mini/train/course/table"
-                              @click="clickMenuItem('课程列表', 'ViewCarouselTable', 'ViewCarouselTable', './page/course/ViewCarouselTable')">
+                              @click="clickMenuItem('课程列表', 'TrainCourseTable', 'TrainCourseTable', './train/course/TrainCourseTable')">
                   <el-icon>
                     <Document/>
                   </el-icon>
