@@ -1,5 +1,5 @@
 <template>
-  <el-form :model="form" label-width="120px" ref="formRef">
+  <el-form :rules="rules" :model="form" label-width="120px" ref="formRef">
     <el-form-item label="分类名称" prop="categoryName">
       <el-input v-model="form.categoryName"/>
     </el-form-item>
@@ -55,15 +55,59 @@ import { useCommonStore } from 'src/stores/common_store'
 import { getAccessUrl, sliceUploadFile } from 'src/api/cos'
 
 const { statusEnum } = useMapState(useCommonStore, ['statusEnum'])
-import '@wangeditor/editor/dist/css/style.css' // 引入 css
+import '@wangeditor/editor/dist/css/style.css'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import { generateAccessUrl } from 'src/api/common'
 
 const fileList = ref([])
-
 const handlePreviewUpload = (e) => {
   window.open(e.url, "_black")
 }
+
+const validateDescRichText = (rule, value, cb) => {
+  if (form['descRichText'] === '') {
+    cb(new Error('请输入富文本描述'))
+    return false
+  }
+  cb()
+}
+
+const rules = reactive({
+  categoryName: [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请输入分类名称'
+    },
+  ],
+  coverResourcePath: [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请上传封面展示图片'
+    },
+  ],
+  status: [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请选择当前状态'
+    },
+  ],
+  descSimple: [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请输入简单描述'
+    },
+  ],
+  descRichText: [
+    {
+      validator: validateDescRichText,
+      trigger: 'blur'
+    }
+  ]
+})
 
 const valueHtml = reactive({
   html: ''
@@ -169,24 +213,28 @@ const bus = inject('bus')
 const onSubmit = async (formEl) => {
   form.descRichText = valueHtml.html
   // update
-  if (props.data) {
-    await putBaseCourseCategory(form).then(res => {
-      ElMessage({
-        type: 'success',
-        message: res.data,
-      })
-    })
-  } else {
-    await postBaseCourseCategory(form).then(res => {
-      ElMessage({
-        type: 'success',
-        message: res.data,
-      })
-      valueHtml.html = ''
-      onResetForm(formEl)
-    })
-  }
-  bus.emit('update-base-course-category-table')
+  formEl.validate(async (valid) => {
+    if (valid) {
+      if (props.data) {
+        await putBaseCourseCategory(form).then(res => {
+          ElMessage({
+            type: 'success',
+            message: res.data,
+          })
+        })
+      } else {
+        await postBaseCourseCategory(form).then(res => {
+          ElMessage({
+            type: 'success',
+            message: res.data,
+          })
+          valueHtml.html = ''
+          onResetForm(formEl)
+        })
+      }
+      bus.emit('update-base-course-category-table')
+    }
+  })
 }
 
 const props = defineProps({

@@ -36,7 +36,6 @@ import { ElMessage } from 'element-plus'
 import { useMapState } from 'src/stores'
 import { useCommonStore } from 'src/stores/common_store'
 import { getBaseSelector } from 'src/api/base'
-import { reactive } from 'vue'
 
 const {
   statusEnum,

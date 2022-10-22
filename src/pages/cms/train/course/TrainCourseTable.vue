@@ -37,7 +37,6 @@
 </template>
 <script setup>
 import { ElMessage } from 'element-plus'
-import { reactive, watch } from 'vue'
 import {
   listTrainCourse,
   deleteTrainCourseByIds,

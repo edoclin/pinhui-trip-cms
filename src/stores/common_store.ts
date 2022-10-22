@@ -16,7 +16,6 @@ interface CourseVersion {
     name: string
 }
 
-
 export const useCommonStore = defineStore('common_store', {
     state: () => ({
         statusEnum: {} as StatusEnum,
@@ -36,7 +35,6 @@ export const useCommonStore = defineStore('common_store', {
             this.courseVersion = courseVersion
         }
     },
-
 })
 
 

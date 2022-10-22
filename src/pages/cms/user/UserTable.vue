@@ -7,7 +7,7 @@
       <el-table-column type="selection" width="30"/>
       <el-table-column v-for="(item, index) in tableData.columns" :key="index" :sortable="item.sortable"
                        :fixed="item.fixed" :prop="item.column" :label="item.label"></el-table-column>
-      <el-table-column fixed="right" label="操作">
+      <el-table-column :fixed="'right'" label="操作">
         <template #header v-if="selectedData.data.length !== 0">
           <el-popconfirm @confirm="deleteSelected" :title="`确定删除所选中的${selectedData.data.length}条记录?`">
             <template #reference>
@@ -23,7 +23,6 @@
         </template>
       </el-table-column>
     </el-table>
-    <!--    modify_flag-->
     <el-row style="margin-top: 10px">
       <el-col :span="12">
         <el-pagination small background layout="total, sizes, prev, pager, next" :total="page.total"
@@ -38,9 +37,8 @@
 </template>
 <script setup>
 import { ElMessage } from 'element-plus'
-import { reactive, watch } from 'vue'
 import { listUser, deleteUserByIds, getUserConditions, getTableColumns } from '../../../api/user'
-import AdvanceQuery from '../../../components/AdvanceQuery.vue'
+import AdvanceQuery from 'src/components/AdvanceQuery.vue'
 import UserFormVue from './UserForm.vue'
 
 import { date } from 'quasar'
@@ -146,11 +144,9 @@ const queryConditions = ({
   })
 }
 
-// 使用defineEmits创建名称，接受一个数组
 const bus = inject('bus')
 
 const onEdit = (record) => {
-  console.log(record)
   bus.emit('edit-item', {
     record,
     component: UserFormVue,

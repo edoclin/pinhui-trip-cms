@@ -45,7 +45,6 @@
 </template>
 <script setup>
 import { ElMessage } from 'element-plus'
-import { reactive, watch } from 'vue'
 import {
   listTrainCourseCategory,
   deleteTrainCourseCategoryByIds,
@@ -155,7 +154,6 @@ const queryConditions = ({
 
 const bus = inject('bus')
 const onEdit = (record) => {
-  console.log(record)
   bus.emit('edit-item', {
     record,
     component: TrainCourseCategoryFormVue,

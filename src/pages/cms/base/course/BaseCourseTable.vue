@@ -33,7 +33,6 @@
         </template>
       </el-table-column>
     </el-table>
-    <!--    modify_flag-->
     <el-row style="margin-top: 10px">
       <el-col :span="12">
         <el-pagination small background layout="total, sizes, prev, pager, next" :total="page.total"
@@ -57,12 +56,9 @@ import {
 import AdvanceQuery from 'src/components/AdvanceQuery.vue'
 import BaseCourseFormVue from './BaseCourseForm.vue'
 import { getBaseSelector } from 'src/api/base'
-//modify_flag
 import { date } from 'quasar'
 
-//modify_flag
 const fetchTime = ref('')
-
 const bus = inject('bus')
 
 const baseSelector = reactive({
@@ -98,7 +94,6 @@ watch(page, () => {
     tableData.data = res.data
     page.total = res.count
     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
-
   })
 })
 
@@ -126,7 +121,6 @@ const handleSelectionChange = (value) => {
 
 const deleteSelected = () => {
   let ids = []
-
   selectedData.data.forEach(item => ids.push(item.courseId))
 
   deleteBaseCourseByIds({ ids }).then(res => {
@@ -190,7 +184,7 @@ const updateData = () => {
     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 }
-bus.on('update-base-course-table', updateData)
+bus.on('update-base-course-table', () => updateData())
 </script>
 <style>
 </style>

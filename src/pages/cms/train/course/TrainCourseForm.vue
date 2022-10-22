@@ -91,7 +91,6 @@
   </el-form>
 </template>
 <script setup>
-import { onBeforeUnmount, reactive, ref, shallowRef } from 'vue'
 import { postTrainCourse, putTrainCourse } from 'src/api/train-course'
 import { ElMessage } from 'element-plus'
 import { useMapState } from 'src/stores'

@@ -6,13 +6,3 @@
   >
   </el-result>
 </template>
-
-<script>
-export default {
-  name: 'LoginSuccess'
-}
-</script>
-
-<style scoped>
-
-</style>

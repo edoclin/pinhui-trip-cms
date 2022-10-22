@@ -191,7 +191,7 @@ const queryConditions = ({
 
 const bus = inject('bus')
 const onEdit = (record) => {
-  emit('edit-item', {
+  bus.emit('edit-item', {
     record,
     component: RoleFormVue,
     title: '角色编辑',

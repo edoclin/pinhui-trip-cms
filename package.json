@@ -1,7 +1,7 @@
 {
   "name": "pinhui_trip_cms",
   "version": "1.0.0-alpha",
-  "description": "游品慧",
+  "description": "游品慧后台管理系统",
   "productName": "游品慧",
   "author": "Fengsx <fengsx@yeah.net>",
   "private": true,

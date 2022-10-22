@@ -1,4 +1,4 @@
-import { template } from 'lodash'
+// DEPRECATED
 import { RouteRecordRaw } from 'vue-router'
 
 // 递归读取pages下的vue文件注册到路由，无需手动添加router

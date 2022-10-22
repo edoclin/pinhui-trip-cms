@@ -43,7 +43,6 @@ const handleTabChange = (current) => {
   })
 }
 
-
 listViewCarousel(queryParam).then(res => {
   let displayed = []
   courseCarousel.value = res.data
@@ -56,7 +55,6 @@ listViewCarousel(queryParam).then(res => {
   currentModel.value = displayed
   showTransform.value = true
 })
-
 
 const updateBatch = ref([])
 

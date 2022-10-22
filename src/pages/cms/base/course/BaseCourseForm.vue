@@ -1,7 +1,7 @@
 <template>
   <course-version-form v-if="courseVersionForm['show']" :form="courseVersionForm['form']" @onSubmit="onSubmitCourseVersion"
                        @onCancel="courseVersionForm['show'] = false"></course-version-form>
-  <el-form :model="form" label-width="120px" ref="formRef">
+  <el-form :rules="rules" :model="form" label-width="120px" ref="formRef">
     <el-form-item label="课程名称" prop="courseName">
       <el-input v-model="form['courseName']"/>
     </el-form-item>
@@ -18,7 +18,7 @@
       </el-select>
     </el-form-item>
     <el-form-item label="所属分类" prop="categoryIds">
-      <el-select multiple v-model="form['categoryIds']" placeholder="请选择所属分类" style="width: 100%">
+      <el-select :multiple="true" v-model="form['categoryIds']" placeholder="请选择所属分类" style="width: 100%">
         <el-option v-for="category in selectorData.baseCourseCategorySelector" :key="category.categoryId"
                    :label="category.categoryName"
                    :value="category.categoryId"/>
@@ -69,7 +69,6 @@
 <script setup>
 import { getBaseCourseById, postBaseCourse, putBaseCourse } from 'src/api/base-course'
 import { ElMessage, ElMessageBox } from 'element-plus'
-
 import { useMapState } from 'src/stores'
 import { useCommonStore } from 'src/stores/common_store'
 import { sliceUploadFile } from 'src/api/cos'
@@ -84,6 +83,51 @@ const {
 } = useMapState(useCommonStore, ['statusEnum', 'courseVersion'])
 
 const bus = inject('bus')
+
+const validateCategoryIds = (rule, value, cb) => {
+  if (!form['categoryIds'] || form['categoryIds'].length === 0) {
+    cb(new Error('请选择课程所属分类'))
+    return false
+  }
+  cb()
+}
+
+const rules = reactive({
+  courseName: [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请输入培训课程名称'
+    },
+  ],
+  baseId: [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请选择课程所属基地'
+    },
+  ],
+  defaultCoverResourcePath: [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请上传课程展示封面'
+    },
+  ],
+  categoryIds: [
+    {
+      validator: validateCategoryIds,
+      trigger: 'blur'
+    },
+  ],
+  status: [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请选择当前状态'
+    },
+  ],
+})
 
 const handleTransfer = (current, direction, value) => {
   if (direction === 'right') {
@@ -135,7 +179,7 @@ getBaseCourseCategorySelector().then(res => {
   selectorData.baseCourseCategorySelector = res.data
 })
 
-const formRef = ref()
+const formRef = ref(null)
 
 const form = reactive({
   versions: [],
@@ -179,27 +223,29 @@ const handleChangeFileUpload = (uploadFile) => {
   })
 }
 
-const emit = defineEmits(['onUpdate'])
-
-const onSubmit = async (formEl) => {
-  // update
-  if (props.data) {
-    await putBaseCourse(form).then(res => {
-      ElMessage({
-        type: 'success',
-        message: res.data,
-      })
-    })
-  } else {
-    await postBaseCourse(form).then(res => {
-      ElMessage({
-        type: 'success',
-        message: res.data,
-      })
-      onResetForm(formEl)
-    })
-  }
-  bus.emit('update-base-course-table')
+const onSubmit = (formEl) => {
+  formEl.validate(async (valid) => {
+    if (valid) {
+      // update
+      if (props.data) {
+        await putBaseCourse(form).then(res => {
+          ElMessage({
+            type: 'success',
+            message: res.data,
+          })
+        })
+      } else {
+        await postBaseCourse(form).then(res => {
+          ElMessage({
+            type: 'success',
+            message: res.data,
+          })
+          onResetForm(formEl)
+        })
+      }
+      bus.emit('update-base-course-table')
+    }
+  })
 }
 
 const props = defineProps({
@@ -218,11 +264,8 @@ if (props.data) {
   }]
   getBaseCourseById(form['courseId']).then(res => {
     form['versions'] = res.data.versions
-
     form['versions'].forEach(item => form['versionNames'].push(item.courseVersion))
     form['categoryIds'] = res.data.categoryIds
   })
 }
-
-
 </script>

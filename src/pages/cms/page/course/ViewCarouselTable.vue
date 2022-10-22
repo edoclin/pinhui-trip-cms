@@ -20,10 +20,10 @@
       </el-table-column>
       <el-table-column label="是否展示">
         <template #default="scope">
-          {{ scope.row.displayed ? '是' : '否' }}
+          {{ scope.row['displayed'] ? '是' : '否' }}
         </template>
       </el-table-column>
-      <el-table-column fixed="right" label="操作">
+      <el-table-column :fixed="'right'" label="操作">
         <template #header v-if="selectedData.data.length !== 0">
           <el-popconfirm @confirm="deleteSelected" :title="`确定删除所选中的${selectedData.data.length}条记录?`">
             <template #reference>
@@ -39,7 +39,6 @@
         </template>
       </el-table-column>
     </el-table>
-    <!--    modify_flag-->
     <el-row style="margin-top: 10px">
       <el-col :span="12">
         <el-pagination small background layout="total, sizes, prev, pager, next" :total="page.total"
@@ -54,7 +53,6 @@
 </template>
 <script setup>
 import { ElMessage } from 'element-plus'
-import { reactive, watch } from 'vue'
 import {
   listViewCarouselByPage,
   deleteViewCarouselByIds,
@@ -63,11 +61,9 @@ import {
 } from 'src/api/view-carousel'
 import AdvanceQuery from 'src/components/AdvanceQuery.vue'
 import ViewCarouselFormVue from './ViewCarouselForm.vue'
-//modify_flag
 import { date } from 'quasar'
 import { getCarouselType } from 'src/api/common'
 
-//modify_flag
 const fetchTime = ref('')
 
 const page = reactive({
@@ -122,6 +118,7 @@ const tableData = reactive({
 const selectedData = reactive({
   data: []
 })
+
 const handleSelectionChange = (value) => {
   selectedData.data = [...value]
 }
@@ -195,7 +192,7 @@ const updateData = () => {
   })
 }
 
-bus.on('update-course-carousel-table', updateData)
+bus.on('update-course-carousel-table', () => updateData())
 
 </script>
 <style>

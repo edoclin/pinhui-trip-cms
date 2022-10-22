@@ -23,7 +23,6 @@
         </template>
       </el-table-column>
     </el-table>
-    <!--    modify_flag-->
     <el-row style="margin-top: 10px">
       <el-col :span="12">
         <el-pagination small background layout="total, sizes, prev, pager, next" :total="page.total"
@@ -34,20 +33,15 @@
         {{ fetchTime }}
       </el-col>
     </el-row>
-
-
   </div>
 </template>
 <script setup>
 import { ElMessage } from 'element-plus'
-import { markRaw, reactive, watch } from 'vue'
 import { listBase, deleteBaseByIds, getBaseConditions, getTableColumns } from 'src/api/base'
 import AdvanceQuery from 'src/components/AdvanceQuery.vue'
 import BaseFormVue from './BaseForm.vue'
-//modify_flag
 import { date } from 'quasar'
 
-//modify_flag
 const fetchTime = ref('')
 
 const page = reactive({
@@ -74,7 +68,6 @@ watch(page, () => {
   listBase(page.current, page.size, queryParam).then(res => {
     tableData.data = res.data
     page.total = res.count
-    //modify_flag 所有list方法都加上更新时间戳......
     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 })
@@ -167,7 +160,6 @@ const updateData = () => {
 }
 
 const bus = inject('bus')
-
 bus.on('update-base-table', () => updateData())
 </script>
 <style>

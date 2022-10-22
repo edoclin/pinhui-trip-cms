@@ -73,5 +73,4 @@ if (props.data) {
   form['customRoleIds'] = props.data['customRoleIds']
   form['status'] = statusEnum.value.find(item => item.name === props.data['status']).key
 }
-
 </script>

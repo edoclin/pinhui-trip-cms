@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeTheme, ipcMain, globalShortcut, Menu, MenuItem } from 'electron'
+import { app, BrowserWindow, nativeTheme, ipcMain, globalShortcut} from 'electron'
 import path from 'path'
 import os from 'os'
 
@@ -39,7 +39,6 @@ function registryShortcut () {
   })
 }
 
-
 app.whenReady().then(() => {
   // 注册快捷键
   registryShortcut()
@@ -63,8 +62,7 @@ function createWindow () {
   })
 
   // @ts-ignore
-  mainWindow.loadURL(process.env.APP_URL).then(r => {
-  })
+  mainWindow.loadURL(process.env.APP_URL)
 
   if (process.env.DEBUGGING) {
     mainWindow.webContents.openDevTools()
@@ -78,7 +76,6 @@ function createWindow () {
   mainWindow.on('closed', () => {
     mainWindow = undefined
   })
-
 }
 
 app.whenReady().then(createWindow)

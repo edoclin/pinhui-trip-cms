@@ -271,23 +271,19 @@
 <script setup>
 
 import { mapActions } from 'pinia'
-
-const pageModules = import.meta.glob('./**/**/**/**/**.vue')
 import { Moon, Sunny, FullScreen, SwitchButton } from '@element-plus/icons-vue'
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import { useDark, useToggle } from '@vueuse/core'
 import SvgExitFullScreen from 'src/components/SvgExitFullScreen.vue'
 import screenfull from 'screenfull'
-
-import 'driver.js/dist/driver.min.css'
 import { useCommonStore } from 'src/stores/common_store'
 import { getCourseVersion, getPreparedRole, getStatusEnum } from 'src/api/common'
 import { webLogout } from '../../api/user'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../../stores/user_store'
 
+const pageModules = import.meta.glob('./**/**/**/**/**.vue')
 const bus = inject('bus')
-
 const commonActions = mapActions(useCommonStore,
     [
       'updateStatusEnum',
@@ -374,7 +370,6 @@ onMounted(() => {
   })
 })
 
-// 删除侦听器
 onUnmounted(() => {
   screenfull.off('change', change)
 })
@@ -423,15 +418,14 @@ const clickMenuItem = (title, name, key, componentPath) => {
 const removeTab = (name) => {
   let index = editableTabs.findIndex(item => item.name === name)
   // chrome 标签
-  if (index === 0) {
-    // 打开引导页
+  if (index === 0 && editableTabs.length === 1) {
+    // todo: 打开引导页
   } else if (index === editableTabs.length - 1) {
     //最后一个标签 -> 打开前一个标签
     currentTab.name = editableTabs[index - 1].name
   } else {
     // 打开后一个标签
     currentTab.name = editableTabs[index + 1].name
-
   }
   editableTabs.splice(index, 1)
   delete children[name]
@@ -458,11 +452,8 @@ bus.on('edit-item', ({
     currentTab.name = name
   }
 })
-
 </script>
-
 <style>
-
 .flex-grow {
   flex-grow: 1;
 }

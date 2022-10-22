@@ -105,13 +105,11 @@ import { ElMessage } from 'element-plus'
 import SvgPassword from 'src/components/SvgPassword.vue'
 import { getValidateCode, postUser, webLogin } from 'src/api/user'
 import { mapActions } from 'pinia'
-import { useCommonStore } from '../../stores/common_store'
-import { useUserStore } from '../../stores/user_store'
+import { useUserStore } from 'src/stores/user_store'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const registerFormRef = ref(null)
-
 const disableCode = ref(false)
 const showSendCode = ref(false)
 const showCodeField = ref(false)
@@ -154,7 +152,6 @@ const registerForm = reactive({
 })
 
 const timeout = ref(60)
-
 const timer = ref(null)
 
 const sendCode = () => {
@@ -281,7 +278,6 @@ const loginForm = reactive({})
 const isPassing = ref(false)
 const dragWidth = ref(200)
 const isElectron = ref(process.env.MODE === 'electron')
-
 const showLoginButton = ref(process.env.NODE_ENV !== 'production')
 const dialogRegisterFormVisible = ref(false)
 
@@ -302,9 +298,7 @@ onMounted(() => {
     })()
   }
 })
-
 </script>
-
 <style lang="scss">
 .bg {
   background: url(https://prod-cdn.tugezigui1.com/static/pinhui.trip.cms.bg.trip);
@@ -337,7 +331,6 @@ onMounted(() => {
       }
     }
 
-
     .el-input {
       margin: 2% 10%;
       width: 80%;
@@ -352,7 +345,6 @@ onMounted(() => {
           color: rgba(255, 255, 255, 0.74);
           background-color: transparent;
           text-align: center;
-
         }
       }
     }

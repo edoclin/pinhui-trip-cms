@@ -1,9 +1,9 @@
 <template>
-  <el-form :model="form" label-width="120px" ref="formRef">
+  <el-form :rules="rules" :model="form" label-width="120px" ref="formRef">
     <el-form-item label="基地名称" prop="baseName">
       <el-input v-model="form.baseName"/>
     </el-form-item>
-    <el-form-item label="当前状态">
+    <el-form-item label="当前状态" prop="status">
       <el-select v-model="form['status']" placeholder="请选择状态" style="width: 100%">
         <el-option v-for="status in statusEnum" :key="status.key" :label="status.name"
                    :value="status.key"/>
@@ -13,7 +13,7 @@
       <div style="height: calc(100vh - 80px);width: 100%;">
         <el-amap :center="amapParam.center" :zoom="amapParam.zoom">
           <el-amap-search-box :visible="true" @select="selectPoi" @choose="choosePoi"/>
-          <el-amap-control-map-type :visible="true" ></el-amap-control-map-type>
+          <el-amap-control-map-type :visible="true"></el-amap-control-map-type>
           <el-amap-control-geolocation :visible="true" @complete="getLocation"/>
           <el-amap-mouse-tool v-if="form.polygonGeometry.length === 0" type="polygon" :auto-clear="true"
                               @draw="drawMouseTool"/>
@@ -22,8 +22,8 @@
         </el-amap>
         <el-form-item v-if="form.polygonGeometry.length !== 0" label="操作" style="margin-top: 10px">
           <el-button
-                     :type="amapPolygon.editable ? 'danger' : 'primary'"
-                     @click="amapPolygon.editable = !amapPolygon.editable">{{ amapPolygon.editable ? '保存' : '编辑' }}
+              :type="amapPolygon.editable ? 'danger' : 'primary'"
+              @click="amapPolygon.editable = !amapPolygon.editable">{{ amapPolygon.editable ? '保存' : '编辑' }}
           </el-button>
         </el-form-item>
 
@@ -33,9 +33,12 @@
       <el-input v-model="form.baseLocationText"/>
     </el-form-item>
     <el-form-item prop="coverResourcePath" label="展示图片">
-      <el-upload :on-preview="handlePreviewUpload" list-type="picture-card" v-model:file-list="fileList" :auto-upload="false" accept="image/*"
+      <el-upload :on-preview="handlePreviewUpload" list-type="picture-card" v-model:file-list="fileList"
+                 :auto-upload="false" accept="image/*"
                  :on-change="handleChangeFileUpload">
-        <el-button type="primary" :loading="uploading">{{ uploading ? '上传中...' : (fileList.length === 1 ? '重新上传' : '点击上传') }}</el-button>
+        <el-button type="primary" :loading="uploading">
+          {{ uploading ? '上传中...' : (fileList.length === 1 ? '重新上传' : '点击上传') }}
+        </el-button>
         <template #tip>
           <div class="el-upload__tip">
             <el-progress
@@ -79,6 +82,7 @@ import { useMapState } from 'src/stores'
 import { useCommonStore } from 'src/stores/common_store'
 import { generateAccessUrl } from 'src/api/common'
 import { openURL } from 'quasar'
+import { reactive } from 'vue'
 
 const { statusEnum } = useMapState(useCommonStore, ['statusEnum'])
 const bus = inject('bus')
@@ -86,7 +90,73 @@ const valueHtml = reactive({
   html: ''
 })
 const editorRef = shallowRef()
-const formRef = ref()
+const formRef = ref(null)
+
+const validateDescRichText = (rule, value, cb) => {
+  if (form['descRichText'] === '') {
+    cb(new Error('请输入富文本描述'))
+    return false
+  }
+  cb()
+}
+
+const validatePolygonGeometry = (rule, value, cb) => {
+  if (!form['polygonGeometry'] || form['polygonGeometry'].length === 0) {
+    cb(new Error('请输入基地位置'))
+    return false
+  }
+  cb()
+}
+
+const rules = reactive({
+  baseName: [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请输入基地名称'
+    },
+  ],
+  polygonGeometry: [
+    {
+      validator: validatePolygonGeometry,
+      trigger: 'blur'
+    },
+  ],
+  baseLocationText: [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请输入基地详细位置'
+    },
+  ],
+  coverResourcePath: [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请上传基地展示图片'
+    },
+  ],
+  status: [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请选择当前状态'
+    },
+  ],
+  descSimple: [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请输入简单描述'
+    },
+  ],
+  descRichText: [
+    {
+      validator: validateDescRichText,
+      trigger: 'blur'
+    }
+  ]
+})
 
 onBeforeUnmount(() => {
   const editor = editorRef.value
@@ -97,6 +167,7 @@ onBeforeUnmount(() => {
 const handleCreated = (editor) => {
   editorRef.value = editor
 }
+
 const toolbarConfig = reactive({
   excludeKeys: [
     'fullScreen'
@@ -167,26 +238,30 @@ const onResetForm = (formEl) => {
   }
 }
 
-const onSubmit = async (formEl) => {
+const onSubmit = (formEl) => {
   form.descRichText = valueHtml.html
-  // update
-  if (props.data) {
-    await putBase(form).then(res => {
-      ElMessage({
-        type: 'success',
-        message: res.data,
-      })
-    })
-  } else {
-    await postBase(form).then(res => {
-      ElMessage({
-        type: 'success',
-        message: res.data,
-      })
-      onResetForm(formEl)
-    })
-  }
-  bus.emit('update-base-table')
+
+  formEl.validate(async (valid) => {
+    if (valid) {
+      if (props.data) {
+        await putBase(form).then(res => {
+          ElMessage({
+            type: 'success',
+            message: res.data,
+          })
+        })
+      } else {
+        await postBase(form).then(res => {
+          ElMessage({
+            type: 'success',
+            message: res.data,
+          })
+          onResetForm(formEl)
+        })
+      }
+      bus.emit('update-base-table')
+    }
+  })
 }
 
 const selectPoi = (e) => {
@@ -201,6 +276,7 @@ const choosePoi = (e) => {
 const getLocation = (e) => {
   amapParam.center = [e.poi.location.lng, e.poi.location.lat]
 }
+
 const drawMouseTool = (e) => {
   form.polygonGeometry = e
 }
@@ -226,13 +302,13 @@ const handleChangeFileUpload = (uploadFile) => {
   uploading.value = true
   fileList.value = []
   sliceUploadFile(uploadFile.raw, 'base-cover').then(data => {
-    form.coverResourcePath = data.Key
+    form.coverResourcePath = data['Key']
     ElMessage({
       type: 'success',
       message: '上传成功'
     })
     uploading.value = false
-    generateAccessUrl(data.Key).then(res => {
+    generateAccessUrl(data['Key']).then(res => {
       fileList.value.push({
         name: '',
         url: res.data
@@ -251,21 +327,21 @@ const props = defineProps({
   data: {}
 })
 if (props.data) {
-  form["baseId"] = props.data["baseId"]
-  form["baseName"] = props.data["baseName"]
-  form["baseLocationText"] = props.data["baseLocationText"]
-  form["coverResourcePath"] = props.data["coverResourcePath"]
-  form["descSimple"] = props.data["descSimple"]
-  form["descRichText"] = props.data["descRichText"]
-  valueHtml.html = props.data["descRichText"]
-  form["status"] = statusEnum.value.find(item => item.name === props.data["status"]).key
-  props.data["polygon"].forEach(item => {
-    form["polygonGeometry"].push([item.lng, item.lat])
+  form['baseId'] = props.data['baseId']
+  form['baseName'] = props.data['baseName']
+  form['baseLocationText'] = props.data['baseLocationText']
+  form['coverResourcePath'] = props.data['coverResourcePath']
+  form['descSimple'] = props.data['descSimple']
+  form['descRichText'] = props.data['descRichText']
+  valueHtml.html = props.data['descRichText']
+  form['status'] = statusEnum.value.find(item => item.name === props.data['status']).key
+  props.data['polygon'].forEach(item => {
+    form['polygonGeometry'].push([item.lng, item.lat])
   })
-  amapParam.center = [props.data["centroid"].lng, props.data["centroid"].lat]
+  amapParam.center = [props.data['centroid'].lng, props.data['centroid'].lat]
   fileList.value = [{
     name: '',
-    url: props.data["coverResourcePathUrl"]
+    url: props.data['coverResourcePathUrl']
   }]
 }
 </script>

@@ -1,4 +1,3 @@
-/* eslint-disable */
 /// <reference types=“vite-plugin-pages/client” />
 
 declare namespace NodeJS {

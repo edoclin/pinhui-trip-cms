@@ -7,7 +7,7 @@
       <el-table-column type="selection" width="30"/>
       <el-table-column v-for="(item, index) in tableData.columns" :key="index" :sortable="item.sortable"
                        :fixed="item.fixed" :prop="item.column" :label="item.label"></el-table-column>
-      <el-table-column fixed="right" label="操作">
+      <el-table-column :fixed="'right'" label="操作">
         <template #header v-if="selectedData.data.length !== 0">
           <el-popconfirm @confirm="deleteSelected" :title="`确定删除所选中的${selectedData.data.length}条记录?`">
             <template #reference>
@@ -63,11 +63,10 @@ import {
 } from 'src/api/base-course-category'
 import AdvanceQuery from 'src/components/AdvanceQuery.vue'
 import BaseCourseCategoryFormVue from './BaseCourseCategoryForm.vue'
+import { copyToClipboard } from 'quasar'
 
 const bus = inject('bus')
-
 import { date } from 'quasar'
-
 const fetchTime = ref('')
 const relatedCourse = ref([])
 
@@ -75,7 +74,6 @@ const resetRelatedCourseData = () => {
   relatedCourse.value = []
 }
 
-import { copyToClipboard } from 'quasar'
 
 const copyCourseId = (courseId) => {
   copyToClipboard(courseId)
@@ -193,9 +191,6 @@ const queryConditions = ({
   })
 }
 
-// 使用defineEmits创建名称，接受一个数组
-// const emit = defineEmits(['onEdit'])
-
 const onEdit = (record) => {
   bus.emit('edit-item', {
     record,
@@ -213,7 +208,7 @@ const updateData = () => {
     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 }
-bus.on('update-base-course-category-table', updateData)
+bus.on('update-base-course-category-table', () => updateData())
 
 // 组件是默认关闭的, 无法通过ref获取到
 // https://blog.csdn.net/qq_35443423/article/details/125574122?spm=1001.2101.3001.6650.9&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-9-125574122-blog-116994776.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-9-125574122-blog-116994776.pc_relevant_default&utm_relevant_index=10
