@@ -63,7 +63,6 @@ api.interceptors.response.use(response => {
       }).catch(err => {
         console.log(err)
       })
-
     }
     return Promise.reject(response.data)
   }
