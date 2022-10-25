@@ -165,7 +165,7 @@
                 </el-menu-item>
               </el-menu-item-group>
             </el-sub-menu>
-            <el-sub-menu index="manage">
+            <el-sub-menu index="manage" v-if="false">
               <template #title>
                 <el-icon>
                   <Setting/>
@@ -208,15 +208,15 @@
                          :icon="isFullscreen ? SvgExitFullScreen : FullScreen" @click="onToggle($event)"></el-button>
 
               <el-button v-if="isElectron" size="large" text style="margin-top: 8px;" id="guide-quit"
-                         :icon="SwitchButton" @click="onBlur($event); electronExitDialog.value = true"></el-button>
-              <el-badge :value="99" style="margin-top: 20px;margin-right: 15px;margin-left: 18px">
+                         :icon="SwitchButton" @click="onBlur($event); electronExitDialog = true"></el-button>
+              <el-badge v-if="false" :value="99" style="margin-top: 20px;margin-right: 15px;margin-left: 18px">
                 <el-icon :size="17">
                   <ChatDotSquare/>
                 </el-icon>
               </el-badge>
               <el-sub-menu index="setting">
-                <template #title>个人中心</template>
-                <el-menu-item index="change-password">修改密码</el-menu-item>
+                <template #title>{{ userInfo.realName }}</template>
+                <el-menu-item index="change-password" @click="dialogChangePassword = true">修改密码</el-menu-item>
                 <el-menu-item index="logout" @click="logout">退出登录</el-menu-item>
               </el-sub-menu>
             </el-menu>
@@ -260,8 +260,40 @@
             title="是否退出当前程序？"/>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="electronExitDialog.value = false">取消</el-button>
+                <el-button @click="electronExitDialog = false">取消</el-button>
                 <el-button type="primary" @click="onElectronQuit">确认</el-button>
+            </span>
+        </template>
+      </el-dialog>
+
+      <el-dialog
+          v-model="dialogChangePassword"
+          title="修改密码"
+          width="30%"
+          :close-on-click-modal="false"
+          :close-on-press-escape="false"
+          :show-close="false"
+          center
+          align-center>
+        <el-form
+            ref="changePasswordFormRef"
+            :model="changePasswordForm"
+            :rules="rules"
+            label-width="80px"
+            status-icon
+        >
+          <el-form-item label="原始密码" prop="originalPassword">
+            <el-input type="password" show-password v-model="changePasswordForm['originalPassword']" placeholder="请输入原始密码"/>
+          </el-form-item>
+          <el-form-item label="新的密码" prop="newPassword">
+            <el-input type="password" show-password v-model="changePasswordForm['newPassword']" placeholder="请输入新的密码"/>
+          </el-form-item>
+        </el-form>
+
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="dialogChangePassword = false">取消</el-button>
+                <el-button type="primary" @click="submitChangePassword(changePasswordFormRef)">确认</el-button>
             </span>
         </template>
       </el-dialog>
@@ -278,9 +310,65 @@ import SvgExitFullScreen from 'src/components/SvgExitFullScreen.vue'
 import screenfull from 'screenfull'
 import { useCommonStore } from 'src/stores/common_store'
 import { getCourseVersion, getPreparedRole, getStatusEnum } from 'src/api/common'
-import { webLogout } from '../../api/user'
+import { webChangePassword, webLogout } from 'src/api/user'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '../../stores/user_store'
+import { useUserStore } from 'src/stores/user_store'
+import { ElMessage } from 'element-plus'
+import { useMapState } from '../../stores'
+
+const {
+  userInfo
+} = useMapState(useUserStore, ['userInfo'])
+
+const dialogChangePassword = ref(false)
+const changePasswordFormRef = ref(null)
+
+const submitChangePassword = (formEl) => {
+  formEl.validate((valid) => {
+    if (valid) {
+      webChangePassword(changePasswordForm).then(res => {
+        ElMessage({
+          type: 'success',
+          message: '密码修改成功'
+        })
+        logout()
+      })
+    }
+  })
+}
+const validatePassword = (rule, value, cb) => {
+  if (!(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^]{8,16}$/.test(value))) {
+    cb(new Error('密码长度8-16个字符，至少1个大写字母，1个小写字母和1个数字'))
+    return false
+  }
+  cb()
+}
+
+const changePasswordForm = reactive({
+  originalPassword: '',
+  newPassword: ''
+})
+
+const rules = reactive({
+  originalPassword: [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请输入原始密码'
+    },
+  ],
+  newPassword: [
+    {
+      required: true,
+      trigger: 'blur',
+      message: '请输入新的密码'
+    },
+    {
+      validator: validatePassword,
+      trigger: 'blur'
+    },
+  ],
+})
 
 const pageModules = import.meta.glob('./**/**/**/**/**.vue')
 const bus = inject('bus')
@@ -352,7 +440,7 @@ const logout = () => {
     localStorage.remove('token')
     localStorage.remove('userInfo')
     router.push({
-      path: "/cms/login"
+      path: '/cms/login'
     })
   })
 }
@@ -385,7 +473,7 @@ let currentTab = reactive({
   name: ''
 })
 
-pageModules[`./LoginSuccess.vue`]().then(item => {
+pageModules[`./Help.vue`]().then(item => {
   editableTabs.push({
     component: markRaw(item.default),
     title: '登录成功',

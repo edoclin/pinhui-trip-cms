@@ -263,8 +263,10 @@ if (props.data) {
     url: props.data['defaultCoverResourcePathUrl']
   }]
   getBaseCourseById(form['courseId']).then(res => {
-    form['versions'] = res.data.versions
-    form['versions'].forEach(item => form['versionNames'].push(item.courseVersion))
+    if (res.data['versions']) {
+      form['versions'] = res.data.versions
+      form['versions'].forEach(item => form['versionNames'].push(item.courseVersion))
+    }
     form['categoryIds'] = res.data.categoryIds
   })
 }

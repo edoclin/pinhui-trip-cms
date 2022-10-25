@@ -31,13 +31,25 @@
         </el-form>
         <el-form v-if="active === 1" :model="form" label-width="120px">
           <el-form-item prop="videoResourcePath" label="课程视频">
-            <el-upload :auto-upload="false" :show-file-list="false" accept="video/*"
+            <el-upload list-type="picture-card" :auto-upload="false" v-model:file-list="videoFile['part1']" accept="video/*"
                        :on-change="handleChangeFileUpload">
               <el-button type="primary" :loading="uploading">{{ uploading ? '上传中...' : '点击上传' }}</el-button>
+              <template #file="{ file }">
+                <div>
+                  <video class="el-upload-list__item-thumbnail" :src="file.url"/>
+                  <span class="el-upload-list__item-actions">
+              <span
+                  class="el-upload-list__item-preview"
+                  @click="handlePreviewUpload(file)">
+                <el-icon><zoom-in/></el-icon>
+              </span>
+            </span>
+                </div>
+              </template>
               <template #tip>
                 <div class="el-upload__tip">
                   <el-progress
-                      style="width: 160px"
+                      style="width: 202px"
                       v-if="uploading"
                       :percentage="100"
                       :indeterminate="true"
@@ -67,13 +79,25 @@
         </el-form>
         <el-form v-if="active === 2" :model="form" label-width="120px">
           <el-form-item prop="videoResourcePath" label="课程视频">
-            <el-upload :auto-upload="false" :show-file-list="false" accept="video/*"
+            <el-upload list-type="picture-card" :auto-upload="false" v-model:file-list="videoFile['part2']" accept="video/*"
                        :on-change="handleChangeFileUpload">
               <el-button type="primary" :loading="uploading">{{ uploading ? '上传中...' : '点击上传' }}</el-button>
+              <template #file="{ file }">
+                <div>
+                  <video class="el-upload-list__item-thumbnail" :src="file.url"/>
+                  <span class="el-upload-list__item-actions">
+              <span
+                  class="el-upload-list__item-preview"
+                  @click="handlePreviewUpload(file)">
+                <el-icon><zoom-in/></el-icon>
+              </span>
+            </span>
+                </div>
+              </template>
               <template #tip>
                 <div class="el-upload__tip">
                   <el-progress
-                      style="width: 160px"
+                      style="width: 202px"
                       v-if="uploading"
                       :percentage="100"
                       :indeterminate="true"
@@ -171,13 +195,25 @@
         </el-form>
         <el-form v-if="active === 4" :model="form" label-width="120px">
           <el-form-item prop="videoResourcePath" label="课程视频">
-            <el-upload :auto-upload="false" :show-file-list="false" accept="video/*"
+            <el-upload list-type="picture-card" :auto-upload="false" v-model:file-list="videoFile['part4']" accept="video/*"
                        :on-change="handleChangeFileUpload">
               <el-button type="primary" :loading="uploading">{{ uploading ? '上传中...' : '点击上传' }}</el-button>
+              <template #file="{ file }">
+                <div>
+                  <video class="el-upload-list__item-thumbnail" :src="file.url"/>
+                  <span class="el-upload-list__item-actions">
+              <span
+                  class="el-upload-list__item-preview"
+                  @click="handlePreviewUpload(file)">
+                <el-icon><zoom-in/></el-icon>
+              </span>
+            </span>
+                </div>
+              </template>
               <template #tip>
                 <div class="el-upload__tip">
                   <el-progress
-                      style="width: 160px"
+                      style="width: 202px"
                       v-if="uploading"
                       :percentage="100"
                       :indeterminate="true"
@@ -224,15 +260,27 @@
         <el-input type="textarea" :rows="2" v-model="route.dialogForm.descSimple"/>
       </el-form-item>
       <el-form-item prop="videoResourcePath" label="点位视频">
-        <el-upload :auto-upload="false" :show-file-list="false" accept="video/*"
+        <el-upload list-type="picture-card" :auto-upload="false" v-model:file-list="videoFile[route.dialogForm['pointName']]"  accept="video/*"
                    :on-change="handleChangeFileUpload">
           <el-button type="primary" :loading="route.dialogForm.uploading">
             {{ route.dialogForm.uploading ? '上传中...' : '点击上传' }}
           </el-button>
+          <template #file="{ file }">
+            <div>
+              <video class="el-upload-list__item-thumbnail" :src="file.url"/>
+              <span class="el-upload-list__item-actions">
+              <span
+                  class="el-upload-list__item-preview"
+                  @click="handlePreviewUpload(file)">
+                <el-icon><zoom-in/></el-icon>
+              </span>
+            </span>
+            </div>
+          </template>
           <template #tip>
             <div class="el-upload__tip">
               <el-progress
-                  style="width: 160px"
+                  style="width: 202px"
                   v-if="route.dialogForm.uploading"
                   :percentage="100"
                   :indeterminate="true"
@@ -257,18 +305,17 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, reactive, ref, shallowRef } from 'vue'
-
-import { useMapState } from 'src/stores'
-import { useCommonStore } from 'src/stores/common_store'
-import { getCourseVersionPartByVersion } from 'src/api/common'
+import { generateAccessUrl, getCourseVersionPartByVersion } from 'src/api/common'
 import { getAccessUrl, sliceUploadFile } from 'src/api/cos'
-import '@wangeditor/editor/dist/css/style.css' // 引入 css
+import '@wangeditor/editor/dist/css/style.css'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import { ElMessage } from 'element-plus'
+import { openURL } from 'quasar'
 
 const mouseToolType = ref('polyline')
 const mouseToolUnlock = ref(true)
+
+const videoFile = reactive({})
 
 const handleMarkerDragEnd = (e, index) => {
   route.markers[index].position = [e.lnglat.KL, e.lnglat.kT]
@@ -399,14 +446,26 @@ if (props.form) {
     let part = props.form['data']['parts'][0]
     courseVersionForm.part1['descSimple'] = part['descSimple']
     courseVersionForm.part1['descRichText'] = part['descRichText']
+    videoFile['part1'] = [{
+      name: '',
+      url: part['videoResourcePathUrl']
+    }]
 
     part = props.form['data']['parts'][1]
     courseVersionForm.part2['descSimple'] = part['descSimple']
     courseVersionForm.part2['descRichText'] = part['descRichText']
+    videoFile['part2'] = [{
+      name: '',
+      url: part['videoResourcePathUrl']
+    }]
 
     part = props.form['data']['parts'][3]
     courseVersionForm.part4['descSimple'] = part['descSimple']
     courseVersionForm.part4['descRichText'] = part['descRichText']
+    videoFile['part4'] = [{
+      name: '',
+      url: part['videoResourcePathUrl']
+    }]
 
     part = props.form['data']['parts'][2]
     courseVersionForm.part3['routeName'] = part['route']['routeName']
@@ -416,10 +475,18 @@ if (props.form) {
     route.polyline.editable = false
     route.polyline.draggable = false
     route.markers = part['route']['points']
+    route.markers.forEach(item => {
+      videoFile[item['pointName']] = [{
+        name: '',
+        url: item['videoResourcePathUrl']
+      }]
+    })
 
     amapParam.center = [part['route']['polylineCentroid'].lng, part['route']['polylineCentroid'].lat]
     amapParam.zoom = 18
     mouseToolUnlock.value = false
+
+    mouseToolType.value = 'hidden'
   })
 }
 const show = ref(true)
@@ -468,12 +535,18 @@ const handleChangeFileUpload = (uploadFile) => {
   }
   sliceUploadFile(uploadFile.raw, 'course-version-part-version').then(data => {
     if (route.showPointDialog) {
-      route.dialogForm['videoResourcePath'] = data.Key
+      route.dialogForm['videoResourcePath'] = data['Key']
       ElMessage({
         type: 'success',
         message: '上传成功'
       })
       route.dialogForm['uploading'] = false
+      generateAccessUrl(data['Key']).then(res => {
+        videoFile[`${route.dialogForm['pointName']}`] = [{
+          name: '',
+          url: res.data
+        }]
+      })
     } else {
       courseVersionForm[`part${active.value}`]['videoResourcePath'] = data.Key
       ElMessage({
@@ -481,6 +554,12 @@ const handleChangeFileUpload = (uploadFile) => {
         message: '上传成功'
       })
       uploading.value = false
+      generateAccessUrl(data['Key']).then(res => {
+        videoFile[`part${active.value}`] = [{
+          name: '',
+          url: res.data
+        }]
+      })
     }
   }).catch(err => {
     if (route.showPointDialog) {
@@ -560,6 +639,11 @@ const editorConfig = reactive({
     }
   }
 })
+
+const handlePreviewUpload = (e) => {
+  console.log(e)
+  openURL(e.url)
+}
 
 // 使用defineEmits创建名称，接受一个数组
 const emit = defineEmits(['onSubmit', 'onCancel'])

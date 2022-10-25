@@ -1,5 +1,5 @@
 {
-  "name": "pinhui_trip_cms",
+  "name": "pinhui-trip-cms",
   "version": "1.0.0-alpha",
   "description": "游品慧后台管理系统",
   "productName": "游品慧",
@@ -19,6 +19,7 @@
     "electrion publish": "quasar build --mode electron --publish always"
   },
   "dependencies": {
+    "@kangc/v-md-editor": "^2.3.15",
     "@quasar/extras": "^1.15.2",
     "@vuemap/vue-amap": "^1.1.15",
     "@vueuse/core": "^9.3.0",

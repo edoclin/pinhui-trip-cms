@@ -45,7 +45,7 @@ export const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   NProgress.start() // 开启顶部加载动画
-  if (to.path == '/cms/login') {
+  if (to.path == '/cms/login' || to.path === '/cms/help') {
     next()
   } else if (JSON.stringify(token.value) == '{}') {
     next('/cms/login')

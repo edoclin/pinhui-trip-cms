@@ -309,6 +309,7 @@ onMounted(() => {
   width: inherit;
   height: 100vh;
   overflow-scrolling: touch;
+  overflow-y: hidden;
 
   .background {
     background-color: rgba(0, 0, 0, .6);

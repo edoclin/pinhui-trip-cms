@@ -6,18 +6,25 @@ import { useMapState } from 'src/stores'
 import { router } from 'src/router'
 import { LocalStorage } from 'quasar'
 import { mapActions } from 'pinia'
+import { copyToClipboard } from 'quasar'
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
     $axios: AxiosInstance;
   }
 }
+
+const prodPrefix = 'https://prod.tugezigui1.com:30443'
 const api = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' ? 'https://prod.tugezigui1.com/server' : 'http://localhost:8000/server'
+  baseURL: process.env.NODE_ENV === 'production' ? `${prodPrefix}/server` : 'http://localhost:8000/server'
 })
 
 const amapRequest = axios.create({
   baseURL: 'https://restapi.amap.com/v3/'
+})
+
+const helpMDRequest = axios.create({
+  baseURL: process.env.NODE_ENV === 'production' ? `${prodPrefix}/help.md` : 'https://localhost:30443/help.md'
 })
 
 api.interceptors.response.use(response => {
@@ -29,7 +36,16 @@ api.interceptors.response.use(response => {
       type: 'error',
       message: response.data.message
     })
-
+    let log = {
+      timestamp: response.data.timestamp,
+      mobile: '当前登录的账号(若未登录则忽略)',
+      errInfo: response.data.message,
+      contact: '您的联系方式',
+      trigger: '文字描述如何触发该bug'
+    }
+    copyToClipboard(JSON.stringify(log)).then(() => {
+      console.log("错误信息已复制")
+    })
     if (response.data.code === 5100) {
       const userAction = mapActions(useUserStore,
         [
@@ -43,7 +59,7 @@ api.interceptors.response.use(response => {
       LocalStorage.remove('userInfo')
 
       router.push({
-        path: "/cms/login"
+        path: '/cms/login'
       }).catch(err => {
         console.log(err)
       })
@@ -110,10 +126,10 @@ export default boot(({
     token
   } = useMapState(useUserStore, ['token'])
   api.interceptors.request.use(config => {
-    // @ts-ignore
-    config.headers[token.value.name] = token.value.value
-    // @ts-ignore
-    console.log(config.headers[token.value.name])
+    if (token.value.name !== undefined) {
+      // @ts-ignore
+      config.headers[token.value.name] = token.value.value
+    }
     return config
   }, error => {
     return Promise.reject(error)
@@ -121,4 +137,6 @@ export default boot(({
   app.config.globalProperties.$axios = axios
   app.config.globalProperties.$api = api
 })
-export { api, amapRequest }
+export { api, amapRequest, helpMDRequest }
+
+

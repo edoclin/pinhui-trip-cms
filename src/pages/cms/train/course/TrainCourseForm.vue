@@ -26,7 +26,7 @@
       </el-upload>
     </el-form-item>
     <el-form-item prop="videoResourcePath" label="课程视频">
-      <el-upload :on-preview="handlePreviewUpload" list-type="picture-card" v-model:file-list="videoFileList"
+      <el-upload list-type="picture-card" v-model:file-list="videoFileList"
                  :auto-upload="false" accept="video/*"
                  :on-change="handleChangeVideoFileUpload">
         <el-button type="primary" :loading="videoUploading">
