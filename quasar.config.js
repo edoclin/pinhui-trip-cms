@@ -19,7 +19,7 @@ const Inspect = require('vite-plugin-inspect')
 const { VueAmapResolver } = require('@vuemap/unplugin-resolver')
 const viteCompression = require('vite-plugin-compression')
 const Pages = require('vite-plugin-pages')
-
+const updateUrl = `https://pinhui-trip-1304812488.cos.ap-shanghai.myqcloud.com/static/client-update`
 module.exports = configure((ctx) => {
   return {
     htmlVariables: {
@@ -237,6 +237,11 @@ module.exports = configure((ctx) => {
         electronDownload: {
           cache: '/Users/edoclin/Downloads',
           mirror: 'https://npm.taobao.org/mirrors/electron/'
+        },
+        publish: {
+          provider: "generic",
+          url: updateUrl,
+          channel: "latest"
         },
         productName: '游品慧',
         artifactName: '${productName}.${ext}'

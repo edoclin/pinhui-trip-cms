@@ -1,6 +1,6 @@
 {
   "name": "pinhui-trip-cms",
-  "version": "1.0.0-alpha",
+  "version": "1.0.3-alpha",
   "description": "游品慧后台管理系统",
   "productName": "游品慧",
   "author": "Fengsx <fengsx@yeah.net>",
@@ -28,6 +28,8 @@
     "axios": "^1.0.0-alpha.1",
     "cos-js-sdk-v5": "^1.4.6",
     "echarts": "^5.4.0",
+    "electron-log": "^4.4.8",
+    "electron-updater": "^5.3.0",
     "element-plus": "^2.2.15",
     "nprogress": "^0.2.0",
     "pinia": "^2.0.22",

@@ -16,7 +16,7 @@
           <el-amap-control-map-type :visible="true"></el-amap-control-map-type>
           <el-amap-control-geolocation :visible="true" @complete="getLocation"/>
           <el-amap-mouse-tool v-if="form.polygonGeometry.length === 0" type="polygon" :auto-clear="true"
-                              @draw="drawMouseTool"/>
+                              @draw="drawMouseTool" @init="handleMouseToolInit"/>
           <el-amap-polygon :path="form.polygonGeometry" :visible="true" :editable="amapPolygon.editable"
                            :draggable="amapPolygon.editable" @end="end"/>
         </el-amap>
@@ -92,6 +92,10 @@ const valueHtml = reactive({
 const editorRef = shallowRef()
 const formRef = ref(null)
 
+
+const handleMouseToolInit = (e) => {
+  console.log(e)
+}
 const validateDescRichText = (rule, value, cb) => {
   if (form['descRichText'] === '') {
     cb(new Error('请输入富文本描述'))

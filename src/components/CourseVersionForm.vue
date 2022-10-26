@@ -157,6 +157,7 @@
                     :visible="marker.visible"
                     :draggable="marker.draggable"
                     :label="marker.label"
+                    :icon="icon"
                 />
                 <el-form-item label="工具类型" label-width="100px" style="margin-top: 10px">
                   <el-radio-group v-model="mouseToolType">
@@ -411,6 +412,13 @@ const drawMouseTool = (data, target) => {
   }
 
 }
+
+const icon = new AMap.Icon({
+  size: new AMap.Size(20, 30),    // 图标尺寸
+  image: 'https://webapi.amap.com/theme/v1.3/markers/b/mark_bs.png',  // Icon的图像
+  imageOffset: new AMap.Pixel(0, 0),  // 图像相对展示区域的偏移量，适于雪碧图等
+  imageSize: new AMap.Size(20, 30)   // 根据所设置的大小拉伸或压缩图片
+});
 
 const amapPolygon = reactive({
   editable: true

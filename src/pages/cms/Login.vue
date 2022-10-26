@@ -67,12 +67,12 @@
           <el-input v-model="registerForm['mobile']" placeholder="请输入11位手机号">
             <template #suffix v-if="showSendCode">
               <el-button :disabled="disableCode" type="success" size="small" @click="sendCode">
-                {{ disableCode ? timeout + '秒后获取' : '获取验证码' }}
+                {{ disableCode && showCodeField ? timeout + '秒后获取' : '获取验证码' }}
               </el-button>
             </template>
           </el-input>
         </el-form-item>
-        <el-form-item label="验证码" prop="validateCode" v-if="showCodeField">
+        <el-form-item label="验证码" prop="validateCode" v-show="showCodeField">
           <el-input v-model="registerForm['validateCode']" placeholder="请输入验证码"/>
         </el-form-item>
         <el-form-item label="密码" prop="password">
@@ -110,7 +110,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const registerFormRef = ref(null)
-const disableCode = ref(false)
+const disableCode = ref(true)
 const showSendCode = ref(false)
 const showCodeField = ref(false)
 const loadingRegister = ref(false)
@@ -176,9 +176,11 @@ const sendCode = () => {
 const validateMobile = (rule, value, cb) => {
   if (!(/^1[3|4|5|7|8|9]\d{9}$/.test(value))) {
     cb(new Error('请输入11位手机号'))
+    disableCode.value = true
     return false
   }
   showSendCode.value = true
+  disableCode.value = false
   cb()
 }
 
@@ -198,6 +200,22 @@ const validatePassword = (rule, value, cb) => {
   cb()
 }
 
+
+const validateCode = (rule, value, cb) => {
+  if (!showCodeField.value) {
+    ElMessage({
+      type: "error",
+      message: '请先点击获取验证码'
+    })
+    cb(new Error('请先点击获取验证码'))
+    return false
+  }
+  if (!value || value.length !== 6) {
+    cb(new Error('请输入合法的验证码'))
+    return false
+  }
+  cb()
+}
 const rules = reactive({
   mobile: [
     {
@@ -219,16 +237,9 @@ const rules = reactive({
   ],
   validateCode: [
     {
-      required: true,
-      trigger: 'blur',
-      message: '请输入验证码'
+      validator: validateCode,
+      trigger: 'blur'
     },
-    {
-      min: 6,
-      max: 6,
-      trigger: 'blur',
-      message: '请输入6位验证码'
-    }
   ],
   idCard: [
     {
@@ -255,6 +266,7 @@ const rules = reactive({
 })
 
 const submitRegisterForm = (el) => {
+  loadingRegister.value = true
   el.validate((valid) => {
     if (valid) {
       loadingRegister.value = true
@@ -267,8 +279,11 @@ const submitRegisterForm = (el) => {
           message: res.data
         })
         loadingRegister.value = false
+      }).catch(err => {
+        loadingRegister.value = false
       })
     } else {
+      loadingRegister.value = false
       return false
     }
   })
