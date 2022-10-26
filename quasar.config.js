@@ -19,7 +19,7 @@ const Inspect = require('vite-plugin-inspect')
 const { VueAmapResolver } = require('@vuemap/unplugin-resolver')
 const viteCompression = require('vite-plugin-compression')
 const Pages = require('vite-plugin-pages')
-const updateUrl = `https://pinhui-trip-1304812488.cos.ap-shanghai.myqcloud.com/static/client-update`
+const updateUrl = `https://pinhui-trip-1304812488.cos.ap-shanghai.myqcloud.com/static/download`
 module.exports = configure((ctx) => {
   return {
     htmlVariables: {
