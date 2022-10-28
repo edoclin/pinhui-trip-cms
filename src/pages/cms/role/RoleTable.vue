@@ -7,7 +7,7 @@
           <el-select :multiple="true" v-model="scope.formData['selector'].roleIds" placeholder="请选择角色权限"
                      style="width: 100%">
             <el-option v-for="role in preparedRole" :key="role.roleKey" :label="role.roleName"
-                       :value="role.roleKey"/>
+                       :value="role.roleId"/>
           </el-select>
         </el-form-item>
         <el-form-item label="关联基地">
@@ -176,10 +176,12 @@ const advancedQuery = reactive({
 const queryConditions = ({
   conditions,
   createdBetween,
-  updatedBetween
+  updatedBetween,
+  selector
 }) => {
   queryParam.createdBetween = createdBetween
   queryParam.updatedBetween = updatedBetween
+  queryParam.selector = selector
   queryParam.conditions = conditions
   listRole(page.current, page.size, { ...queryParam }).then(res => {
     tableData.data = res.data

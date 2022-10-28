@@ -1,13 +1,15 @@
 import { app, BrowserWindow, nativeTheme, ipcMain, globalShortcut, dialog } from 'electron'
 import { autoUpdater, UpdateInfo } from 'electron-updater'
+import { electronLocalshortcut } from 'electron-localshortcut'
+import { ProgressInfo } from 'electron-updater/out/differentialDownloader/ProgressDifferentialDownloadCallbackTransform'
 
 import path from 'path'
 import os from 'os'
-import { ProgressInfo } from 'electron-updater/out/differentialDownloader/ProgressDifferentialDownloadCallbackTransform'
 
 ipcMain.on('app-quit', () => {
   app.quit()
 })
+
 // needed in case process is undefined under Linux
 const platform = process.platform || os.platform()
 
@@ -25,6 +27,7 @@ let mainWindow: BrowserWindow | undefined
 let timer = null
 
 function registryShortcut () {
+
   globalShortcut.register('CommandOrControl+J+K', () => {
     // 获取当前窗口
     // @ts-ignore
@@ -59,17 +62,22 @@ const updateHandle = () => {
 
   // 检查到新版本
   autoUpdater.on('update-available', (info: UpdateInfo) => {
-    if (process.platform === 'darwin') {
-      dialog.showMessageBoxSync(mainWindow, {
-        title: '提示',
-        message: '当前平台不支持自动更新',
-        detail: '应用有新版本, 请手动下载更新!',
-        type: 'warning'
-      })
+    if (platform === 'darwin') {
 
       clearInterval(timer)
       autoUpdater.autoDownload = false
       autoUpdater.removeAllListeners()
+
+      if (dialog.showMessageBoxSync(mainWindow, {
+        title: '提示',
+        message: '当前平台不支持自动更新',
+        detail: '应用有新版本, 请手动下载更新!',
+        type: 'warning',
+        buttons: ['暂不更新', '立即下载'],
+      }) === 1) {
+        mainWindow.loadURL('https://pinhui-trip-1304812488.cos.ap-shanghai.myqcloud.com/static/download/%E6%B8%B8%E5%93%81%E6%85%A7.dmg').then(r => {
+        })
+      }
     }
 
     mainWindow.webContents.send('update-available', {
@@ -121,13 +129,23 @@ const updateHandle = () => {
   }, 1000 * 60 * 12)
 }
 
-function createWindow () {
+const createWindow = () => {
+  const { screen } = require('electron')
+
+  // Create a window that fills the screen's available work area.
+  const primaryDisplay = screen.getPrimaryDisplay()
+  const {
+    width,
+    height
+  } = primaryDisplay.workAreaSize
+
   mainWindow = new BrowserWindow({
     icon: path.resolve(__dirname, 'icons/icon.png'), // tray icon
-    width: 1920,
-    height: 1080,
+    width: width,
+    height: height,
     useContentSize: true,
     frame: false,
+    minimizable: true,
     webPreferences: {
       // isTrue -> nodeIntegration is valid!
       contextIsolation: true,
@@ -139,7 +157,6 @@ function createWindow () {
   })
 
   mainWindow.loadURL(process.env.APP_URL).then(r => {
-
   })
 
   if (process.env.DEBUGGING) {
@@ -150,9 +167,15 @@ function createWindow () {
     mainWindow = undefined
   })
 
+  ipcMain.on('minimize-window', () => {
+    mainWindow.minimize();
+  })
+
   registryShortcut()
 
   updateHandle()
+
+
 }
 
 app.whenReady().then(createWindow)

@@ -19,13 +19,15 @@ const Inspect = require('vite-plugin-inspect')
 const { VueAmapResolver } = require('@vuemap/unplugin-resolver')
 const viteCompression = require('vite-plugin-compression')
 const Pages = require('vite-plugin-pages')
-const updateUrl = `https://pinhui-trip-1304812488.cos.ap-shanghai.myqcloud.com/static/download`
+const downloadUrl = `https://pinhui-trip-1304812488.cos.ap-shanghai.myqcloud.com/static/download`
+
 module.exports = configure((ctx) => {
   return {
     htmlVariables: {
       title: '游品慧',
       desc: '游品慧后台管理系统',
     },
+    downloadUrl,
     server: {},
     eslint: {
       // fix: true,
@@ -231,7 +233,6 @@ module.exports = configure((ctx) => {
 
       builder: {
         // Full list of options: https://www.electron.build/configuration/configuration
-
         appId: 'pinhui.trip',
         copyright: '武汉图歌信息技术有限责任公司', // see https://www.electron.build/configuration/configuration
         electronDownload: {
@@ -239,9 +240,9 @@ module.exports = configure((ctx) => {
           mirror: 'https://npm.taobao.org/mirrors/electron/'
         },
         publish: {
-          provider: "generic",
-          url: updateUrl,
-          channel: "latest"
+          provider: 'generic',
+          url: downloadUrl,
+          channel: 'latest'
         },
         productName: '游品慧',
         artifactName: '${productName}.${ext}'

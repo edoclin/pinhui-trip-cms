@@ -306,11 +306,13 @@ const handlePassCallback = () => {
   }, 2000)
 }
 onMounted(() => {
-  dragWidth.value = window.document.getElementById('background').clientWidth * 0.8
-  window.onresize = () => {
-    return (() => {
-      dragWidth.value = window.document.getElementById('background').clientWidth * 0.8
-    })()
+  if (!showLoginButton.value) {
+    dragWidth.value = window.document.getElementById('background').clientWidth * 0.8
+    window.onresize = () => {
+      return (() => {
+        dragWidth.value = window.document.getElementById('background').clientWidth * 0.8
+      })()
+    }
   }
 })
 </script>

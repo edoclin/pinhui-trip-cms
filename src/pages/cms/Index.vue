@@ -176,23 +176,19 @@
           </el-menu>
         </el-aside>
         <el-container>
-          <el-header>
+          <el-header style="-webkit-app-region: drag">
             <el-menu
                 default-active="user"
                 mode="horizontal"
                 :ellipsis="false">
-              <el-menu-item index="logo">
-                <el-avatar shape="square" :size="50"
-                           src="https://prod-cdn.tugezigui1.com/static/pinhui.trip.logo.trip"/>
-              </el-menu-item>
-              <el-menu-item index="info">
-                <div style="font-size: 3ch">
-                  研学实践服务平台
-                </div>
-              </el-menu-item>
-              <el-menu-item index="addition" disabled>
+              <el-avatar shape="square" :size="50"
+                         src="https://prod-cdn.tugezigui1.com/static/pinhui.trip.logo.trip"/>
+              <div style="font-size: 3ch; margin-left: 20px; margin-top: 10px">
+                研学实践服务平台
+              </div>
+              <div style="margin-left: 10px; margin-top: 21px;color: #d6d6d7">
                 后台管理系统
-              </el-menu-item>
+              </div>
               <div class="flex-grow"/>
               <div id="guide-dark">
                 <el-switch
@@ -207,7 +203,10 @@
               <el-button size="large" text style="margin-top: 8px;" id="guide-fullscreen"
                          :icon="isFullscreen ? SvgExitFullScreen : FullScreen" @click="onToggle($event)"></el-button>
 
-              <el-button v-if="isElectron" size="large" text style="margin-top: 8px;" id="guide-quit"
+              <el-button v-if="isElectron" size="large" text style="margin-top: 8px;"
+                         :icon="SvgMinimizeWindow" @click="onBlur($event) && electronMinimize()"></el-button>
+
+              <el-button v-if="isElectron" size="large" text style="margin-top: 8px;"
                          :icon="SwitchButton" @click="onBlur($event); electronExitDialog = true"></el-button>
               <el-badge v-if="false" :value="99" style="margin-top: 20px;margin-right: 15px;margin-left: 18px">
                 <el-icon :size="17">
@@ -307,6 +306,7 @@ import { Moon, Sunny, FullScreen, SwitchButton } from '@element-plus/icons-vue'
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import { useDark, useToggle } from '@vueuse/core'
 import SvgExitFullScreen from 'src/components/SvgExitFullScreen.vue'
+import SvgMinimizeWindow from 'src/components/SvgMinimizeWindow.vue'
 import screenfull from 'screenfull'
 import { useCommonStore } from 'src/stores/common_store'
 import { getCourseVersion, getPreparedRole, getStatusEnum } from 'src/api/common'
@@ -322,6 +322,12 @@ const {
 
 const dialogChangePassword = ref(false)
 const changePasswordFormRef = ref(null)
+
+const electronMinimize = () => {
+  if (isElectron.value) {
+    window.$electron.minimizeWindow()
+  }
+}
 
 const submitChangePassword = (formEl) => {
   formEl.validate((valid) => {

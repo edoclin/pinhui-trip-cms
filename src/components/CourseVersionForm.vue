@@ -483,12 +483,14 @@ if (props.form) {
     route.polyline.editable = false
     route.polyline.draggable = false
     route.markers = part['route']['points']
-    route.markers.forEach(item => {
-      videoFile[item['pointName']] = [{
-        name: '',
-        url: item['videoResourcePathUrl']
-      }]
-    })
+    if (route.markers !== undefined) {
+      route.markers.forEach(item => {
+        videoFile[item['pointName']] = [{
+          name: '',
+          url: item['videoResourcePathUrl']
+        }]
+      })
+    }
 
     amapParam.center = [part['route']['polylineCentroid'].lng, part['route']['polylineCentroid'].lat]
     amapParam.zoom = 18

@@ -264,10 +264,10 @@ if (props.data) {
   }]
   getBaseCourseById(form['courseId']).then(res => {
     if (res.data['versions']) {
-      form['versions'] = res.data.versions
-      form['versions'].forEach(item => form['versionNames'].push(item.courseVersion))
+      form['versions'] = res.data['versions']
+      form['versions'].forEach(item => form['versionNames'].push(item['courseVersion']))
     }
-    form['categoryIds'] = res.data.categoryIds
+    form['categoryIds'] = res.data['categoryIds'] === undefined ? [] : res.data['categoryIds']
   })
 }
 </script>

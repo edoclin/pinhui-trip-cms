@@ -20,13 +20,12 @@
         </template>
         <template #default="scope">
           <el-button type="success" link @click="onEdit(scope.row)" size="small">编辑</el-button>
-          <el-popover placement="left" :width="626" trigger="click" @after-leave="resetRelatedCourseData">
+          <el-popover placement="left" :width="626" trigger="hover" @after-leave="resetRelatedCourseData" @show="fetchRelatedCourse(scope.row.categoryId)">
             <template #reference>
-              <el-button type="primary" link size="small" style="margin-right: 16px"
-                         @click="fetchRelatedCourse(scope.row.categoryId)">课程
+              <el-button type="primary" link size="small" style="margin-right: 16px">课程
               </el-button>
             </template>
-            <el-table :data="relatedCourse">
+            <el-table v-loading="loadingRelatedCourse" :data="relatedCourse">
               <el-table-column width="300" property="baseName" label="所属基地"></el-table-column>
               <el-table-column width="300" property="courseName" label="课程名称">
                 <template #default="scope">
@@ -68,10 +67,12 @@ import { copyToClipboard } from 'quasar'
 const bus = inject('bus')
 import { date } from 'quasar'
 const fetchTime = ref('')
+const loadingRelatedCourse = ref(true)
 const relatedCourse = ref([])
 
 const resetRelatedCourseData = () => {
   relatedCourse.value = []
+  loadingRelatedCourse.value = true
 }
 
 
@@ -89,7 +90,10 @@ const copyCourseId = (courseId) => {
 
 const fetchRelatedCourse = (categoryId) => {
   listRelatedCourseById(categoryId).then(res => {
-    relatedCourse.value = res.data
+    setTimeout(() => {
+      relatedCourse.value = res.data
+      loadingRelatedCourse.value = false
+    }, 500)
   })
 }
 

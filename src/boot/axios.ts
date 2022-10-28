@@ -16,7 +16,7 @@ declare module '@vue/runtime-core' {
 
 const prodPrefix = 'https://prod.tugezigui1.com:30443'
 const api = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' ? `${prodPrefix}/server` : 'http://localhost:8000/server'
+  baseURL: process.env.NODE_ENV === 'production' ? `${prodPrefix}/server` : 'http://localhost:18000/server'
 })
 
 const amapRequest = axios.create({

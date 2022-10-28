@@ -67,5 +67,4 @@ webCheck().then(res => {
   })
 })
 
-
 </script>
