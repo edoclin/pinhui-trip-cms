@@ -2,7 +2,11 @@
   <div>
     <advance-query v-if="advancedQuery.show" :conditions="conditions.map" @onSubmit="queryConditions"
                    @onCancel="advancedQuery.show = false"></advance-query>
-    <el-table @sort-change='sortTable' border table-layout="auto" stripe :data="tableData.data" style="width: 100%"
+
+
+    <!-- lwc_flag  v-loading="tableData.loading"   -->
+    <el-table v-loading="tableData.loading" @sort-change='sortTable' border table-layout="auto" stripe
+              :data="tableData.data" style="width: 100%"
               @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="30"/>
       <el-table-column v-for="(item, index) in tableData.columns" :key="index" :sortable="item.sortable"
@@ -65,32 +69,51 @@ const queryParam = reactive({
   conditions: []
 })
 
-watch(page, () => {
-  listUser(page.current, page.size, queryParam).then(res => {
+
+// lwc_flag tableData 定义放在fetchListData()之前
+const tableData = reactive({
+  data: [],
+  columns: [],
+  // lwc_flag
+  loading: true
+})
+
+// lwc_flag fetchListData() 放在调用前
+const fetchListData = (postHandler) => {
+  tableData.loading = true
+  listUser(page.current, page.size, { ...queryParam }).then(res => {
     tableData.data = res.data
     page.total = res.count
     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
+
+    // 延迟 500ms 防止画面闪烁
+    setTimeout(() => {
+      tableData.loading = false
+    }, 500)
+
+    if (postHandler !== undefined) {
+      postHandler()
+    }
   })
+}
+
+// lwc_flag
+watch(page, () => {
+  fetchListData()
 })
 
-listUser(page.current, page.size, queryParam).then(res => {
-  tableData.data = res.data
-  page.total = res.count
-  fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
-})
+
+// lwc_flag list** 替换为 fetchListData
+fetchListData()
 
 getTableColumns().then(res => {
   tableData.columns = res.data
 })
 
-const tableData = reactive({
-  data: [],
-  columns: []
-})
-
 const selectedData = reactive({
   data: []
 })
+
 const handleSelectionChange = (value) => {
   selectedData.data = [...value]
 }
@@ -105,22 +128,18 @@ const deleteSelected = () => {
       type: 'success',
       message: res.data
     })
-    listUser(page.current, page.size, { ...queryParam }).then(res => {
-      tableData.data = res.data
-      page.total = res.count
-      fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
-    })
+
+    // lwc_flag 所有list**** 替换为新抽取的函数
+    fetchListData()
   })
 }
 
 const sortTable = (column) => {
   queryParam.isAsc = column.order === 'ascending'
   queryParam.orderColumns = [column.prop]
-  listUser(page.current, page.size, queryParam).then(res => {
-    tableData.data = res.data
-    page.total = res.count
-    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
-  })
+
+  // lwc_flag
+  fetchListData()
 }
 
 const advancedQuery = reactive({
@@ -135,13 +154,12 @@ const queryConditions = ({
   queryParam.createdBetween = createdBetween
   queryParam.updatedBetween = updatedBetween
   queryParam.conditions = conditions
-  listUser(page.current, page.size, { ...queryParam }).then(res => {
-    tableData.data = res.data
-    page.total = res.count
-    advancedQuery.show = false
-    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
 
+  // lwc_flag 这里由于要关闭dialog 传入一个后处理器
+  fetchListData(() => {
+    advancedQuery.show = false
   })
+
 }
 
 const bus = inject('bus')
@@ -154,6 +172,19 @@ const onEdit = (record) => {
     name: record.mobile
   })
 }
+
+//
+// const updateData = () => {
+//   listRole(page.current, page.size, { ...queryParam }).then(res => {
+//     tableData.data = res.data
+//     page.total = res.count
+//     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
+//   })
+// }
+// bus.on('update-role-table', () => updateData())
+
+// lwc_flag 原来的updateData()函数删除掉
+bus.on('update-role-table', () => fetchListData())
 </script>
 <style>
 </style>

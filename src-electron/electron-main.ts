@@ -1,10 +1,10 @@
-import { app, BrowserWindow, nativeTheme, ipcMain, globalShortcut, dialog } from 'electron'
+import { app, BrowserWindow, nativeTheme, ipcMain, globalShortcut, dialog, net } from 'electron'
 import { autoUpdater, UpdateInfo } from 'electron-updater'
-import { electronLocalshortcut } from 'electron-localshortcut'
 import { ProgressInfo } from 'electron-updater/out/differentialDownloader/ProgressDifferentialDownloadCallbackTransform'
 
 import path from 'path'
 import os from 'os'
+import Timeout = NodeJS.Timeout
 
 ipcMain.on('app-quit', () => {
   app.quit()
@@ -24,9 +24,9 @@ try {
 
 let mainWindow: BrowserWindow | undefined
 
-let timer = null
+let timer: Timeout
 
-function registryShortcut () {
+const registryShortcut = () => {
 
   globalShortcut.register('CommandOrControl+J+K', () => {
     // 获取当前窗口
@@ -162,14 +162,24 @@ const createWindow = () => {
   if (process.env.DEBUGGING) {
     mainWindow.webContents.openDevTools()
   }
+  ipcMain.on('minimize-window', () => {
+    mainWindow.minimize();
+  })
+
 
   mainWindow.on('closed', () => {
     mainWindow = undefined
   })
 
-  ipcMain.on('minimize-window', () => {
-    mainWindow.minimize();
-  })
+  if (!net.isOnline()) {
+    dialog.showMessageBox(mainWindow, {
+      title: '提示',
+      message: '请检查当前网络连接是否正常',
+      detail: '当前网络环境大概率下无法连接远程网站',
+      type: 'warning',
+      buttons: ['确认'],
+    }).then(r => {})
+  }
 
   registryShortcut()
 
@@ -191,6 +201,17 @@ app.on('activate', () => {
     createWindow()
   }
 })
+app.on('browser-window-blur', () => {
+  globalShortcut.unregisterAll()
+})
+
+app.on('browser-window-focus', () => {
+  registryShortcut()
+})
+
+
 app.on('will-quit', () => {
   globalShortcut.unregisterAll()
 })
+
+

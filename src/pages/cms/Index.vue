@@ -181,12 +181,12 @@
                 default-active="user"
                 mode="horizontal"
                 :ellipsis="false">
-              <el-avatar shape="square" :size="50"
+              <el-avatar shape="square" :size="50" style="user-select: none"
                          src="https://prod-cdn.tugezigui1.com/static/pinhui.trip.logo.trip"/>
-              <div style="font-size: 3ch; margin-left: 20px; margin-top: 10px">
+              <div style="font-size: 3ch; margin-left: 20px; margin-top: 10px;user-select: none">
                 研学实践服务平台
               </div>
-              <div style="margin-left: 10px; margin-top: 21px;color: #d6d6d7">
+              <div style="margin-left: 10px; margin-top: 21px;color: #d6d6d7;user-select: none">
                 后台管理系统
               </div>
               <div class="flex-grow"/>
@@ -213,7 +213,7 @@
                   <ChatDotSquare/>
                 </el-icon>
               </el-badge>
-              <el-sub-menu index="setting">
+              <el-sub-menu index="setting" style="user-select: none">
                 <template #title>{{ userInfo.realName }}</template>
                 <el-menu-item index="change-password" @click="dialogChangePassword = true">修改密码</el-menu-item>
                 <el-menu-item index="logout" @click="logout">退出登录</el-menu-item>

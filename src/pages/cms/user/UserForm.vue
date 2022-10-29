@@ -46,14 +46,15 @@ const onResetForm = (formEl) => {
   }
 }
 const bus = inject('bus')
-const onSubmit = (formEl) => {
+const onSubmit = async (formEl) => {
   if (props.data) {
-    putUser(form).then(res => {
+    await putUser(form).then(res => {
       ElMessage({
         type: 'success',
         message: res.data,
       })
     })
+    bus.emit('update-user-table')
   }
 }
 
