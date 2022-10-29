@@ -1,8 +1,16 @@
 <template>
   <div>
     <el-config-provider :locale="zhCn">
+      <el-button-group v-if="isElectron" style="position: absolute; right: 0; z-index: 9999">
+        <el-button size="small"
+                   :icon="SvgMinimizeWindow" @click="onBlur($event) && electronMinimize()"></el-button>
+        <el-button size="small"
+                   :icon="isFullscreen ? SvgExitFullScreen : FullScreen" @click="onToggle($event)"></el-button>
+        <el-button size="small" type="danger"
+                   :icon="SwitchButton" @click="onBlur($event); electronExitDialog = true"></el-button>
+      </el-button-group>
       <el-container>
-        <el-aside width="220px">
+        <el-aside width="220px" class="disabled-selected">
           <el-menu style="height: calc(100vh - 70px)">
             <el-sub-menu index="base">
               <template #title>
@@ -176,17 +184,17 @@
           </el-menu>
         </el-aside>
         <el-container>
-          <el-header style="-webkit-app-region: drag">
+          <el-header style="-webkit-app-region: drag" @dblclick="maximizeWindow">
             <el-menu
                 default-active="user"
                 mode="horizontal"
                 :ellipsis="false">
-              <el-avatar shape="square" :size="50" style="user-select: none"
+              <el-avatar shape="square" :size="50" class="disabled-selected"
                          src="https://prod-cdn.tugezigui1.com/static/pinhui.trip.logo.trip"/>
               <div style="font-size: 3ch; margin-left: 20px; margin-top: 10px;user-select: none">
                 研学实践服务平台
               </div>
-              <div style="margin-left: 10px; margin-top: 21px;color: #d6d6d7;user-select: none">
+              <div style="margin-left: 10px; margin-top: 21px;color: #d6d6d7;" class="disabled-selected">
                 后台管理系统
               </div>
               <div class="flex-grow"/>
@@ -199,30 +207,23 @@
                     :inactive-icon="Sunny"
                     active-color="#2c2c2c"/>
               </div>
-
-              <el-button size="large" text style="margin-top: 8px;" id="guide-fullscreen"
+              <el-button v-if="!isElectron" size="large" style="margin-top: 8px" text
                          :icon="isFullscreen ? SvgExitFullScreen : FullScreen" @click="onToggle($event)"></el-button>
-
-              <el-button v-if="isElectron" size="large" text style="margin-top: 8px;"
-                         :icon="SvgMinimizeWindow" @click="onBlur($event) && electronMinimize()"></el-button>
-
-              <el-button v-if="isElectron" size="large" text style="margin-top: 8px;"
-                         :icon="SwitchButton" @click="onBlur($event); electronExitDialog = true"></el-button>
               <el-badge v-if="false" :value="99" style="margin-top: 20px;margin-right: 15px;margin-left: 18px">
                 <el-icon :size="17">
                   <ChatDotSquare/>
                 </el-icon>
               </el-badge>
-              <el-sub-menu index="setting" style="user-select: none">
+              <el-sub-menu index="setting" class="disabled-selected">
                 <template #title>{{ userInfo.realName }}</template>
-                <el-menu-item index="change-password" @click="dialogChangePassword = true">修改密码</el-menu-item>
-                <el-menu-item index="logout" @click="logout">退出登录</el-menu-item>
+                <el-menu-item index="change-password" @click="dialogChangePassword = true" class="disabled-selected">修改密码</el-menu-item>
+                <el-menu-item index="logout" @click="logout" class="disabled-selected">退出登录</el-menu-item>
               </el-sub-menu>
             </el-menu>
           </el-header>
           <el-main>
             <el-tabs
-                id="el-tabs"
+                class="disabled-selected"
                 stretch
                 style="height: calc(100vh - 100px - 12px)"
                 v-model="currentTab.name"
@@ -234,11 +235,11 @@
                   :key="item.key"
                   :label="item.title"
                   :name="item.name">
-                <component
+                <component style="user-select: text"
                     :is="item.component" :data="children[item.name]"></component>
               </el-tab-pane>
             </el-tabs>
-            <el-footer>
+            <el-footer class="disabled-selected">
               © 2022 武汉图歌信息技术有限责任公司
             </el-footer>
           </el-main>
@@ -282,10 +283,12 @@
             status-icon
         >
           <el-form-item label="原始密码" prop="originalPassword">
-            <el-input type="password" show-password v-model="changePasswordForm['originalPassword']" placeholder="请输入原始密码"/>
+            <el-input type="password" show-password v-model="changePasswordForm['originalPassword']"
+                      placeholder="请输入原始密码"/>
           </el-form-item>
           <el-form-item label="新的密码" prop="newPassword">
-            <el-input type="password" show-password v-model="changePasswordForm['newPassword']" placeholder="请输入新的密码"/>
+            <el-input type="password" show-password v-model="changePasswordForm['newPassword']"
+                      placeholder="请输入新的密码"/>
           </el-form-item>
         </el-form>
 
@@ -326,6 +329,12 @@ const changePasswordFormRef = ref(null)
 const electronMinimize = () => {
   if (isElectron.value) {
     window.$electron.minimizeWindow()
+  }
+}
+
+const maximizeWindow = () => {
+  if (isElectron.value) {
+    window.$electron.maximizeWindow()
   }
 }
 
@@ -585,5 +594,9 @@ bus.on('edit-item', ({
   right: 0;
   top: 70px;
   bottom: 0;
+}
+
+.disabled-selected {
+  user-select: none
 }
 </style>

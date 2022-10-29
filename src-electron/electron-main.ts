@@ -166,6 +166,10 @@ const createWindow = () => {
     mainWindow.minimize();
   })
 
+  ipcMain.on('maximize-window', () => {
+    mainWindow.maximize();
+  })
+
 
   mainWindow.on('closed', () => {
     mainWindow = undefined

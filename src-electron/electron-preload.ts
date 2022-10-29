@@ -17,6 +17,7 @@ import { contextBridge, ipcMain, ipcRenderer } from 'electron'
 contextBridge.exposeInMainWorld('$electron', {
   exitApp: () => ipcRenderer.send("app-quit"),
   minimizeWindow: () => ipcRenderer.send("minimize-window"),
+  maximizeWindow: () => ipcRenderer.send("maximize-window"),
   closeTab: (callback: any) => ipcRenderer.on('close-tab', callback),
   switchTab: (callback: any) => ipcRenderer.on('switch-tab', callback),
   checkingUpdate: (callback: any) => ipcRenderer.on('checking-for-update', callback),
