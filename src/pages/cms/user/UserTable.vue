@@ -69,7 +69,6 @@ const queryParam = reactive({
   conditions: []
 })
 
-
 // lwc_flag tableData 定义放在fetchListData()之前
 const tableData = reactive({
   data: [],
@@ -98,10 +97,7 @@ const fetchListData = (postHandler) => {
 }
 
 // lwc_flag
-watch(page, () => {
-  fetchListData()
-})
-
+watch(page, () => fetchListData())
 
 // lwc_flag list** 替换为 fetchListData
 fetchListData()
@@ -137,7 +133,6 @@ const deleteSelected = () => {
 const sortTable = (column) => {
   queryParam.isAsc = column.order === 'ascending'
   queryParam.orderColumns = [column.prop]
-
   // lwc_flag
   fetchListData()
 }
