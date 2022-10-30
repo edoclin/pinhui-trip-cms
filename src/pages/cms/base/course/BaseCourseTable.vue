@@ -12,10 +12,12 @@
         </el-form-item>
       </template>
     </advance-query>
-    <el-table @sort-change='sortTable' border table-layout="auto" stripe :data="tableData.data" style="width: 100%"
+    <!-- flag -->
+    <el-table v-loading="tableData.loading" @sort-change='sortTable' border table-layout="auto" stripe :data="tableData.data" style="width: 100%"
               @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="30"/>
-      <el-table-column v-for="(item, index) in tableData.columns" :key="index" :sortable="item.sortable"
+      <!-- flag -->
+      <el-table-column v-for="(item, index) in displayRows" :key="index" :sortable="item.sortable"
                        :fixed="item.fixed" :prop="item.column" :label="item.label"></el-table-column>
       <el-table-column :fixed="'right'" label="操作">
         <template #header v-if="selectedData.data.length !== 0">
@@ -34,13 +36,38 @@
       </el-table-column>
     </el-table>
     <el-row style="margin-top: 10px">
-      <el-col :span="12">
+    <!-- flag -->
+      <el-col :span="4">
         <el-pagination small background layout="total, sizes, prev, pager, next" :total="page.total"
                        :page-sizes="[10, 20, 50, 100]" v-model:currentPage="page.current"
                        v-model:page-size="page.size"/>
       </el-col>
-      <el-col style="position: absolute;right: 0;color: #919398;font-size: 12px;margin-top: 5px">数据更新时间:
-        {{ fetchTime }}
+    
+    <!--      lwc_flag-->
+    <el-col :span="12">
+        <el-select :multiple="true" value-key="column" size="small" v-model="displayRows" placeholder="请选择需要展示的字段"
+                   :style="{marginTop: '2px', width: `${autoWidth}px`}">
+          <el-option
+              v-for="item in tableData.columns"
+              :key="item.column"
+              :label="item.label"
+              :value="item"
+          />
+        </el-select>
+      </el-col>
+    <!--      lwc_flag-->
+      <el-col style="position: absolute;right: 0;margin-top: 5px" @click="fetchListData">
+        <el-link>
+          <template #icon>
+            <el-icon>
+              <Refresh/>
+            </el-icon>
+          </template>
+          <div style="color: #919398;font-size: 12px;">
+            数据更新时间:
+            {{ fetchTime }}
+          </div>
+        </el-link>
       </el-col>
     </el-row>
   </div>
@@ -60,6 +87,11 @@ import { date } from 'quasar'
 
 const fetchTime = ref('')
 const bus = inject('bus')
+
+// lwc_flag
+const displayRows = ref([])
+// lwc_flag
+const autoWidth = ref(0)
 
 const baseSelector = reactive({
   data: []
@@ -89,28 +121,61 @@ const queryParam = reactive({
   conditions: []
 })
 
-watch(page, () => {
-  listBaseCourse(page.current, page.size, queryParam).then(res => {
+// lwc_flag tableData 定义放在fetchListData()之前
+const tableData = reactive({
+  data: [],
+  columns: [],
+  // lwc_flag
+  loading: true
+})
+
+// lwc_flag fetchListData() 放在调用前
+const fetchListData = (postHandler) => {
+  tableData.loading = true
+  listBaseCourse(page.current, page.size, { ...queryParam }).then(res => {
     tableData.data = res.data
     page.total = res.count
     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
+
+    // 延迟 500ms 防止画面闪烁
+    setTimeout(() => {
+      tableData.loading = false
+    }, 500)
+
+    if (typeof postHandler === 'function') {
+      postHandler()
+    }
   })
+}
+
+// lwc_flag
+watch(page, () => fetchListData())
+
+// lwc_flag
+watch(displayRows, () => {
+  if (displayRows.value.length <= 3) {
+    autoWidth.value = 300
+  } else {
+    autoWidth.value = 90 * displayRows.value.length
+  }
 })
 
-listBaseCourse(page.current, page.size, queryParam).then(res => {
-  tableData.data = res.data
-  page.total = res.count
-  fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
-})
+// lwc_flag list** 替换为 fetchListData
+fetchListData()
 
 getTableColumns().then(res => {
   tableData.columns = res.data
+
+  // lwc_flag
+  displayRows.value = res.data
+  if (res.data.length <= 3) {
+    autoWidth.value = 300
+  } else {
+    autoWidth.value = 90 * res.data.length
+  }
 })
 
-const tableData = reactive({
-  data: [],
-  columns: []
-})
+
 
 const selectedData = reactive({
   data: []
@@ -128,22 +193,17 @@ const deleteSelected = () => {
       type: 'success',
       message: res.data
     })
-    listBaseCourse(page.current, page.size, { ...queryParam }).then(res => {
-      tableData.data = res.data
-      page.total = res.count
-      fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
-    })
+    
+    // lwc_flag 所有list**** 替换为新抽取的函数
+    fetchListData()
   })
 }
 
 const sortTable = (column) => {
   queryParam.isAsc = column.order === 'ascending'
   queryParam.orderColumns = [column.prop]
-  listBaseCourse(page.current, page.size, queryParam).then(res => {
-    tableData.data = res.data
-    page.total = res.count
-    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
-  })
+    // lwc_flag 所有list**** 替换为新抽取的函数
+    fetchListData()
 }
 
 const advancedQuery = reactive({
@@ -160,11 +220,10 @@ const queryConditions = ({
   queryParam.updatedBetween = updatedBetween
   queryParam.conditions = conditions
   queryParam.selector = selector
-  listBaseCourse(page.current, page.size, { ...queryParam }).then(res => {
-    tableData.data = res.data
-    page.total = res.count
+  
+  // lwc_flag 这里由于要关闭dialog 传入一个后处理器
+  fetchListData(() => {
     advancedQuery.show = false
-    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 }
 
@@ -177,14 +236,17 @@ const onEdit = (record) => {
   })
 }
 
-const updateData = () => {
-  listBaseCourse(page.current, page.size, { ...queryParam }).then(res => {
-    tableData.data = res.data
-    page.total = res.count
-    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
-  })
-}
-bus.on('update-base-course-table', () => updateData())
+// const updateData = () => {
+//   listBaseCourse(page.current, page.size, { ...queryParam }).then(res => {
+//     tableData.data = res.data
+//     page.total = res.count
+//     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
+//   })
+// }
+// bus.on('update-base-course-table', () => updateData())
+
+// lwc_flag 原来的updateData()函数删除掉
+bus.on('update-role-table', () => fetchListData())
 </script>
 <style>
 </style>
