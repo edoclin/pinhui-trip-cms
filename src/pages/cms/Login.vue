@@ -1,7 +1,7 @@
 <template>
-  <div class="bg">
-    <div class="background" id="background">
-      <div style="margin-top:30px; text-align: center;color: transparent">
+  <div class="bg"  style="-webkit-app-region: drag">
+    <div class="background" id="background" style="-webkit-app-region: no-drag">
+      <div style="margin-top:30px; text-align: center;color: transparent;">
         游品慧
       </div>
       <el-input show-word-limit autofocus v-model="loginForm['mobile']" placeholder="请输入手机号" clearable>
@@ -306,6 +306,12 @@ const handlePassCallback = () => {
   }, 2000)
 }
 onMounted(() => {
+
+  document.onkeydown = (e) => {
+    if (window.event.keyCode === 13) {
+      login()
+    }
+  }
   if (!showLoginButton.value) {
     dragWidth.value = window.document.getElementById('background').clientWidth * 0.8
     window.onresize = () => {

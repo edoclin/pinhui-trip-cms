@@ -200,21 +200,21 @@
               <div class="flex-grow"/>
               <div id="guide-dark">
                 <el-switch
-                    style="margin-top: 12px"
+                    style="margin-top: 12px;-webkit-app-region: no-drag"
                     v-model="isDark"
                     inline-prompt
                     :active-icon="Moon"
                     :inactive-icon="Sunny"
                     active-color="#2c2c2c"/>
               </div>
-              <el-button v-if="!isElectron" size="large" style="margin-top: 8px" text
+              <el-button v-if="!isElectron" size="large" style="margin-top: 8px;-webkit-app-region: no-drag" text
                          :icon="isFullscreen ? SvgExitFullScreen : FullScreen" @click="onToggle($event)"></el-button>
               <el-badge v-if="false" :value="99" style="margin-top: 20px;margin-right: 15px;margin-left: 18px">
                 <el-icon :size="17">
                   <ChatDotSquare/>
                 </el-icon>
               </el-badge>
-              <el-sub-menu index="setting" class="disabled-selected">
+              <el-sub-menu index="setting" class="disabled-selected" style="-webkit-app-region: no-drag">
                 <template #title>{{ userInfo.realName }}</template>
                 <el-menu-item index="change-password" @click="dialogChangePassword = true" class="disabled-selected">修改密码</el-menu-item>
                 <el-menu-item index="logout" @click="logout" class="disabled-selected">退出登录</el-menu-item>
@@ -224,7 +224,6 @@
           <el-main>
             <el-tabs
                 class="disabled-selected"
-                stretch
                 style="height: calc(100vh - 100px - 12px)"
                 v-model="currentTab.name"
                 type="card"

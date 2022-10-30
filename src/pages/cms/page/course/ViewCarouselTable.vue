@@ -11,6 +11,35 @@
         </el-form-item>
       </template>
     </advance-query>
+    <el-descriptions
+        :column="2"
+        size="small"
+        border
+    >
+      <el-descriptions-item label-align="center" label="当前展示字段" label-class-name="desc-label">
+        <el-select :filterable="true" :clearable="true" :multiple="true" value-key="column" size="small" v-model="displayRows" placeholder="请选择需要展示的字段"
+                   style="width: 100%">
+          <el-option
+              v-for="item in tableData.columns"
+              :key="item.column"
+              :label="item.label"
+              :value="item"
+          />
+        </el-select>
+      </el-descriptions-item>
+      <el-descriptions-item label-align="center" width="180px" label="数据更新时间">
+        <el-link :disabled="disabledFetch"  @click="fetchListData">
+          <template #icon>
+            <el-icon>
+              <Refresh/>
+            </el-icon>
+          </template>
+          <div style="color: #919398;font-size: 12px;">
+            {{ fetchTime }}
+          </div>
+        </el-link>
+      </el-descriptions-item>
+    </el-descriptions>
 
     <!-- lwc_flag  v-loading="tableData.loading"   -->
     <el-table v-loading="tableData.loading" @sort-change='sortTable' border table-layout="auto" stripe
@@ -44,31 +73,11 @@
     </el-table>
     <el-row style="margin-top: 10px">
       <!--      lwc_flag-->
-      <el-col :span="4">
+      <el-col :span="12">
         <el-pagination small background layout="total, sizes, prev, pager, next" :total="page.total"
           :page-sizes="[10, 20, 50, 100]" v-model:currentPage="page.current" v-model:page-size="page.size" />
       </el-col>
-      <!--      lwc_flag-->
-      <el-col :span="12">
-        <el-select :multiple="true" value-key="column" size="small" v-model="displayRows" placeholder="请选择需要展示的字段"
-          :style="{ marginTop: '2px', width: `${autoWidth}px` }">
-          <el-option v-for="item in tableData.columns" :key="item.column" :label="item.label" :value="item" />
-        </el-select>
-      </el-col>
-      <!--      lwc_flag-->
-      <el-col style="position: absolute;right: 0;margin-top: 5px" @click="fetchListData">
-        <el-link>
-          <template #icon>
-            <el-icon>
-              <Refresh />
-            </el-icon>
-          </template>
-          <div style="color: #919398;font-size: 12px;">
-            数据更新时间:
-            {{ fetchTime }}
-          </div>
-        </el-link>
-      </el-col>
+
     </el-row>
   </div>
 </template>
@@ -88,6 +97,7 @@ import { getCarouselType } from 'src/api/common'
 const fetchTime = ref('')
 // lwc_flag
 const displayRows = ref([])
+const disabledFetch = ref(false)
 // lwc_flag
 const autoWidth = ref(0)
 const page = reactive({
@@ -127,6 +137,7 @@ const tableData = reactive({
 // lwc_flag fetchListData() 放在调用前
 const fetchListData = (postHandler) => {
   tableData.loading = true
+  disabledFetch.value = true
   listViewCarouselByPage(page.current, page.size, { ...queryParam }).then(res => {
     tableData.data = res.data
     page.total = res.count
@@ -135,11 +146,14 @@ const fetchListData = (postHandler) => {
     // 延迟 500ms 防止画面闪烁
     setTimeout(() => {
       tableData.loading = false
+      disabledFetch.value = false
     }, 500)
 
     if (typeof postHandler === 'function') {
       postHandler()
     }
+  }).catch(err => {
+    disabledFetch.value = false
   })
 }
 

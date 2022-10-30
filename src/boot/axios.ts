@@ -23,8 +23,8 @@ const amapRequest = axios.create({
   baseURL: 'https://restapi.amap.com/v3/'
 })
 
-const helpMDRequest = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' ? `${prodPrefix}/help.md` : 'https://localhost:30443/help.md'
+const MDRequest = axios.create({
+  baseURL: process.env.NODE_ENV === 'production' ? `${prodPrefix}` : 'https://localhost:30443'
 })
 
 api.interceptors.response.use(response => {
@@ -136,6 +136,6 @@ export default boot(({
   app.config.globalProperties.$axios = axios
   app.config.globalProperties.$api = api
 })
-export { api, amapRequest, helpMDRequest }
+export { api, amapRequest, MDRequest }
 
 
