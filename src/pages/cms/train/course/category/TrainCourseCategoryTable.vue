@@ -2,10 +2,13 @@
   <div>
     <advance-query v-if="advancedQuery.show" :conditions="conditions.map" @onSubmit="queryConditions"
                    @onCancel="advancedQuery.show = false"></advance-query>
-    <el-table @sort-change='sortTable' border table-layout="auto" stripe :data="tableData.data" style="width: 100%"
+    
+    <!-- lwc_flag  v-loading="tableData.loading"   -->
+    <el-table v-loading="tableData.loading" @sort-change='sortTable' border table-layout="auto" stripe :data="tableData.data" style="width: 100%"
               @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="30"/>
-      <el-table-column v-for="(item, index) in tableData.columns" :key="index" :sortable="item.sortable"
+      <!-- lwc_flag  displayRows  -->
+      <el-table-column v-for="(item, index) in displayRows" :key="index" :sortable="item.sortable"
                        :fixed="item.fixed" :prop="item.column" :label="item.label">
         <template #default="scope" v-if="item.column === 'color'">
           <el-tag
@@ -32,13 +35,37 @@
       </el-table-column>
     </el-table>
     <el-row style="margin-top: 10px">
-      <el-col :span="12">
+      <!--      lwc_flag-->
+      <el-col :span="4">
         <el-pagination small background layout="total, sizes, prev, pager, next" :total="page.total"
                        :page-sizes="[10, 20, 50, 100]" v-model:currentPage="page.current"
                        v-model:page-size="page.size"/>
       </el-col>
-      <el-col style="position: absolute;right: 0;color: #919398;font-size: 12px;margin-top: 5px">数据更新时间:
-        {{ fetchTime }}
+      <!--      lwc_flag-->
+      <el-col :span="12">
+        <el-select :multiple="true" value-key="column" size="small" v-model="displayRows" placeholder="请选择需要展示的字段"
+                   :style="{marginTop: '2px', width: `${autoWidth}px`}">
+          <el-option
+              v-for="item in tableData.columns"
+              :key="item.column"
+              :label="item.label"
+              :value="item"
+          />
+        </el-select>
+      </el-col>
+      <!--      lwc_flag-->
+      <el-col style="position: absolute;right: 0;margin-top: 5px" @click="fetchListData">
+        <el-link>
+          <template #icon>
+            <el-icon>
+              <Refresh/>
+            </el-icon>
+          </template>
+          <div style="color: #919398;font-size: 12px;">
+            数据更新时间:
+            {{ fetchTime }}
+          </div>
+        </el-link>
       </el-col>
     </el-row>
   </div>
@@ -56,6 +83,10 @@ import TrainCourseCategoryFormVue from './TrainCourseCategoryForm.vue'
 import { date } from 'quasar'
 
 const fetchTime = ref('')
+// lwc_flag
+const displayRows = ref([])
+// lwc_flag
+const autoWidth = ref(0)
 const page = reactive({
   current: 1,
   total: 0,
@@ -76,28 +107,60 @@ const queryParam = reactive({
   conditions: []
 })
 
-watch(page, () => {
-  listTrainCourseCategory(page.current, page.size, queryParam).then(res => {
+// lwc_flag tableData 定义放在fetchListData()之前
+const tableData = reactive({
+  data: [],
+  columns: [],
+  // lwc_flag
+  loading: true
+})
+
+// lwc_flag fetchListData() 放在调用前
+const fetchListData = (postHandler) => {
+  tableData.loading = true
+  listTrainCourseCategory(page.current, page.size, { ...queryParam }).then(res => {
     tableData.data = res.data
     page.total = res.count
     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
+
+    // 延迟 500ms 防止画面闪烁
+    setTimeout(() => {
+      tableData.loading = false
+    }, 500)
+
+    if (typeof postHandler === 'function') {
+      postHandler()
+    }
   })
+}
+
+// lwc_flag
+watch(page, () => fetchListData())
+
+// lwc_flag
+watch(displayRows, () => {
+  if (displayRows.value.length <= 3) {
+    autoWidth.value = 300
+  } else {
+    autoWidth.value = 90 * displayRows.value.length
+  }
 })
 
-listTrainCourseCategory(page.current, page.size, queryParam).then(res => {
-  tableData.data = res.data
-  page.total = res.count
-  fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
-})
+// lwc_flag list** 替换为 fetchListData
+fetchListData()
 
 getTableColumns().then(res => {
   tableData.columns = res.data
+
+    // lwc_flag
+    displayRows.value = res.data
+  if (res.data.length <= 3) {
+    autoWidth.value = 300
+  } else {
+    autoWidth.value = 90 * res.data.length
+  }
 })
 
-const tableData = reactive({
-  data: [],
-  columns: []
-})
 
 const selectedData = reactive({
   data: []
@@ -114,22 +177,16 @@ const deleteSelected = () => {
       type: 'success',
       message: res.data
     })
-    listTrainCourseCategory(page.current, page.size, { ...queryParam }).then(res => {
-      tableData.data = res.data
-      page.total = res.count
-      fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
-    })
+    // lwc_flag 所有list**** 替换为新抽取的函数
+    fetchListData()
   })
 }
 
 const sortTable = (column) => {
   queryParam.isAsc = column.order === 'ascending'
   queryParam.orderColumns = [column.prop]
-  listTrainCourseCategory(page.current, page.size, queryParam).then(res => {
-    tableData.data = res.data
-    page.total = res.count
-    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
-  })
+  // lwc_flag
+  fetchListData()
 }
 
 const advancedQuery = reactive({
@@ -144,11 +201,9 @@ const queryConditions = ({
   queryParam.createdBetween = createdBetween
   queryParam.updatedBetween = updatedBetween
   queryParam.conditions = conditions
-  listTrainCourseCategory(page.current, page.size, { ...queryParam }).then(res => {
-    tableData.data = res.data
-    page.total = res.count
+  // lwc_flag 这里由于要关闭dialog 传入一个后处理器
+  fetchListData(() => {
     advancedQuery.show = false
-    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
   })
 }
 
@@ -162,14 +217,16 @@ const onEdit = (record) => {
   })
 }
 
-const updateData = () => {
-  listTrainCourseCategory(page.current, page.size, { ...queryParam }).then(res => {
-    tableData.data = res.data
-    page.total = res.count
-    fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
-  })
-}
-bus.on('update-train-course-category-table', () => updateData())
+// const updateData = () => {
+//   listTrainCourseCategory(page.current, page.size, { ...queryParam }).then(res => {
+//     tableData.data = res.data
+//     page.total = res.count
+//     fetchTime.value = date.formatDate(Date.now(), 'YYYY年MM月DD日 HH时mm分')
+//   })
+// }
+// bus.on('update-train-course-category-table', () => updateData())
+
+bus.on('update-role-table', () => fetchListData())
 </script>
 <style>
 </style>
