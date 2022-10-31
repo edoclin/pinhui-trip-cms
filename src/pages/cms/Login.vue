@@ -1,6 +1,6 @@
 <template>
-  <div class="bg"  style="-webkit-app-region: drag">
-    <div class="background" id="background" style="-webkit-app-region: no-drag">
+  <div class="bg"  :class="[isMac ? 'mac-drag' : '']">
+    <div class="background" id="background" :class="[isMac ? 'mac-no-drag' : '']">
       <div style="margin-top:30px; text-align: center;color: transparent;">
         游品慧
       </div>
@@ -107,6 +107,10 @@ import { getValidateCode, postUser, webLogin } from 'src/api/user'
 import { mapActions } from 'pinia'
 import { useUserStore } from 'src/stores/user_store'
 import { useRouter } from 'vue-router'
+
+const isElectron = ref(process.env.MODE === 'electron')
+
+const isMac = isElectron && window.$electron.isMac()
 
 const router = useRouter()
 const registerFormRef = ref(null)
@@ -292,7 +296,6 @@ const submitRegisterForm = (el) => {
 const loginForm = reactive({})
 const isPassing = ref(false)
 const dragWidth = ref(200)
-const isElectron = ref(process.env.MODE === 'electron')
 const showLoginButton = ref(process.env.NODE_ENV !== 'production')
 const dialogRegisterFormVisible = ref(false)
 
@@ -380,5 +383,13 @@ onMounted(() => {
   height: 12px;
   color: #a6a8ae;
   text-align: center;
+}
+
+.mac-drag {
+  -webkit-app-region: drag
+}
+
+.mac-no-drag {
+  -webkit-app-region: no-drag
 }
 </style>

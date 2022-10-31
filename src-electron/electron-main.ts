@@ -179,17 +179,13 @@ const createWindow = () => {
     dialog.showMessageBox(mainWindow, {
       title: '提示',
       message: '请检查当前网络连接是否正常',
-      detail: '当前网络环境大概率下无法连接远程网站',
+      detail: '无法连接到远程服务器',
       type: 'warning',
       buttons: ['确认'],
     }).then(r => {})
   }
-
   registryShortcut()
-
   updateHandle()
-
-
 }
 
 app.whenReady().then(createWindow)

@@ -27,4 +27,5 @@ contextBridge.exposeInMainWorld('$electron', {
   UpdateDownloading: (callback: any) => ipcRenderer.on('download-progress', callback),
   UpdateDownloaded: (callback: any) => ipcRenderer.on('update-downloaded', callback),
   quitAndInstall: () => ipcRenderer.send("update-quit-install"),
+  isMac: () => process.platform === 'darwin',
 })
