@@ -1,98 +1,85 @@
 <template>
-  <div class="bg"  :class="[isMac ? 'mac-drag' : '']">
-    <div class="background" id="background" :class="[isMac ? 'mac-no-drag' : '']">
+  <div class="bg" :class="[isMac ? 'mac-drag' : (isWin ? 'win-drag' : '')]">
+    <div class="background" id="background" :class="[isMac ? 'mac-no-drag' : (isWin ? 'win-no-drag' : '')]">
       <div style="margin-top:30px; text-align: center;color: transparent;">
         游品慧
       </div>
-      <el-input show-word-limit autofocus v-model="loginForm['mobile']" placeholder="请输入手机号" clearable>
-        <template #prefix>
-          <el-icon>
-            <User/>
-          </el-icon>
-        </template>
-      </el-input>
-      <el-input show-password type="password" v-model="loginForm['password']" placeholder="请输入密码">
-        <template #prefix>
-          <el-icon>
-            <SvgPassword/>
-          </el-icon>
-        </template>
-      </el-input>
+      <div :class="[isWin ? 'win-no-drag' : '']">
+        <el-input show-word-limit autofocus v-model="loginForm['mobile']" placeholder="请输入手机号" clearable>
+          <template #prefix>
+            <el-icon>
+              <User />
+            </el-icon>
+          </template>
+        </el-input>
+        <el-input show-password type="password" v-model="loginForm['password']" placeholder="请输入密码">
+          <template #prefix>
+            <el-icon>
+              <SvgPassword />
+            </el-icon>
+          </template>
+        </el-input>
 
-      <drag-verify
-          v-if="!showLoginButton && !isElectron"
-          radius="5px"
-          style="margin-left: 10%;margin-top: 15px"
-          :isPassing.sync="isPassing"
-          :width="dragWidth"
-          :height="32"
-          text="请按住滑块拖动完成验证"
-          textColor="#1b1a25"
-          successText="验证通过"
-          handlerIcon="el-icon-d-arrow-right"
-          successIcon="el-icon-circle-check"
-          @passcallback="handlePassCallback"
-      >
-      </drag-verify>
-      <el-button :loading="loadingLogin" v-if="showLoginButton || isElectron" id="loginBtn" color="#626aefbb" type="success"
-                 style="width: 80%;margin-left: 10%;margin-top: 15px" @click="login">登录
-      </el-button>
-      <el-divider style="margin-top: 15px">
-      </el-divider>
-      <el-row style="text-align: center;color: #eeeeee49;margin-top: 15px">
-        <el-col :span="12">
-          <el-link type="success" @click="dialogRegisterFormVisible = true">注册账户</el-link>
-        </el-col>
-        <el-col :span="12">
-          <el-link type="warning">忘记密码</el-link>
-        </el-col>
-      </el-row>
+        <drag-verify :class="[isWin ? 'win-no-drag' : '']" v-if="!showLoginButton && !isElectron" radius="5px" style="margin-left: 10%;margin-top: 15px"
+          :isPassing.sync="isPassing" :width="dragWidth" :height="32" text="请按住滑块拖动完成验证" textColor="#1b1a25"
+          successText="验证通过" handlerIcon="el-icon-d-arrow-right" successIcon="el-icon-circle-check"
+          @passcallback="handlePassCallback">
+        </drag-verify>
+        <el-button :loading="loadingLogin" v-if="showLoginButton || isElectron" id="loginBtn" color="#626aefbb"
+          type="success" style="width: 80%;margin-left: 10%;margin-top: 15px" @click="login">登录
+        </el-button>
+        <el-divider style="margin-top: 15px">
+        </el-divider>
+        <el-row style="text-align: center;color: #eeeeee49;margin-top: 15px">
+          <el-col :span="12">
+            <el-link type="success" @click="dialogRegisterFormVisible = true">注册账户</el-link>
+          </el-col>
+          <el-col :span="12">
+            <el-link type="warning">忘记密码</el-link>
+          </el-col>
+        </el-row>
+      </div>
+
+      <el-dialog :class="[isWin ? 'win-no-drag' : '']" width="30%" align-center center destroy-on-close v-model="dialogRegisterFormVisible" title="用户注册">
+        <el-form ref="registerFormRef" :model="registerForm" :rules="rules" label-width="120px" status-icon>
+          <el-form-item label="身份证号" prop="idCard">
+            <el-input v-model="registerForm['idCard']" placeholder="请输入18位身份证号" />
+          </el-form-item>
+          <el-form-item label="真实姓名" prop="name">
+            <el-input v-model="registerForm['name']" placeholder="请输入真实姓名" />
+          </el-form-item>
+          <el-form-item label="手机号" prop="mobile">
+            <el-input v-model="registerForm['mobile']" placeholder="请输入11位手机号">
+              <template #suffix v-if="showSendCode">
+                <el-button :disabled="disableCode" type="success" size="small" @click="sendCode">
+                  {{ disableCode && showCodeField ? timeout + '秒后获取' : '获取验证码' }}
+                </el-button>
+              </template>
+            </el-input>
+          </el-form-item>
+          <el-form-item label="验证码" prop="validateCode" v-show="showCodeField">
+            <el-input v-model="registerForm['validateCode']" placeholder="请输入验证码" />
+          </el-form-item>
+          <el-form-item label="密码" prop="password">
+            <el-input show-password type="password" v-model="registerForm['password']" placeholder="请输入密码">
+            </el-input>
+          </el-form-item>
+          <el-form-item label="注册说明">
+            <el-input v-model="registerForm['desc']" placeholder="请输入留言(注册原因, 所需权限等)" />
+          </el-form-item>
+
+
+        </el-form>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="dialogRegisterFormVisible = false">取消</el-button>
+            <el-button :loading="loadingRegister" type="primary" @click="submitRegisterForm(registerFormRef)">注册
+            </el-button>
+          </span>
+        </template>
+      </el-dialog>
     </div>
 
-    <el-dialog width="30%" align-center center destroy-on-close v-model="dialogRegisterFormVisible" title="用户注册">
-      <el-form
-          ref="registerFormRef"
-          :model="registerForm"
-          :rules="rules"
-          label-width="120px"
-          status-icon
-      >
-        <el-form-item label="身份证号" prop="idCard">
-          <el-input v-model="registerForm['idCard']" placeholder="请输入18位身份证号"/>
-        </el-form-item>
-        <el-form-item label="真实姓名" prop="name">
-          <el-input v-model="registerForm['name']" placeholder="请输入真实姓名"/>
-        </el-form-item>
-        <el-form-item label="手机号" prop="mobile">
-          <el-input v-model="registerForm['mobile']" placeholder="请输入11位手机号">
-            <template #suffix v-if="showSendCode">
-              <el-button :disabled="disableCode" type="success" size="small" @click="sendCode">
-                {{ disableCode && showCodeField ? timeout + '秒后获取' : '获取验证码' }}
-              </el-button>
-            </template>
-          </el-input>
-        </el-form-item>
-        <el-form-item label="验证码" prop="validateCode" v-show="showCodeField">
-          <el-input v-model="registerForm['validateCode']" placeholder="请输入验证码"/>
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input show-password type="password" v-model="registerForm['password']" placeholder="请输入密码">
-          </el-input>
-        </el-form-item>
-        <el-form-item label="注册说明">
-          <el-input v-model="registerForm['desc']" placeholder="请输入留言(注册原因, 所需权限等)"/>
-        </el-form-item>
-
-
-      </el-form>
-      <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="dialogRegisterFormVisible = false">取消</el-button>
-        <el-button :loading="loadingRegister" type="primary"
-                   @click="submitRegisterForm(registerFormRef)">注册</el-button>
-      </span>
-      </template>
-    </el-dialog>
     <el-footer>
       © 2022 武汉图歌信息技术有限责任公司
     </el-footer>
@@ -111,6 +98,7 @@ import { useRouter } from 'vue-router'
 const isElectron = ref(process.env.MODE === 'electron')
 
 const isMac = isElectron && window.$electron.isMac()
+const isWin = isElectron && window.$electron.isWin()
 
 const router = useRouter()
 const registerFormRef = ref(null)
@@ -120,9 +108,9 @@ const showCodeField = ref(false)
 const loadingRegister = ref(false)
 const loadingLogin = ref(false)
 const userAction = mapActions(useUserStore,
-    [
-      'updateToken',
-      'updateUserInfo'])
+  [
+    'updateToken',
+    'updateUserInfo'])
 
 const localStorage = inject('localStorage')
 
@@ -343,8 +331,7 @@ onMounted(() => {
     border-radius: 20px;
     height: 26vh;
 
-    .el-divider {
-    }
+    .el-divider {}
 
     .el-divider--horizontal {
       border-radius: 5px;
@@ -390,6 +377,14 @@ onMounted(() => {
 }
 
 .mac-no-drag {
+  -webkit-app-region: no-drag
+}
+
+.win-drag {
+  -webkit-app-region: drag
+}
+
+.win-no-drag {
   -webkit-app-region: no-drag
 }
 </style>
