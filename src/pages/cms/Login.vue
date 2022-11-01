@@ -1,18 +1,18 @@
 <template>
   <div class="bg" :class="[isMac ? 'mac-drag' : (isWin ? 'win-drag' : '')]">
-    <div class="background" id="background" :class="[isMac ? 'mac-no-drag' : (isWin ? 'win-no-drag' : '')]">
+    <div class="background disabled-selected" id="background" :class="[isMac ? 'mac-no-drag' : (isWin ? 'win-no-drag' : '')]">
       <div style="margin-top:30px; text-align: center;color: transparent;">
         游品慧
       </div>
       <div :class="[isWin ? 'win-no-drag' : '']">
-        <el-input show-word-limit autofocus v-model="loginForm['mobile']" placeholder="请输入手机号" clearable>
+        <el-input show-word-limit autofocus style="ime-mode: disabled" v-model="loginForm['mobile']" placeholder="请输入手机号" clearable>
           <template #prefix>
             <el-icon>
               <User />
             </el-icon>
           </template>
         </el-input>
-        <el-input show-password type="password" v-model="loginForm['password']" placeholder="请输入密码">
+        <el-input show-password type="password" clearable style="ime-mode: disabled" v-model="loginForm['password']" placeholder="请输入密码">
           <template #prefix>
             <el-icon>
               <SvgPassword />
@@ -25,12 +25,13 @@
           successText="验证通过" handlerIcon="el-icon-d-arrow-right" successIcon="el-icon-circle-check"
           @passcallback="handlePassCallback">
         </drag-verify>
+        <el-checkbox v-if="isElectron" style="float: right; right: 10%" :checked="rememberForm" v-model="rememberForm" label="记住密码" size="small" />
         <el-button :loading="loadingLogin" v-if="showLoginButton || isElectron" id="loginBtn" color="#626aefbb"
           type="success" style="width: 80%;margin-left: 10%;margin-top: 15px" @click="login">登录
         </el-button>
         <el-divider style="margin-top: 15px">
         </el-divider>
-        <el-row style="text-align: center;color: #eeeeee49;margin-top: 15px">
+        <el-row style="text-align: center;color: #eeeeee49;margin-top: 15px" class="disabled-selected">
           <el-col :span="12">
             <el-link type="success" @click="dialogRegisterFormVisible = true">注册账户</el-link>
           </el-col>
@@ -40,7 +41,7 @@
         </el-row>
       </div>
 
-      <el-dialog :class="[isWin ? 'win-no-drag' : '']" width="30%" align-center center destroy-on-close v-model="dialogRegisterFormVisible" title="用户注册">
+      <el-dialog class="disabled-selected" :class="[isWin ? 'win-no-drag' : '']" width="30%" align-center center destroy-on-close v-model="dialogRegisterFormVisible" title="用户注册">
         <el-form ref="registerFormRef" :model="registerForm" :rules="rules" label-width="120px" status-icon>
           <el-form-item label="身份证号" prop="idCard">
             <el-input v-model="registerForm['idCard']" placeholder="请输入18位身份证号" />
@@ -80,7 +81,7 @@
       </el-dialog>
     </div>
 
-    <el-footer>
+    <el-footer class="disabled-selected">
       © 2022 武汉图歌信息技术有限责任公司
     </el-footer>
   </div>
@@ -94,15 +95,18 @@ import { getValidateCode, postUser, webLogin } from 'src/api/user'
 import { mapActions } from 'pinia'
 import { useUserStore } from 'src/stores/user_store'
 import { useRouter } from 'vue-router'
+import { useMapState } from '../../stores'
 
 const isElectron = ref(process.env.MODE === 'electron')
+const loginForm = reactive({})
 
-const isMac = isElectron && window.$electron.isMac()
-const isWin = isElectron && window.$electron.isWin()
+const isMac = isElectron.value && window.$electron.isMac()
+const isWin = isElectron.value && window.$electron.isWin()
 
 const router = useRouter()
 const registerFormRef = ref(null)
 const disableCode = ref(true)
+const rememberForm = ref(false)
 const showSendCode = ref(false)
 const showCodeField = ref(false)
 const loadingRegister = ref(false)
@@ -110,9 +114,21 @@ const loadingLogin = ref(false)
 const userAction = mapActions(useUserStore,
   [
     'updateToken',
-    'updateUserInfo'])
+    'updateUserInfo',
+    'updateLoginForm'])
+
+const { clientLoginForm } = useMapState(useUserStore, ['clientLoginForm'])
+
 
 const localStorage = inject('localStorage')
+
+if (isElectron.value) {
+  loginForm['mobile'] = clientLoginForm.value['mobile']
+  if (clientLoginForm.value['mobile'] !== undefined) {
+    loginForm['password'] = 'password'
+  }
+  loginForm['encode'] = clientLoginForm.value['encode']
+}
 
 const login = () => {
   loginForm['isElectron'] = isElectron
@@ -122,8 +138,22 @@ const login = () => {
       name: res.data['tokenName'],
       value: res.data['tokenValue'],
     }
+
     userAction.updateToken(value)
     localStorage.set('token', value)
+    if (isElectron.value && rememberForm.value) {
+      value = {
+        mobile: res.data['mobile'],
+        encode: res.data['encode']
+      }
+      userAction.updateLoginForm(value)
+      localStorage.set('clientLoginForm', value)
+      delete res.data['encode']
+    } else {
+      localStorage.remove('clientLoginForm')
+      userAction.updateLoginForm({})
+    }
+
     delete res.data['tokenName']
     delete res.data['tokenValue']
 
@@ -281,7 +311,6 @@ const submitRegisterForm = (el) => {
   })
 }
 
-const loginForm = reactive({})
 const isPassing = ref(false)
 const dragWidth = ref(200)
 const showLoginButton = ref(process.env.NODE_ENV !== 'production')
@@ -297,12 +326,15 @@ const handlePassCallback = () => {
   }, 2000)
 }
 onMounted(() => {
-
   document.onkeydown = (e) => {
     if (window.event.keyCode === 13) {
       login()
     }
   }
+  if (isElectron.value) {
+    rememberForm.value = clientLoginForm.value['mobile'] !== undefined
+  }
+
   if (!showLoginButton.value) {
     dragWidth.value = window.document.getElementById('background').clientWidth * 0.8
     window.onresize = () => {
@@ -386,5 +418,9 @@ onMounted(() => {
 
 .win-no-drag {
   -webkit-app-region: no-drag
+}
+
+.disabled-selected {
+  user-select: none
 }
 </style>

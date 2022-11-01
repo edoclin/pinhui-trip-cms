@@ -1,16 +1,16 @@
 <template>
   <el-form :model="form" label-width="120px" ref="formRef">
     <el-form-item label="身份证号">
-      <el-input v-model="form['idCard']" disabled/>
+      <el-input v-model="form['idCard']" readonly/>
     </el-form-item>
     <el-form-item label="真实姓名">
-      <el-input v-model="form['realName']" disabled/>
+      <el-input v-model="form['realName']" readonly/>
     </el-form-item>
     <el-form-item label="手机号">
-      <el-input v-model="form['mobile']" disabled/>
+      <el-input v-model="form['mobile']" readonly/>
     </el-form-item>
     <el-form-item label="注册说明">
-      <el-input v-model="form['desc']" disabled/>
+      <el-input v-model="form['desc']" readonly/>
     </el-form-item>
     <el-form-item label="当前状态">
       <el-select v-model="form['status']" placeholder="请选择状态" style="width: 100%">
@@ -54,7 +54,7 @@ const onSubmit = async (formEl) => {
         message: res.data,
       })
     })
-    bus.emit('update-user-table')
+    bus.emit('update-user -table')
   }
 }
 
