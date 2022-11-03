@@ -133,6 +133,10 @@ if (isElectron.value) {
 const login = () => {
   loginForm['isElectron'] = isElectron
   loadingLogin.value = true
+
+  if (loginForm['password'] === 'password') {
+    delete loginForm['password']
+  }
   webLogin(loginForm).then(res => {
     let value = {
       name: res.data['tokenName'],
@@ -164,6 +168,13 @@ const login = () => {
     })
   }).catch(err => {
     loadingLogin.value = false
+    console.log("AAAAAAAAAAAAA")
+    console.log(err)
+    if (err.code === 5101) {
+      delete loginForm['encode']
+      localStorage.remove('clientLoginForm')
+      userAction.updateLoginForm({})
+    }
   })
 }
 const registerForm = reactive({
